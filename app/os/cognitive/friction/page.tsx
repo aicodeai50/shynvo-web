@@ -8,10 +8,10 @@ import { OSCard } from "@/components/os/OSCard";
 type Blocker = "confusion" | "distraction" | "unclearGoal" | "overwhelm";
 
 const BLOCKERS: Array<{ key: Blocker; label: string; hint: string; icon: string }> = [
-  { key: "confusion", label: "Confusion", hint: "You don't know what to do next.", icon: "Ì∑†" },
-  { key: "distraction", label: "Distraction", hint: "You keep switching contexts.", icon: "Ìª∞Ô∏è" },
-  { key: "unclearGoal", label: "Unclear goal", hint: "The objective isn't precise.", icon: "ÌæØ" },
-  { key: "overwhelm", label: "Overwhelm", hint: "Too big, too many moving parts.", icon: "Ìºä" },
+  { key: "confusion", label: "Confusion", hint: "You don't know what to do next.", icon: "√≠¬∑¬†" },
+  { key: "distraction", label: "Distraction", hint: "You keep switching contexts.", icon: "√≠¬ª¬∞√Ø¬∏¬è" },
+  { key: "unclearGoal", label: "Unclear goal", hint: "The objective isn't precise.", icon: "√≠¬æ¬Ø" },
+  { key: "overwhelm", label: "Overwhelm", hint: "Too big, too many moving parts.", icon: "√≠¬º≈†" },
 ];
 
 function fixesFor(active: Set<Blocker>) {
@@ -83,9 +83,9 @@ export default function CognitiveFrictionPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <OSCard title="Friction level" value={`${selected.size} / 4`} hint="selected blockers" icon="Ì≥â" />
-            <OSCard title="Recommended next" value={selected.has("distraction") ? "Lock context" : "Define win"} hint="priority" icon="Ì∑≠" />
-            <OSCard title="Session type" value={selected.has("overwhelm") ? "Micro-chunks" : "Single objective"} hint="mode" icon="Ì∑±" />
+            <OSCard title="Friction level" value={`${selected.size} / 4`} hint="selected blockers" icon="√≠¬≥‚Ä∞" />
+            <OSCard title="Recommended next" value={selected.has("distraction") ? "Lock context" : "Define win"} hint="priority" icon="√≠¬∑¬≠" />
+            <OSCard title="Session type" value={selected.has("overwhelm") ? "Micro-chunks" : "Single objective"} hint="mode" icon="√≠¬∑¬±" />
           </div>
 
           <div className="rounded-xl border border-white/10 bg-black/30 p-4">

@@ -6,9 +6,9 @@ export default function OutcomePage() {
     <OSShell title="Trajectory / Outcome" subtitle="Ship, measure, iterate." chips={["online", "phase: outcome", "missions: active", "sync: idle"]}>
       <BackRow href="/os/trajectory" label="Back to Trajectory" />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <OSCard title="Objective" value="Ship results" hint="measurable" icon="í¿" />
-        <OSCard title="This week" value="Deliverable" hint="publish/submit" icon="í³¦" />
-        <OSCard title="Next action" value="Define metric" hint="success criteria" icon="í³" />
+        <OSCard title="Objective" value="Ship results" hint="measurable" icon="Ã­Â¿Â" />
+        <OSCard title="This week" value="Deliverable" hint="publish/submit" icon="Ã­Â³Â¦" />
+        <OSCard title="Next action" value="Define metric" hint="success criteria" icon="Ã­Â³Â" />
       </div>
     </OSShell>
   );

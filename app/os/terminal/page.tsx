@@ -12,7 +12,7 @@ const COMMANDS = ["help", "os", "planet", "cognitive", "focus", "momentum", "tra
 export default function OSTerminalPage() {
   const [input, setInput] = useState("");
   const [lines, setLines] = useState<Line[]>([
-    { t: "sys", v: "Shynvo OS Terminal — deck preview" },
+    { t: "sys", v: "Shynvo OS Terminal â€” deck preview" },
     { t: "out", v: "Type 'help' to see commands. Try: status, routes, planet" },
   ]);
 
@@ -44,7 +44,7 @@ export default function OSTerminalPage() {
 
     if (c === "clear") {
       setLines([
-        { t: "sys", v: "Shynvo OS Terminal — deck preview" },
+        { t: "sys", v: "Shynvo OS Terminal â€” deck preview" },
         { t: "out", v: "Cleared. Type 'help' to see commands." },
       ]);
       return { reply: "" };

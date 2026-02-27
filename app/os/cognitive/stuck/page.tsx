@@ -8,11 +8,11 @@ import { OSCard } from "@/components/os/OSCard";
 type StuckType = "Too big" | "Too vague" | "Too risky" | "No energy" | "No clarity";
 
 const STUCK_TYPES: Array<{ key: StuckType; icon: string; hint: string }> = [
-  { key: "Too big", icon: "���", hint: "Task is massive and shapeless." },
-  { key: "Too vague", icon: "���️", hint: "No clear next move." },
-  { key: "Too risky", icon: "⚠️", hint: "Fear of wasting time or failing." },
-  { key: "No energy", icon: "���", hint: "Capacity is low." },
-  { key: "No clarity", icon: "���", hint: "Missing info / direction." },
+  { key: "Too big", icon: "í³¦", hint: "Task is massive and shapeless." },
+  { key: "Too vague", icon: "í¼«ï¸", hint: "No clear next move." },
+  { key: "Too risky", icon: "âš ï¸", hint: "Fear of wasting time or failing." },
+  { key: "No energy", icon: "í´‹", hint: "Capacity is low." },
+  { key: "No clarity", icon: "í·©", hint: "Missing info / direction." },
 ];
 
 function nextSteps(stuck: StuckType, text: string): string[] {
@@ -111,9 +111,9 @@ export default function CognitiveStuckPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <OSCard title="Scope" value={type === "Too big" ? "Reduce 80%" : "Small slice"} hint="protocol" icon="✂️" />
-            <OSCard title="Clarity" value={type === "No clarity" ? "Ask 1 question" : "Good enough"} hint="protocol" icon="���" />
-            <OSCard title="Momentum" value={type === "No energy" ? "Micro-session" : "Commit 1 step"} hint="protocol" icon="���" />
+            <OSCard title="Scope" value={type === "Too big" ? "Reduce 80%" : "Small slice"} hint="protocol" icon="âœ‚ï¸" />
+            <OSCard title="Clarity" value={type === "No clarity" ? "Ask 1 question" : "Good enough"} hint="protocol" icon="í´Ž" />
+            <OSCard title="Momentum" value={type === "No energy" ? "Micro-session" : "Commit 1 step"} hint="protocol" icon="íº€" />
           </div>
 
           <div className="rounded-xl border border-white/10 bg-black/30 p-4">

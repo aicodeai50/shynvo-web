@@ -77,7 +77,7 @@ export default function CognitiveEnergyPage() {
           <div>
             <div className="text-xs uppercase tracking-widest text-white/60">Energy Signal</div>
             <div className="mt-1 text-sm text-white/80">
-              Band: <span className="text-white/90">{band}</span> • Mode:{" "}
+              Band: <span className="text-white/90">{band}</span> â€¢ Mode:{" "}
               <span className="text-white/90">{protocol.mode}</span>
             </div>
           </div>
@@ -101,9 +101,9 @@ export default function CognitiveEnergyPage() {
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <OSCard title="Focus length" value={protocol.focus} hint="recommended" icon="⏱️" />
-        <OSCard title="Break type" value={protocol.breakType} hint="recommended" icon="���" />
-        <OSCard title="Operator prompt" value={protocol.prompt} hint="guidance" icon="���️" />
+        <OSCard title="Focus length" value={protocol.focus} hint="recommended" icon="â±ï¸" />
+        <OSCard title="Break type" value={protocol.breakType} hint="recommended" icon="í»§" />
+        <OSCard title="Operator prompt" value={protocol.prompt} hint="guidance" icon="í»°ï¸" />
       </div>
 
       <div className="mt-4 rounded-xl border border-white/10 bg-black/30 p-4">

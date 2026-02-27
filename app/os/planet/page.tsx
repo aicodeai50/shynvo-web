@@ -26,10 +26,10 @@ export default function PlanetControlPage() {
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <BoxLink href="/os/cognitive" title="Academy Sector" desc="Cadet training protocols." tag="Subsystem" icon="í¾“" />
-              <BoxLink href="/os/focus" title="Research Dome" desc="Deep work rituals & execution." tag="Subsystem" icon="í·ª" />
-              <BoxLink href="/os/trajectory" title="Industrial Ring" desc="Mission control & outcomes." tag="Subsystem" icon="í¿—ï¸" />
-              <BoxLink href="/os/momentum" title="Comms & Momentum" desc="Feedback loops & drills." tag="Subsystem" icon="í³¡" />
+              <BoxLink href="/os/cognitive" title="Academy Sector" desc="Cadet training protocols." tag="Subsystem" icon="Ã­Â¾â€œ" />
+              <BoxLink href="/os/focus" title="Research Dome" desc="Deep work rituals & execution." tag="Subsystem" icon="Ã­Â·Âª" />
+              <BoxLink href="/os/trajectory" title="Industrial Ring" desc="Mission control & outcomes." tag="Subsystem" icon="Ã­Â¿â€”Ã¯Â¸Â" />
+              <BoxLink href="/os/momentum" title="Comms & Momentum" desc="Feedback loops & drills." tag="Subsystem" icon="Ã­Â³Â¡" />
             </div>
           </div>
         </div>

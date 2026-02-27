@@ -7,9 +7,9 @@ export default function WorkPage() {
       <BackRow href="/os/focus" label="Back to Focus" />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <OSCard title="Objective" value="Ship a small slice" hint="done/not done" icon="���" />
-        <OSCard title="Timer" value="25 min" hint="build block" icon="⏱️" />
-        <OSCard title="Rule" value="No switching" hint="park thoughts" icon="���" />
+        <OSCard title="Objective" value="Ship a small slice" hint="done/not done" icon="í¾¯" />
+        <OSCard title="Timer" value="25 min" hint="build block" icon="â±ï¸" />
+        <OSCard title="Rule" value="No switching" hint="park thoughts" icon="í³µ" />
       </div>
     </OSShell>
   );

@@ -105,9 +105,9 @@ export default function CognitiveRecoveryPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <OSCard title="Priority" value={mode === "Downshift" ? "Stabilize fast" : mode === "Rest Window" ? "Restore capacity" : "Re-enter clean"} hint="goal" icon="í·­" />
-            <OSCard title="Input rule" value={mode === "Rest Window" ? "No feeds" : "Minimal"} hint="protect recovery" icon="í³µ" />
-            <OSCard title="Restart" value="One tiny deliverable" hint="win condition" icon="âœ…" />
+            <OSCard title="Priority" value={mode === "Downshift" ? "Stabilize fast" : mode === "Rest Window" ? "Restore capacity" : "Re-enter clean"} hint="goal" icon="Ã­Â·Â­" />
+            <OSCard title="Input rule" value={mode === "Rest Window" ? "No feeds" : "Minimal"} hint="protect recovery" icon="Ã­Â³Âµ" />
+            <OSCard title="Restart" value="One tiny deliverable" hint="win condition" icon="Ã¢Å“â€¦" />
           </div>
 
           <div className="rounded-xl border border-white/10 bg-black/30 p-4">
