@@ -54,7 +54,8 @@ export default function CognitiveFrictionPage() {
 
   return (
     <OSShell
-      title="Cognitive / Friction"
+      zone="cognitive"
+  title="Cognitive / Friction"
       subtitle={
         <OSSub
           en="Identify blockers and apply quick fixes. Saved locally."

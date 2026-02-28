@@ -3,7 +3,8 @@ import { BackRow } from "@/components/os/OSCard";
 
 export default function DeepWorkPage() {
   return (
-    <OSShell title="Focus / Deep Work" subtitle="Protect the sprint and eliminate context switching." chips={["online", "module: focus", "mode: deep-work", "sync: locked"]}>
+    <OSShell zone="focus"
+  title="Focus / Deep Work" subtitle="Protect the sprint and eliminate context switching." chips={["online", "module: focus", "mode: deep-work", "sync: locked"]}>
       <BackRow href="/os/focus" label="Back to Focus" />
 
       <div className="rounded-xl border border-white/10 bg-black/30 p-4">

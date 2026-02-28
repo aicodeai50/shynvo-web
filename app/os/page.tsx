@@ -5,7 +5,8 @@ import OSSub from "@/components/os/OSSub";
 export default function OSHomePage() {
   return (
     <OSShell
-      title="Shynvo OS"
+      zone="home"
+  title="Shynvo OS"
       subtitle={
         <OSSub
           en="Cockpit interface for focus, cognition, momentum, and missions."

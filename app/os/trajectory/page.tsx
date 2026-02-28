@@ -11,7 +11,8 @@ export default function TrajectoryPage() {
 
   return (
     <OSShell
-      title="Trajectory"
+      zone="trajectory"
+  title="Trajectory"
       subtitle={
         <OSSub
           en="90-day mission control. Saved locally."

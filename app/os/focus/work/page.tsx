@@ -3,7 +3,8 @@ import { BackRow, OSCard } from "@/components/os/OSCard";
 
 export default function WorkPage() {
   return (
-    <OSShell title="Focus / Work Loop" subtitle="Single objective execution loop." chips={["online", "module: focus", "loop: work", "sync: idle"]}>
+    <OSShell zone="focus"
+  title="Focus / Work Loop" subtitle="Single objective execution loop." chips={["online", "module: focus", "loop: work", "sync: idle"]}>
       <BackRow href="/os/focus" label="Back to Focus" />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

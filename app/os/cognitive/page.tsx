@@ -5,7 +5,8 @@ import OSSub from "@/components/os/OSSub";
 export default function CognitiveHubPage() {
   return (
     <OSShell
-      title="Cognitive"
+      zone="cognitive"
+  title="Cognitive"
       subtitle={
         <OSSub
           en="Signal-based guidance for energy, friction, recovery, and getting unstuck."

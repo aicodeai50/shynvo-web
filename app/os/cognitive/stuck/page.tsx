@@ -42,7 +42,8 @@ export default function CognitiveStuckPage() {
 
   return (
     <OSShell
-      title="Cognitive / Stuck"
+      zone="cognitive"
+  title="Cognitive / Stuck"
       subtitle={
         <OSSub
           en="Unstuck protocol: reduce scope, reframe, generate next step. Saved locally."

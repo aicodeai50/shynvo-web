@@ -3,7 +3,8 @@ import { BackRow } from "@/components/os/OSCard";
 
 export default function WarmUpPage() {
   return (
-    <OSShell title="Focus / Warm-up" subtitle="3-minute ignition: wake recall, prime focus, start clean." chips={["online", "module: focus", "stage: warm-up", "sync: idle"]}>
+    <OSShell zone="focus"
+  title="Focus / Warm-up" subtitle="3-minute ignition: wake recall, prime focus, start clean." chips={["online", "module: focus", "stage: warm-up", "sync: idle"]}>
       <BackRow href="/os/focus" label="Back to Focus" />
 
       <div className="rounded-xl border border-white/10 bg-black/30 p-4">

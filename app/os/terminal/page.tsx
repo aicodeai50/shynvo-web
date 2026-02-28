@@ -83,7 +83,8 @@ export default function OSTerminalPage() {
 
   return (
     <OSShell
-      title="OS Terminal"
+      zone="terminal"
+  title="OS Terminal"
       subtitle={
         <OSSub
           en="Diagnostics and route launcher (frontend-only)."

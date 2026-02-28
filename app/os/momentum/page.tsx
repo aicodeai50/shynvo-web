@@ -5,7 +5,8 @@ import OSSub from "@/components/os/OSSub";
 export default function MomentumPage() {
   return (
     <OSShell
-      title="Momentum"
+      zone="momentum"
+  title="Momentum"
       subtitle={
         <OSSub
           en="Keep moving: drills, reflection, and hard prompts."

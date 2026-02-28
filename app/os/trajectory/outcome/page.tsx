@@ -3,7 +3,8 @@ import { BackRow, OSCard } from "@/components/os/OSCard";
 
 export default function OutcomePage() {
   return (
-    <OSShell title="Trajectory / Outcome" subtitle="Ship, measure, iterate." chips={["online", "phase: outcome", "missions: active", "sync: idle"]}>
+    <OSShell zone="trajectory"
+  title="Trajectory / Outcome" subtitle="Ship, measure, iterate." chips={["online", "phase: outcome", "missions: active", "sync: idle"]}>
       <BackRow href="/os/trajectory" label="Back to Trajectory" />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <OSCard title="Objective" value="Ship results" hint="measurable" icon="í¿" />

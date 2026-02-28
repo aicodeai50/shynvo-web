@@ -35,7 +35,8 @@ export default function CognitiveRecoveryPage() {
 
   return (
     <OSShell
-      title="Cognitive / Recovery"
+      zone="cognitive"
+  title="Cognitive / Recovery"
       subtitle={
         <OSSub
           en="Downshift, rest window, and reset prompts. Saved locally."

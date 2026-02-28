@@ -48,7 +48,8 @@ export default function CognitiveEnergyPage() {
 
   return (
     <OSShell
-      title="Cognitive / Energy"
+      zone="cognitive"
+  title="Cognitive / Energy"
       subtitle={
         <OSSub
           en="Energy protocol (signal-based session guidance). Saved locally."

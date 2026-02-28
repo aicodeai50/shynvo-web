@@ -11,7 +11,8 @@ export default function FocusPage() {
 
   return (
     <OSShell
-      title="Focus"
+      zone="focus"
+  title="Focus"
       subtitle={
         <OSSub
           en="Rituals that turn intent into output. Saved locally."

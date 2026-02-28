@@ -8,7 +8,8 @@ import "@/app/os/os-planet.css";
 export default function PlanetControlPage() {
   return (
     <OSShell
-      title="Orbital Nexus / Planet Control"
+      zone="planet"
+  title="Orbital Nexus / Planet Control"
       subtitle={
         <OSSub
           en="Planet dashboard with animated zones (frontend-only)."

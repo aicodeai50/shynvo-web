@@ -4,7 +4,8 @@ import { BackRow } from "@/components/os/OSCard";
 
 export default function LockInPage() {
   return (
-    <OSShell title="Focus / Lock-in" subtitle="Remove distractions, define the win, start." chips={["online", "module: focus", "mode: lock-in", "sync: idle"]}>
+    <OSShell zone="focus"
+  title="Focus / Lock-in" subtitle="Remove distractions, define the win, start." chips={["online", "module: focus", "mode: lock-in", "sync: idle"]}>
       <BackRow href="/os/focus" label="Back to Focus" />
 
       <div className="rounded-xl border border-white/10 bg-black/30 p-4">
