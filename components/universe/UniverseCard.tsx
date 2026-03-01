@@ -12,88 +12,79 @@ export default function UniverseCard({ u }: { u: UniverseDef }) {
     <Link href={u.href} className="group block">
       <div
         className={cx(
-          "relative overflow-hidden rounded-3xl border border-white/10",
-          "bg-black/40 backdrop-blur-xl",
-          "transition duration-300",
-          "hover:-translate-y-1 hover:border-white/20"
+          "relative overflow-hidden rounded-3xl border backdrop-blur-xl",
+          "transition duration-300 hover:-translate-y-1"
         )}
         style={{
-          boxShadow: u.glow,
+          borderColor: `${u.accent}88`,
+          background: u.bg, // THIS is the universe background
+          boxShadow: `0 0 0 1px rgba(255,255,255,0.06), 0 0 70px ${u.accent}22`,
         }}
       >
-        {/* Universe background */}
+        {/* neon beam (unique per box) */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-100"
-          style={{ background: u.bg }}
-        />
-
-        {/* Grid noise */}
-        <div className="pointer-events-none absolute inset-0 opacity-[0.10] [background-image:radial-gradient(rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:18px_18px]" />
-
-        {/* Shine sweep */}
-        <div
-          className={cx(
-            "pointer-events-none absolute -inset-24 opacity-0",
-            "transition-opacity duration-300 group-hover:opacity-100"
-          )}
+          className="pointer-events-none absolute left-0 top-0 h-full w-[6px] opacity-95"
           style={{
-            background:
-              "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 45%, transparent 70%)",
-            transform: "rotate(12deg)",
+            background: `linear-gradient(180deg, transparent, ${u.accent}, transparent)`,
+            filter: "blur(0.2px)",
           }}
         />
 
-        {/* Content */}
+        {/* hover aura */}
+        <div
+          className="pointer-events-none absolute -inset-12 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{
+            background: `radial-gradient(700px circle at 30% 30%, ${u.accent}35, transparent 60%)`,
+          }}
+        />
+
+        {/* hologrid */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(255,255,255,0.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.09)_1px,transparent_1px)] [background-size:44px_44px]" />
+
+        {/* content */}
         <div className="relative p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
               <div
-                className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/40 text-lg"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border bg-black/35 text-lg"
                 style={{
-                  boxShadow: `0 0 30px ${u.accent}33`,
+                  borderColor: `${u.accent}AA`,
+                  boxShadow: `0 0 40px ${u.accent}55`,
                 }}
               >
-                <span aria-hidden="true">{u.icon}</span>
+                {u.icon}
               </div>
 
               <div className="min-w-0">
-                <div className="text-base font-semibold text-white/95">
-                  {u.title}
-                </div>
-                <div className="mt-1 text-sm text-white/65">{u.desc}</div>
+                <div className="text-base font-semibold text-white/95">{u.title}</div>
+                <div className="mt-1 text-sm text-white/75">{u.desc}</div>
               </div>
             </div>
 
             <span
-              className="shrink-0 rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] tracking-wider text-white/70"
-              style={{ borderColor: `${u.accent}33` }}
+              className="shrink-0 rounded-full border bg-black/35 px-3 py-1 text-[11px] tracking-wider text-white/90"
+              style={{ borderColor: `${u.accent}AA` }}
             >
               universe
             </span>
           </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <div className="text-xs text-white/50">Portal</div>
-
+            <div className="text-xs text-white/60">Portal</div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-white/85">
-                {u.cta}
-              </span>
+              <span className="text-xs font-semibold text-white/95">{u.cta}</span>
               <span
-                className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/80 transition group-hover:translate-x-[2px]"
-                style={{ borderColor: `${u.accent}33` }}
+                className="inline-flex h-7 w-7 items-center justify-center rounded-full border bg-black/35 text-white/95 transition group-hover:translate-x-[2px]"
+                style={{ borderColor: `${u.accent}AA` }}
               >
                 →
               </span>
             </div>
           </div>
 
-          {/* Accent line */}
           <div
-            className="mt-4 h-[1px] w-full opacity-70"
-            style={{
-              background: `linear-gradient(90deg, transparent, ${u.accent}, transparent)`,
-            }}
+            className="mt-4 h-[1px] w-full opacity-95"
+            style={{ background: `linear-gradient(90deg, transparent, ${u.accent}, transparent)` }}
           />
         </div>
       </div>
