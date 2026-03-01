@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import OSShell from "@/components/os/OSShell";
 import OSSub from "@/components/os/OSSub";
 import { useOSState } from "@/components/os/useOSState";
@@ -16,22 +16,31 @@ const CORES: Array<{ key: Core; desc: string; specialty: string }> = [
   { key: "Diplomat", desc: "Language and communication.", specialty: "tone" },
 ];
 
+const SEED: Msg[] = [
+  { role: "sys", text: "AI Council online. Pick a core and ask a question." },
+  { role: "core", text: "Try: 'Give me the next action for today' or 'Help me plan missions'." },
+];
+
 function canned(core: Core, q: string): string {
   const t = q.toLowerCase();
   if (core === "Strategist") {
-    if (t.includes("next") || t.includes("plan")) return "Plan: define outcome, pick 3 weekly missions, choose one next action, run daily 45m focus block.";
+    if (t.includes("next") || t.includes("plan"))
+      return "Plan: define outcome, pick 3 weekly missions, choose one next action, run daily 45m focus block.";
     return "Strategy: simplify scope, set measurable milestones, protect a weekly cadence. Ship small slices.";
   }
   if (core === "Engineer") {
-    if (t.includes("bug") || t.includes("error")) return "Debug loop: reproduce, isolate, reduce, log inputs, fix smallest cause, add guard and test.";
+    if (t.includes("bug") || t.includes("error"))
+      return "Debug loop: reproduce, isolate, reduce, log inputs, fix smallest cause, add guard and test.";
     return "Engineering: keep components small, keep props typed, avoid non-TSX text in pages, keep files ASCII safe.";
   }
   if (core === "Archivist") {
-    if (t.includes("remember") || t.includes("notes")) return "Archive: store the plan in logbook, tag it, and pin one summary. Reduce friction by reusing templates.";
+    if (t.includes("remember") || t.includes("notes"))
+      return "Archive: store the plan in logbook, tag it, and pin one summary. Reduce friction by reusing templates.";
     return "Research: list unknowns, search one source, write 3 bullet summary, then decide next step.";
   }
   // Diplomat
-  if (t.includes("email") || t.includes("message")) return "Draft: short context, clear ask, deadline, and a polite close. Keep it human.";
+  if (t.includes("email") || t.includes("message"))
+    return "Draft: short context, clear ask, deadline, and a polite close. Keep it human.";
   return "Communication: lead with the win, then constraints, then the request. Keep tone calm and confident.";
 }
 
@@ -40,15 +49,35 @@ export default function CouncilPage() {
   const [history, setHistory] = useOSState<Record<string, Msg[]>>("os.council.history", {});
   const [input, setInput] = useState("");
 
-  const msgs = history[active] || [
-    { role: "sys", text: "AI Council online. Pick a core and ask a question." },
-    { role: "core", text: "Try: 'Give me the next action for today' or 'Help me plan missions'." },
-  ];
+  // Ensure each core has a persisted seed (so it doesn't "re-seed" only in-memory)
+  useEffect(() => {
+    if (!history[active] || history[active].length === 0) {
+      setHistory({ ...history, [active]: SEED });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  const msgs: Msg[] = history[active] && history[active].length > 0 ? history[active] : SEED;
 
   const headerChip = useMemo(() => `core: ${active.toLowerCase()}`, [active]);
 
+  function setMsgs(nextMsgs: Msg[]) {
+    setHistory({ ...history, [active]: nextMsgs });
+  }
+
   function push(m: Msg) {
-    const next = { ...history, [active]: [...msgs, m] };
+    setMsgs([...msgs, m]);
+  }
+
+  function clearActive() {
+    setMsgs(SEED);
+  }
+
+  function clearAll() {
+    const next: Record<string, Msg[]> = {};
+    CORES.forEach((c) => {
+      next[c.key] = SEED;
+    });
     setHistory(next);
   }
 
@@ -87,7 +116,27 @@ export default function CouncilPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         {/* Core cards */}
         <div className="lg:col-span-4 rounded-xl border border-white/10 bg-black/30 p-4">
-          <div className="text-xs uppercase tracking-widest text-white/60">Cores</div>
+          <div className="flex items-center justify-between">
+            <div className="text-xs uppercase tracking-widest text-white/60">Cores</div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={clearActive}
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/75 hover:bg-white/10"
+                title="Clear this core chat"
+              >
+                Clear core
+              </button>
+              <button
+                onClick={clearAll}
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/75 hover:bg-white/10"
+                title="Clear all cores"
+              >
+                Clear all
+              </button>
+            </div>
+          </div>
+
           <div className="mt-3 space-y-2">
             {CORES.map((c) => {
               const on = c.key === active;
@@ -146,13 +195,17 @@ export default function CouncilPage() {
           </div>
 
           <div className="mt-3 flex gap-2">
-            <input
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask the active core..."
-              className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white/85 outline-none"
+              placeholder="Ask the active core... (Enter to send, Shift+Enter for newline)"
+              className="w-full resize-none rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white/85 outline-none"
+              rows={2}
               onKeyDown={(e) => {
-                if (e.key === "Enter") send();
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
               }}
             />
             <button
@@ -163,9 +216,7 @@ export default function CouncilPage() {
             </button>
           </div>
 
-          <div className="mt-2 text-xs text-white/55">
-            Saved locally for demo continuity.
-          </div>
+          <div className="mt-2 text-xs text-white/55">Saved locally for demo continuity.</div>
         </div>
       </div>
     </OSShell>

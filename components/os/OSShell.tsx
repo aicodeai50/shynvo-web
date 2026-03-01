@@ -33,11 +33,7 @@ type OSShellProps = {
 };
 
 function Chip({ text }: { text: string }) {
-  return (
-    <span className="os-chip rounded-full px-3 py-1 text-xs">
-      {text}
-    </span>
-  );
+  return <span className="os-chip rounded-full px-3 py-1 text-xs">{text}</span>;
 }
 
 export default function OSShell({
@@ -48,10 +44,7 @@ export default function OSShell({
   zone = "home",
   children,
 }: OSShellProps) {
-  const [storyOpen, setStoryOpen] = useOSState<boolean>(
-    "os.ui.storyBarOpen",
-    true
-  );
+  const [storyOpen, setStoryOpen] = useOSState<boolean>("os.ui.storyBarOpen", true);
 
   // boot force key used by overlay
   const [, setBootForce] = useOSState<number>("os.ui.bootForce", 0);
@@ -72,9 +65,7 @@ export default function OSShell({
         <div className="os-panel rounded-2xl px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs uppercase tracking-widest text-white/70">
-                Shynvo OS
-              </span>
+              <span className="text-xs uppercase tracking-widest text-white/70">Shynvo OS</span>
               {chips.map((c) => (
                 <Chip key={c} text={c} />
               ))}
@@ -82,7 +73,6 @@ export default function OSShell({
 
             {/* ===== OS Controls ===== */}
             <div className="flex items-center gap-2">
-              {/* SH Assistant entry */}
               <Link
                 href="/assistant"
                 className="os-btn px-3 py-1 text-xs hover:bg-white/10"
@@ -91,7 +81,6 @@ export default function OSShell({
                 SH Assistant
               </Link>
 
-              {/* Split entry */}
               <Link
                 href="/split"
                 className="os-btn px-3 py-1 text-xs hover:bg-white/10"
@@ -121,12 +110,8 @@ export default function OSShell({
           </div>
 
           <div className="mt-3">
-            <div className="text-2xl font-semibold text-white/95">
-              {title}
-            </div>
-            {subtitle ? (
-              <div className="mt-1 text-sm text-white/65">{subtitle}</div>
-            ) : null}
+            <div className="text-2xl font-semibold text-white/95">{title}</div>
+            {subtitle ? <div className="mt-1 text-sm text-white/65">{subtitle}</div> : null}
           </div>
         </div>
 
@@ -139,9 +124,7 @@ export default function OSShell({
 
           {/* Center: page content */}
           <div className="lg:col-span-6">
-            <div className="os-panel rounded-2xl p-4">
-              {children}
-            </div>
+            <div className="os-panel rounded-2xl p-4">{children}</div>
           </div>
 
           {/* Right: story bar */}
@@ -150,9 +133,7 @@ export default function OSShell({
 
             {/* Ambient block */}
             <div className="mt-4 os-panel rounded-2xl p-4">
-              <div className="text-xs uppercase tracking-widest text-white/60">
-                Ambient status
-              </div>
+              <div className="text-xs uppercase tracking-widest text-white/60">Ambient status</div>
               <div className="mt-2 text-sm text-white/75">
                 You are inside an active control deck. Systems feel alive.
               </div>
@@ -166,19 +147,20 @@ export default function OSShell({
                   <div className="mt-1 text-sm text-white/85">local</div>
                 </div>
               </div>
-              <div className="mt-3 text-xs text-white/50">
-                Later: this becomes real telemetry.
-              </div>
+              <div className="mt-3 text-xs text-white/50">Later: this becomes real telemetry.</div>
             </div>
           </div>
         </div>
 
-       
+        {/* =========================================================
+            Persistent overlay host (Terminal must NEVER vanish)
+            Mounted once here so it exists across all OS pages.
+           ========================================================= */}
         <OSTerminalHost />
 
-<div className="mt-6 text-center text-xs text-white/40">
-  Shynvo OS – cinematic UI layer (frontend only)
-</div>
+        <div className="mt-6 text-center text-xs text-white/40">
+          Shynvo OS – cinematic UI layer (frontend only)
+        </div>
       </div>
     </div>
   );
