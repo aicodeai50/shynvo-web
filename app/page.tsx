@@ -127,61 +127,114 @@ export default function HomePage() {
             {/* Thought Forge */}
             <Link
               href="/experiments/thought-forge"
-              className="group rounded-3xl border border-white/10 bg-black p-6 hover:bg-white/5"
+              className="group rounded-3xl border border-white/10 p-6 hover:brightness-110 transition"
+              style={{
+                background: `
+                  radial-gradient(800px circle at 20% 20%, rgba(34,211,238,0.18), transparent 55%),
+                  radial-gradient(700px circle at 80% 30%, rgba(163,230,53,0.14), transparent 55%),
+                  radial-gradient(700px circle at 30% 90%, rgba(244,114,182,0.10), transparent 60%),
+                  linear-gradient(180deg, rgba(10,10,15,0.92), rgba(0,0,0,0.92))
+                `,
+              }}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="text-lg font-semibold text-white">Thought Forge</div>
-                <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+                <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
                   v0.2 • Beta
                 </div>
               </div>
 
-              <p className="mt-2 text-sm text-white/65">
+              <p className="mt-2 text-sm text-white/75">
                 A living concept graph. Seed a thought, click nodes, and expand meaning visually.
               </p>
 
               <div className="mt-4 flex items-center justify-between">
-                <div className="text-xs text-white/50">Phase 1 stable • AI expansion next</div>
-                <div className="text-xs text-white/70 group-hover:text-white">Enter →</div>
+                <div className="text-xs text-white/60">Phase 1 stable • AI expansion next</div>
+                <div className="text-xs text-white/80 group-hover:text-white">Enter →</div>
               </div>
             </Link>
 
-            {/* Upcoming experiments */}
-            <div className="rounded-3xl border border-white/10 bg-black p-6">
+            {/* Debate Matrix */}
+            <Link
+              href="/experiments/debate-matrix"
+              className="group rounded-3xl border border-white/10 p-6 hover:brightness-110 transition"
+              style={{
+                background: `
+                  radial-gradient(850px circle at 18% 22%, rgba(244,114,182,0.16), transparent 55%),
+                  radial-gradient(800px circle at 85% 18%, rgba(99,102,241,0.18), transparent 55%),
+                  radial-gradient(700px circle at 40% 90%, rgba(34,211,238,0.10), transparent 60%),
+                  linear-gradient(180deg, rgba(10,10,15,0.92), rgba(0,0,0,0.92))
+                `,
+              }}
+            >
               <div className="flex items-center justify-between gap-3">
-                <div className="text-lg font-semibold text-white/70">Debate Matrix</div>
-                <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/50">
+                <div className="text-lg font-semibold text-white/90">Debate Matrix</div>
+                <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
                   Soon
                 </div>
               </div>
-              <p className="mt-2 text-sm text-white/55">
+
+              <p className="mt-2 text-sm text-white/75">
                 Multi-agent debate to break echo chambers. Arguments mapped for & against.
               </p>
-              <div className="mt-4 text-xs text-white/45">Status: planned</div>
-            </div>
 
-            <div className="rounded-3xl border border-white/10 bg-black p-6">
+              <div className="mt-4 flex items-center justify-between">
+                <div className="text-xs text-white/60">Status: planned</div>
+                <div className="text-xs text-white/80 group-hover:text-white">Preview →</div>
+              </div>
+            </Link>
+
+            {/* Chrono Vault */}
+            <Link
+              href="/experiments/chrono-vault"
+              className="group rounded-3xl border border-white/10 p-6 hover:brightness-110 transition"
+              style={{
+                background: `
+                  radial-gradient(900px circle at 22% 25%, rgba(34,211,238,0.16), transparent 55%),
+                  radial-gradient(850px circle at 78% 20%, rgba(168,85,247,0.16), transparent 55%),
+                  radial-gradient(700px circle at 35% 95%, rgba(163,230,53,0.08), transparent 60%),
+                  linear-gradient(180deg, rgba(10,10,15,0.92), rgba(0,0,0,0.92))
+                `,
+              }}
+            >
               <div className="flex items-center justify-between gap-3">
-                <div className="text-lg font-semibold text-white/70">Chrono Vault</div>
-                <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/50">
+                <div className="text-lg font-semibold text-white/90">Chrono Vault</div>
+                <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
                   Soon
                 </div>
               </div>
-              <p className="mt-2 text-sm text-white/55">
+
+              <p className="mt-2 text-sm text-white/75">
                 Future-self simulation with branching timelines and reflective guidance.
               </p>
-              <div className="mt-4 text-xs text-white/45">Status: planned</div>
-            </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                <div className="text-xs text-white/60">Status: planned</div>
+                <div className="text-xs text-white/80 group-hover:text-white">Preview →</div>
+              </div>
+            </Link>
 
             {/* Beta notes */}
-            <div className="rounded-3xl border border-white/10 bg-black p-6">
-              <div className="text-xs uppercase tracking-widest text-white/60">Beta Notes</div>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-xs text-white/50">
+            <Link
+              href="/experiments#beta-notes"
+              className="group rounded-3xl border border-white/10 p-6 hover:brightness-110 transition"
+              style={{
+                background: `
+                  radial-gradient(900px circle at 18% 25%, rgba(99,102,241,0.16), transparent 55%),
+                  radial-gradient(850px circle at 78% 18%, rgba(244,114,182,0.14), transparent 55%),
+                  radial-gradient(700px circle at 35% 95%, rgba(34,211,238,0.08), transparent 60%),
+                  linear-gradient(180deg, rgba(10,10,15,0.92), rgba(0,0,0,0.92))
+                `,
+              }}
+            >
+              <div className="text-xs uppercase tracking-widest text-white/70">Beta Notes</div>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-xs text-white/65">
                 <li>v0.2: Canvas stability + build fixes</li>
                 <li>v0.3 next: AI-generated nodes (/api/public/chat)</li>
                 <li>v0.4 next: Animated emergence + thinking effects</li>
               </ul>
-            </div>
+              <div className="mt-4 text-xs text-white/80 group-hover:text-white">Open notes →</div>
+            </Link>
           </div>
         </section>
 
