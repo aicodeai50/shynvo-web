@@ -1,50 +1,38 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  try {
-    const base = process.env.RAILWAY_API_BASE_URL;
+  const base = process.env.RAILWAY_API_BASE_URL?.replace(/\/$/, "");
+  const key = process.env.SH_API_KEY; // must exist in Vercel env
 
-    if (!base) {
-      return NextResponse.json(
-        { error: "Missing RAILWAY_API_BASE_URL on server (Vercel env var)" },
-        { status: 500 }
-      );
-    }
-
-    const body = await req.json();
-
-    const url = `${base.replace(/\/$/, "")}/api/public/chat`;
-
-    const upstream = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Optional: forward auth if you ever add it later
-        ...(req.headers.get("authorization")
-          ? { Authorization: req.headers.get("authorization") as string }
-          : {}),
-      },
-      body: JSON.stringify(body),
-      // Avoid caching issues
-      cache: "no-store",
-    });
-
-    const contentType =
-      upstream.headers.get("Content-Type") ?? "application/json";
-    const text = await upstream.text();
-
-    // If Railway errors, return its message + status to browser
-    return new NextResponse(text, {
-      status: upstream.status,
-      headers: { "Content-Type": contentType },
-    });
-  } catch (err: any) {
-    return NextResponse.json(
-      {
-        error: "Proxy crashed in Vercel route",
-        message: String(err?.message ?? err),
-      },
-      { status: 500 }
-    );
+  if (!base) {
+    return NextResponse.json({ error: "Missing RAILWAY_API_BASE_URL" }, { status: 500 });
   }
+  if (!key) {
+    return NextResponse.json({ error: "Missing SH_API_KEY" }, { status: 500 });
+  }
+
+  const body = await req.json();
+
+  const upstream = await fetch(`${base}/api/public/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+
+      // ✅ send key to Railway (choose 1 your backend expects)
+      "x-sh-api-key": key,
+
+      // Optional compatibility (won’t hurt)
+      "x-api-key": key,
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+
+  const text = await upstream.text();
+
+  return new NextResponse(text, {
+    status: upstream.status,
+    headers: { "Content-Type": upstream.headers.get("Content-Type") ?? "application/json" },
+  });
 }
