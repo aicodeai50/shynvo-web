@@ -16,8 +16,7 @@ export default function UniversityHub() {
         <header className="space-y-3">
           <h1 className="text-3xl font-semibold">University Hub</h1>
           <p className="text-white/70">
-            A complete academic building covering BSc, BA, Business, Engineering,
-            Health, Law, Education, and Creative Arts.
+            A complete academic building covering BSc, BA, Business, Engineering, Health, Law, Education, and Creative Arts.
           </p>
         </header>
 
