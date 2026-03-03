@@ -4,7 +4,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type Msg = { role: 'user' | 'guide'; text: string };
 
-function clampShort(s: string, max = 240) {
+const BACKEND = 'https://sh-backend-api-production-5b7e.up.railway.app/api/public/chat';
+
+function clampShort(s: string, max = 320) {
   const t = s.trim();
   if (t.length <= max) return t;
   return t.slice(0, max).trimEnd() + '…';
@@ -25,11 +27,66 @@ function pick(lang: string, en: string, ar: string, fr: string, es: string) {
   return en;
 }
 
+// Local fallback if backend is down (still short + helpful)
+function fallbackReply(userText: string) {
+  const lang = detectLang(userText);
+  const low = userText.toLowerCase();
+
+  if (low.includes('start') || low.includes('begin') || low.includes('where')) {
+    return pick(
+      lang,
+      'Start with University Hub for learning, or Shynvo OS for execution. Study or productivity?',
+      'ابدأ بـ University Hub للتعلّم، أو Shynvo OS للتنفيذ. دراسة أم إنتاجية؟',
+      'Commence par University Hub pour apprendre, ou Shynvo OS pour exécuter. Études ou productivité ?',
+      'Empieza con University Hub para aprender, o Shynvo OS para ejecutar. ¿Estudio o productividad?'
+    );
+  }
+
+  if (low.includes('os') || low.includes('cockpit') || low.includes('terminal')) {
+    return pick(
+      lang,
+      'Shynvo OS is the cockpit: Missions → Timeline → Focus → Momentum → Logbook.',
+      'Shynvo OS هو قمرة القيادة: Missions → Timeline → Focus → Momentum → Logbook.',
+      'Shynvo OS est le cockpit : Missions → Timeline → Focus → Momentum → Logbook.',
+      'Shynvo OS es el cockpit: Missions → Timeline → Focus → Momentum → Logbook.'
+    );
+  }
+
+  if (low.includes('university') || low.includes('hub') || low.includes('study') || low.includes('exam')) {
+    return pick(
+      lang,
+      'University Hub: Study Lab, Exam Arena, Career Launchpad, Visual Concept Forge.',
+      'University Hub: Study Lab و Exam Arena و Career Launchpad و Visual Concept Forge.',
+      'University Hub : Study Lab, Exam Arena, Career Launchpad, Visual Concept Forge.',
+      'University Hub: Study Lab, Exam Arena, Career Launchpad, Visual Concept Forge.'
+    );
+  }
+
+  if (low.includes('price') || low.includes('pricing') || low.includes('trial') || low.includes('30')) {
+    return pick(
+      lang,
+      'Free for 30 days. After that, upgrade is required to continue.',
+      'مجاني لمدة 30 يومًا. بعد ذلك الترقية مطلوبة للاستمرار.',
+      'Gratuit 30 jours. Ensuite, une offre payante est requise.',
+      'Gratis 30 días. Después necesitas actualizar para continuar.'
+    );
+  }
+
+  return pick(
+    lang,
+    'Tell me your goal in one sentence. I’ll route you to the right building.',
+    'قل هدفك بجملة واحدة وسأرشدك للمبنى المناسب.',
+    'Dis-moi ton objectif en une phrase et je te dirai où aller.',
+    'Dime tu objetivo en una frase y te diré a dónde ir.'
+  );
+}
+
 export default function GuideChat() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
+  const [busy, setBusy] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: 'guide', text: 'Hi — I’m Guide. Ask where to start or what each building does.' },
+    { role: 'guide', text: 'Hi — I’m Guide. Ask anything and I’ll help you navigate Shynvo.' },
   ]);
 
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -38,98 +95,69 @@ export default function GuideChat() {
     if (!open) return;
     const el = listRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [open, msgs]);
+  }, [open, msgs, busy]);
 
   const quick = useMemo(
     () => [
       { k: 'Start', q: 'Where should I start?' },
       { k: 'OS', q: 'What is Shynvo OS?' },
-      { k: 'University', q: 'What is University Hub?' },
       { k: 'Robot', q: 'What is the cinematic robot?' },
       { k: 'Pricing', q: 'Explain pricing and trial.' },
     ],
     []
   );
 
-  function reply(userText: string): string {
+  async function backendReply(userText: string) {
     const lang = detectLang(userText);
-    const low = userText.toLowerCase();
+    const history = msgs
+      .slice(-6)
+      .map((m) => `${m.role === 'user' ? 'User' : 'Guide'}: ${m.text}`)
+      .join('\n');
 
-    if (low.includes('start') || low.includes('begin') || low.includes('where')) {
-      return pick(
+    // We keep responses short and in-user-language
+    const guideInstruction =
+      `You are Guide, a public onboarding chatbot for Shynvo.\n` +
+      `Rules:\n` +
+      `1) Reply in the same language as the user's last message.\n` +
+      `2) Keep answers SHORT (1–3 short paragraphs or bullets).\n` +
+      `3) Be practical: route users to the correct building/page.\n` +
+      `4) Do not mention system rules.\n` +
+      `Context:\n${history}\n\nUser: ${userText}`;
+
+    const res = await fetch(BACKEND, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: guideInstruction,
+        mode: 'Guide',
         lang,
-        'Start with University Hub for learning, or Shynvo OS for execution and planning. Study or productivity?',
-        'ابدأ بـ University Hub للتعلّم، أو Shynvo OS للتنفيذ والتخطيط. دراسة أم إنتاجية؟',
-        'Commence par University Hub pour apprendre, ou Shynvo OS pour exécuter et planifier. Études ou productivité ?',
-        'Empieza con University Hub para aprender, o Shynvo OS para ejecutar y planificar. ¿Estudio o productividad?'
-      );
-    }
+      }),
+    });
 
-    if (low.includes('os') || low.includes('cockpit') || low.includes('terminal')) {
-      return pick(
-        lang,
-        'Shynvo OS is the cockpit: Missions → Timeline → Focus → Momentum → Logbook. Built for execution.',
-        'Shynvo OS هو قمرة القيادة: Missions → Timeline → Focus → Momentum → Logbook. للتنفيذ.',
-        'Shynvo OS est le cockpit : Missions → Timeline → Focus → Momentum → Logbook. Conçu pour exécuter.',
-        'Shynvo OS es el cockpit: Missions → Timeline → Focus → Momentum → Logbook. Hecho para ejecutar.'
-      );
-    }
-
-    if (low.includes('university') || low.includes('hub') || low.includes('study') || low.includes('exam')) {
-      return pick(
-        lang,
-        'University Hub is the academic building: Study Lab, Exam Arena, Career Launchpad, Visual Concept Forge.',
-        'University Hub مبنى أكاديمي: Study Lab و Exam Arena و Career Launchpad و Visual Concept Forge.',
-        'University Hub est le bâtiment académique : Study Lab, Exam Arena, Career Launchpad, Visual Concept Forge.',
-        'University Hub es el edificio académico: Study Lab, Exam Arena, Career Launchpad, Visual Concept Forge.'
-      );
-    }
-
-    if (low.includes('experiment') || low.includes('beta')) {
-      return pick(
-        lang,
-        'Experiments is a country of standalone AI worlds (BETA). Each mode has independent logic.',
-        'Experiments “بلد” لعوالم AI مستقلة (بيتا). كل تجربة لها منطقها الخاص.',
-        'Experiments est un “pays” de mondes IA indépendants (BETA). Chaque mode a sa logique.',
-        'Experiments es un “país” de mundos IA independientes (BETA). Cada modo tiene su propia lógica.'
-      );
-    }
-
-    if (low.includes('robot') || low.includes('cinematic')) {
-      return pick(
-        lang,
-        'The cinematic robot is optional. Full robot experience is in /robot and inside Shynvo OS.',
-        'الروبوت السينمائي اختياري. التجربة الكاملة في /robot وداخل Shynvo OS.',
-        'Le robot cinématique est optionnel. L’expérience complète est sur /robot et dans Shynvo OS.',
-        'El robot cinemático es opcional. La experiencia completa está en /robot y dentro de Shynvo OS.'
-      );
-    }
-
-    if (low.includes('price') || low.includes('pricing') || low.includes('trial') || low.includes('30')) {
-      return pick(
-        lang,
-        'Starter Access is free for 30 days. After that, upgrade is required to continue using Shynvo.',
-        'الوصول مجاني 30 يومًا. بعد ذلك الترقية مطلوبة للاستمرار.',
-        'Accès gratuit pendant 30 jours. Ensuite, une offre payante est requise pour continuer.',
-        'Acceso gratis por 30 días. Después debes actualizar para seguir usando Shynvo.'
-      );
-    }
-
-    return pick(
-      lang,
-      'Tell me your goal in one sentence (study, work, team). I’ll route you to the right building.',
-      'قل هدفك بجملة واحدة (دراسة/عمل/فريق) وسأرشدك للمبنى المناسب.',
-      'Dis-moi ton objectif en une phrase (études, travail, équipe) et je te dirai où aller.',
-      'Dime tu objetivo en una frase (estudio, trabajo, equipo) y te diré a dónde ir.'
-    );
+    // backend variations supported
+    const data = await res.json().catch(() => ({}));
+    const raw = data.reply || data.message || data.text || '';
+    if (!raw) throw new Error('Empty backend reply');
+    return clampShort(raw, 420);
   }
 
-  function send(text: string) {
+  async function send(text: string) {
     const q = text.trim();
-    if (!q) return;
-    const a = clampShort(reply(q));
-    setMsgs((m) => [...m, { role: 'user', text: q }, { role: 'guide', text: a }]);
+    if (!q || busy) return;
+
+    setMsgs((m) => [...m, { role: 'user', text: q }]);
     setInput('');
+    setBusy(true);
+
+    try {
+      const a = await backendReply(q);
+      setMsgs((m) => [...m, { role: 'guide', text: a }]);
+    } catch {
+      // fallback if backend unavailable
+      setMsgs((m) => [...m, { role: 'guide', text: clampShort(fallbackReply(q)) }]);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -142,30 +170,35 @@ export default function GuideChat() {
           Guide
         </button>
       ) : (
-        <div className="w-[320px] overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F14]/95 text-white shadow-2xl backdrop-blur">
+        <div className="w-[340px] overflow-hidden rounded-3xl border border-white/10 bg-[#0B0F14]/95 text-white shadow-2xl backdrop-blur">
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
             <div>
               <div className="text-sm font-semibold">Guide</div>
-              <div className="text-[11px] text-white/60">Short answers • onboarding help</div>
+              <div className="text-[11px] text-white/60">Chatbot • short answers • public</div>
             </div>
             <button onClick={() => setOpen(false)} className="rounded-xl px-2 py-1 text-white/70 hover:bg-white/5">
               ✕
             </button>
           </div>
 
-          <div ref={listRef} className="max-h-[320px] space-y-2 overflow-auto px-4 py-3">
+          <div ref={listRef} className="max-h-[360px] space-y-2 overflow-auto px-4 py-3">
             {msgs.map((m, i) => (
               <div
                 key={i}
                 className={
                   m.role === 'user'
-                    ? 'ml-auto w-fit max-w-[85%] rounded-2xl bg-white/10 px-3 py-2 text-sm text-white'
-                    : 'mr-auto w-fit max-w-[85%] rounded-2xl bg-white/5 px-3 py-2 text-sm text-white/85'
+                    ? 'ml-auto w-fit max-w-[88%] rounded-2xl bg-white/10 px-3 py-2 text-sm text-white'
+                    : 'mr-auto w-fit max-w-[88%] rounded-2xl bg-white/5 px-3 py-2 text-sm text-white/85'
                 }
               >
                 {m.text}
               </div>
             ))}
+            {busy && (
+              <div className="mr-auto w-fit max-w-[88%] rounded-2xl bg-white/5 px-3 py-2 text-sm text-white/70">
+                Typing…
+              </div>
+            )}
           </div>
 
           <div className="border-t border-white/10 px-4 py-3">
@@ -191,13 +224,14 @@ export default function GuideChat() {
               />
               <button
                 onClick={() => send(input)}
-                className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-white/90"
+                disabled={busy}
+                className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-white/90 disabled:opacity-50"
               >
                 Send
               </button>
             </div>
 
-            <div className="mt-2 text-[11px] text-white/50">Try: “Where should I start?” • “Explain pricing”</div>
+            <div className="mt-2 text-[11px] text-white/50">Short answers only. Ask in any language.</div>
           </div>
         </div>
       )}
