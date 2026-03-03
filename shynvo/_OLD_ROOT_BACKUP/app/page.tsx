@@ -37,7 +37,7 @@ export default function HomePage() {
       label: 'Structured Academic Campus',
       desc: 'Guided study systems, exam preparation, and faculty-based learning environments.',
       tags: ['Study', 'Exams', 'Career'],
-      href: '/university-hub',
+      href: '/university',
       accent: 'university',
     },
     {
@@ -128,7 +128,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0B0F14] text-white">
       <BackgroundFX />
-
       <TopNav />
 
       <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -174,13 +173,10 @@ export default function HomePage() {
       </main>
 
       <ShynvoGuide />
-
       <div className="h-10" />
     </div>
   );
 }
-
-/* ---------------------------- UI: Background ---------------------------- */
 
 function BackgroundFX() {
   return (
@@ -191,8 +187,6 @@ function BackgroundFX() {
     </div>
   );
 }
-
-/* ------------------------------ UI: Top Nav ----------------------------- */
 
 function TopNav() {
   const [open, setOpen] = useState(false);
@@ -213,7 +207,6 @@ function TopNav() {
           <span className="text-sm font-semibold tracking-wide">Shynvo</span>
         </a>
 
-        {/* Desktop links */}
         <nav className="hidden items-center gap-6 md:flex">
           <a href="#buildings" className="text-sm text-white/80 hover:text-white">
             Buildings
@@ -226,7 +219,6 @@ function TopNav() {
           </a>
         </nav>
 
-        {/* Right controls */}
         <div className="hidden items-center gap-2 md:flex">
           <IconButton label="Search" href="/search" icon="search" />
           <IconButton label="Language" href="/language" icon="globe" />
@@ -247,7 +239,6 @@ function TopNav() {
           </a>
         </div>
 
-        {/* Mobile controls */}
         <div className="flex items-center gap-2 md:hidden">
           <IconButton label="Search" href="/search" icon="search" />
           <IconButton label="Language" href="/language" icon="globe" />
@@ -261,13 +252,8 @@ function TopNav() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
       <div className={cx('md:hidden', open ? 'block' : 'hidden')}>
-        <div
-          className="fixed inset-0 z-50 bg-black/60"
-          onClick={() => setOpen(false)}
-          aria-hidden="true"
-        />
+        <div className="fixed inset-0 z-50 bg-black/60" onClick={() => setOpen(false)} aria-hidden="true" />
         <div className="fixed right-0 top-0 z-50 h-full w-[86%] max-w-sm border-l border-white/10 bg-[#0B0F14] p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">Menu</span>
@@ -335,8 +321,6 @@ function IconButton({ label, href, icon }: { label: string; href: string; icon: 
   );
 }
 
-/* ------------------------------ UI: Hero -------------------------------- */
-
 function Hero() {
   return (
     <section className="relative pt-10 sm:pt-14 lg:pt-16">
@@ -347,12 +331,8 @@ function Hero() {
             Structured Intelligence Platform
           </div>
 
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-            Shynvo
-          </h1>
-          <p className="mt-2 text-xl text-white/90 sm:text-2xl">
-            Architecture of Applied Intelligence
-          </p>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Shynvo</h1>
+          <p className="mt-2 text-xl text-white/90 sm:text-2xl">Architecture of Applied Intelligence</p>
 
           <p className="mt-4 max-w-xl text-sm leading-6 text-white/70 sm:text-base">
             A multi-environment intelligence platform for learning, execution, strategy, resilience, and organizational growth.
@@ -378,7 +358,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* Robot visual (placeholder block) */}
         <div className="relative">
           <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5">
             <div className="h-full w-full p-6">
@@ -403,8 +382,6 @@ function Hero() {
     </section>
   );
 }
-
-/* ------------------------------ UI: Section ----------------------------- */
 
 function Section({
   id,
@@ -431,8 +408,6 @@ function Section({
   );
 }
 
-/* -------------------------- UI: Buildings Grid -------------------------- */
-
 function BuildingsGrid({ buildings }: { buildings: Building[] }) {
   return (
     <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -448,16 +423,6 @@ function BuildingCard({ b }: { b: Building }) {
     switch (b.accent) {
       case 'os':
         return 'border-white/20 bg-white/6 ring-1 ring-white/10';
-      case 'university':
-        return 'border-white/10 bg-white/5';
-      case 'experiments':
-        return 'border-white/10 bg-white/5';
-      case 'enterprise':
-        return 'border-white/10 bg-white/5';
-      case 'frontier':
-        return 'border-white/10 bg-white/5';
-      case 'arcade':
-        return 'border-white/10 bg-white/5';
       default:
         return 'border-white/10 bg-white/5';
     }
@@ -516,8 +481,6 @@ function BuildingCard({ b }: { b: Building }) {
   );
 }
 
-/* ------------------------------ UI: Pillars ----------------------------- */
-
 function Pillars() {
   const items = [
     {
@@ -550,8 +513,6 @@ function Pillars() {
   );
 }
 
-/* --------------------------- UI: How It Works --------------------------- */
-
 function HowItWorks() {
   const steps = [
     {
@@ -583,8 +544,6 @@ function HowItWorks() {
     </div>
   );
 }
-
-/* ------------------------------ UI: Pricing ----------------------------- */
 
 function Pricing({ plans }: { plans: PricingPlan[] }) {
   return (
@@ -641,8 +600,6 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
   );
 }
 
-/* ------------------------------ UI: Footer ------------------------------ */
-
 function Footer() {
   return (
     <footer className="border-t border-white/10 py-12">
@@ -652,9 +609,7 @@ function Footer() {
             <div className="h-8 w-8 rounded-xl bg-white/10 ring-1 ring-white/15" />
             <div className="text-sm font-semibold">Shynvo</div>
           </div>
-          <p className="mt-3 text-sm leading-6 text-white/70">
-            Architecture of Applied Intelligence.
-          </p>
+          <p className="mt-3 text-sm leading-6 text-white/70">Architecture of Applied Intelligence.</p>
           <p className="mt-2 text-xs text-white/55">
             Multi-environment platform for learning, execution, strategy, resilience, and teams.
           </p>
@@ -717,8 +672,6 @@ function FooterCol({
   );
 }
 
-/* --------------------------- Shynvo Guide Chat -------------------------- */
-
 type Msg = { role: 'user' | 'guide'; text: string };
 
 function ShynvoGuide() {
@@ -741,8 +694,7 @@ function ShynvoGuide() {
       },
       {
         match: (q) => /shynvo os|what is os|what is shynvo os/.test(q),
-        answer:
-          'Shynvo OS is the execution cockpit. It runs missions, focus systems, and strategic orchestration.',
+        answer: 'Shynvo OS is the execution cockpit. It runs missions, focus systems, and strategic orchestration.',
       },
       {
         match: (q) => /university hub|university/.test(q),
@@ -751,8 +703,7 @@ function ShynvoGuide() {
       },
       {
         match: (q) => /experiments|beta/.test(q),
-        answer:
-          'Experiments are standalone AI worlds for thinking, debate, simulation, and concept development.',
+        answer: 'Experiments are standalone AI worlds for thinking, debate, simulation, and concept development.',
       },
       {
         match: (q) => /enterprise suite|team|company/.test(q),
@@ -784,12 +735,9 @@ function ShynvoGuide() {
         answer:
           'You can explore Shynvo publicly. Creating an account is needed to save progress and use platform features.',
       },
-      // Redirect rule: deep planning
       {
-        match: (q) =>
-          /plan|strategy|90 day|schedule|roadmap|create a mission|build me|generate/.test(q),
-        answer:
-          'Strategic planning and mission execution tools are available inside Shynvo OS.',
+        match: (q) => /plan|strategy|90 day|schedule|roadmap|create a mission|build me|generate/.test(q),
+        answer: 'Strategic planning and mission execution tools are available inside Shynvo OS.',
       },
     ],
     []
@@ -819,10 +767,8 @@ function ShynvoGuide() {
     setInput('');
   }
 
-  // Mobile: full screen sheet. Desktop: side panel.
   return (
     <>
-      {/* Floating button */}
       <button
         onClick={() => setOpen(true)}
         className="fixed bottom-5 right-5 z-50 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#0B0F14] shadow-lg hover:bg-white/90"
@@ -831,11 +777,9 @@ function ShynvoGuide() {
         Guide
       </button>
 
-      {/* Panel */}
       {open ? (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
-
           <div
             className={cx(
               'absolute right-0 top-0 h-full w-full border-l border-white/10 bg-[#0B0F14]',
@@ -906,8 +850,6 @@ function ShynvoGuide() {
   );
 }
 
-/* -------------------------------- Icons -------------------------------- */
-
 function SearchIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -916,12 +858,7 @@ function SearchIcon() {
         stroke="currentColor"
         strokeWidth="1.6"
       />
-      <path
-        d="M16.5 16.5 21 21"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
+      <path d="M16.5 16.5 21 21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }

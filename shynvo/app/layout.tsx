@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import GuideChat from './_components/GuideChat';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -29,11 +28,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-      
-      <div id="shynvo-guide" className="hidden"></div>
-      {/* Guide Chat */}
-      <GuideChat />
-</body>
+      </body>
     </html>
   );
 }
