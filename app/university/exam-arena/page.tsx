@@ -1,178 +1,26 @@
-"use client";
-
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import DestinationSearch, { type Destination } from "@/components/university/DestinationSearch";
-import { askTutor } from "@/lib/university/tutor";
 
-const FACULTIES: Record<string, { name: string; accent: string }> = {
-  "stem-it": { name: "STEM & IT", accent: "#22D3EE" },
-  business: { name: "Business & Economics", accent: "#A3E635" },
-  medicine: { name: "Medicine & Health", accent: "#FB7185" },
-  "law-social": { name: "Law & Social Sciences", accent: "#B48CFF" },
-  "arts-humanities": { name: "Arts & Humanities", accent: "#38BDF8" },
-  education: { name: "Education", accent: "#34D399" },
-  custom: { name: "Custom / Interdisciplinary", accent: "#F59E0B" },
-};
-
-function getParams() {
-  if (typeof window === "undefined") return { faculty: "stem-it", q: "" };
-  const p = new URLSearchParams(window.location.search);
-  return { faculty: p.get("faculty") || "stem-it", q: p.get("q") || "" };
-}
-
-export default function ExamArenaPage() {
-  const init = getParams();
-  const [facultyId, setFacultyId] = useState(init.faculty);
-  const [topic, setTopic] = useState(init.q);
-  const faculty = FACULTIES[facultyId] || FACULTIES["stem-it"];
-
-  const destinations: Destination[] = useMemo(
-    () => [
-      { label: "Study Lab", keywords: ["study", "notes", "explain"], href: ({ faculty, q }) => `/university/study-lab?faculty=${encodeURIComponent(faculty || "stem-it")}${q ? `&q=${encodeURIComponent(q)}` : ""}` },
-      { label: "Exam Arena", keywords: ["exam", "timed", "mock"], href: ({ faculty, q }) => `/university/exam-arena?faculty=${encodeURIComponent(faculty || "stem-it")}${q ? `&q=${encodeURIComponent(q)}` : ""}` },
-      { label: "Concept Forge", keywords: ["concept", "map", "visual"], href: ({ faculty, q }) => `/university/concept-forge?faculty=${encodeURIComponent(faculty || "stem-it")}${q ? `&q=${encodeURIComponent(q)}` : ""}` },
-      { label: "Career Launchpad", keywords: ["career", "interview", "resume"], href: ({ faculty, q }) => `/university/career-launchpad?faculty=${encodeURIComponent(faculty || "stem-it")}${q ? `&q=${encodeURIComponent(q)}` : ""}` },
-    ],
-    []
-  );
-
-  const [out, setOut] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  async function run() {
-    const t = topic.trim();
-    if (!t) return;
-    setLoading(true);
-    setOut(null);
-
-    const prompt = [
-      `Faculty: ${faculty.name}`,
-      "Room: Exam Arena",
-      "",
-      `Topic: ${t}`,
-      "",
-      "Deliver:",
-      "- 10 exam-style questions (mix difficulty)",
-      "- After each question: short solution + common mistake",
-      "- End with a score rubric (how to self-grade)",
-    ].join("\n");
-
-    try {
-      setOut(await askTutor(prompt));
-    } catch (e: any) {
-      setOut(String(e?.message || e));
-    } finally {
-      setLoading(false);
-    }
-  }
-
+export default function Page() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="pointer-events-none fixed inset-0">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(1100px circle at 18% 18%, ${faculty.accent}20, transparent 55%),
-              radial-gradient(900px circle at 82% 24%, rgba(255,255,255,0.08), transparent 55%),
-              linear-gradient(180deg, rgba(2,6,23,0.70), rgba(0,0,0,0.95))
-            `,
-          }}
-        />
-      </div>
+    <main className="min-h-screen bg-black text-white px-6 py-10">
+      <div className="mx-auto max-w-5xl space-y-4">
+        <div className="text-xs tracking-widest text-white/50">ACADEMIC SYSTEM</div>
+        <h1 className="text-3xl font-semibold">Exam Arena</h1>
+        <p className="text-white/70">Practice quiz, full mock exams, timed tests, scoring and feedback.</p>
 
-      <div className="relative mx-auto w-full max-w-5xl px-6 py-12">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs tracking-widest text-white/60">UNIVERSITY HUB</div>
-            <div className="mt-2 text-3xl font-semibold">Exam Arena</div>
-            <div className="mt-2 text-sm text-white/70">
-              Timed practice + feedback. Build speed and accuracy.
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Link href="/university" className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/85 hover:bg-white/15">
-              Back to Hub →
-            </Link>
-            <Link href="/" className="rounded-2xl border border-white/15 bg-black/40 px-4 py-2 text-sm text-white/85 hover:bg-white/10">
-              Home →
-            </Link>
-          </div>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+          This page is active (no 404). Next: we build the full learning flow UI + connect backend.
         </div>
 
-        <div className="mt-7">
-          <DestinationSearch faculty={facultyId} destinations={destinations} placeholder="Search rooms… (study, exam, concept, career)" />
-        </div>
-
-        <div className="mt-6 rounded-3xl border border-white/15 bg-black/35 p-6 backdrop-blur-xl">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-sm text-white/80">
-              Faculty: <span style={{ color: faculty.accent }} className="font-semibold">{faculty.name}</span>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(FACULTIES).map(([id, f]) => {
-                const active = id === facultyId;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFacultyId(id)}
-                    className={[
-                      "rounded-full border px-3 py-1 text-xs transition",
-                      active ? "border-white/25 bg-white/15 text-white" : "border-white/15 bg-white/5 text-white/70 hover:bg-white/10",
-                    ].join(" ")}
-                    style={active ? { boxShadow: `0 0 24px ${f.accent}2A` } : undefined}
-                  >
-                    {f.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/15 bg-white/5 p-5">
-              <div className="text-xs tracking-widest text-white/60">GENERATE A MOCK</div>
-              <div className="mt-2 text-sm text-white/70">
-                Enter a topic and get exam-style questions + solutions.
-              </div>
-
-              <input
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="e.g., Big-O / DCF / diagnosis reasoning / case law"
-                className="mt-4 w-full rounded-2xl border border-white/15 bg-black/50 px-4 py-3 text-sm text-white outline-none placeholder:text-white/40"
-                onKeyDown={(e) => (e.key === "Enter" ? run() : null)}
-              />
-
-              <button
-                onClick={run}
-                disabled={loading || !topic.trim()}
-                className="mt-3 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/85 hover:bg-white/15 disabled:opacity-50"
-                type="button"
-              >
-                {loading ? "Generating…" : "Generate Exam Set →"}
-              </button>
-            </div>
-
-            <div className="rounded-2xl border border-white/15 bg-white/5 p-5">
-              <div className="text-xs tracking-widest text-white/60">OUTPUT</div>
-              {!out ? (
-                <div className="mt-3 text-sm text-white/70">Your exam set appears here.</div>
-              ) : (
-                <pre className="mt-3 whitespace-pre-wrap text-sm text-white/80">{out}</pre>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-5 text-xs text-white/50">
-            Purpose: exam readiness via timed practice, feedback, and mistake correction.
-          </div>
+        <div className="flex gap-2">
+          <Link className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black" href="/university">
+            Back to University Hub
+          </Link>
+          <Link className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white" href="/university/faculty/bsc-science-tech">
+            Open a Faculty Dashboard
+          </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

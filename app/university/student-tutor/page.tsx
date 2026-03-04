@@ -5,8 +5,8 @@ export default function Page() {
     <main className="min-h-screen bg-black text-white px-6 py-10">
       <div className="mx-auto max-w-5xl space-y-4">
         <div className="text-xs tracking-widest text-white/50">ACADEMIC SYSTEM</div>
-        <h1 className="text-3xl font-semibold">Career Launchpad</h1>
-        <p className="text-white/70">CV, portfolio, and interview training connected to academic work.</p>
+        <h1 className="text-3xl font-semibold">Student Tutor</h1>
+        <p className="text-white/70">Faculty-aware AI tutor with course/week context and study recommendations.</p>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
           This page is active (no 404). Next: we build the full learning flow UI + connect backend.
