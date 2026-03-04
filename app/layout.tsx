@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SiteFooter from "./components/SiteFooter";
+import SiteNav from "./components/SiteNav";
+import TrialGate from "./components/TrialGate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,22 +17,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Shynvo",
-  description: "AI knowledge systems for structured learning and thinking.",
+  description: "A multi-environment AI platform for learning, strategy, execution, and growth.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#05070A] text-white`}
-      >
-        {children}
-
-        {/* Global Site Footer */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#05070A] text-white`}>
+        <SiteNav />
+        <TrialGate>{children}</TrialGate>
         <SiteFooter />
       </body>
     </html>
