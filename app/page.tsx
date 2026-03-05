@@ -8,8 +8,7 @@ type Building = {
   label: string;
   desc: string;
   tags: string[];
-  href?: string;
-  planned?: boolean;
+  href: string; // required now (so no “planned” and no dead links)
   accent?: "neutral" | "os" | "university" | "experiments" | "enterprise" | "frontier" | "arcade";
 };
 
@@ -41,7 +40,7 @@ export default function HomePage() {
       label: "Structured Academic Campus",
       desc: "Guided study systems, exam preparation, and faculty-based learning environments.",
       tags: ["Study", "Exams", "Career"],
-      planned: true,
+      href: "/docs",
       accent: "university",
     },
     {
@@ -49,7 +48,7 @@ export default function HomePage() {
       label: "Dimensional Execution Cockpit",
       desc: "Missions, focus systems, AI agents, and strategic orchestration in one cockpit.",
       tags: ["Missions", "Focus", "Terminal"],
-      planned: true,
+      href: "/docs",
       accent: "os",
     },
     {
@@ -57,7 +56,7 @@ export default function HomePage() {
       label: "AI Exploration Worlds",
       desc: "Standalone worlds for thinking, debate, simulation, and concept development.",
       tags: ["Debate", "Simulation", "Concepts"],
-      planned: true,
+      href: "/docs",
       accent: "experiments",
     },
     {
@@ -65,7 +64,7 @@ export default function HomePage() {
       label: "Organizational Intelligence System",
       desc: "Admin tools, skill matrices, team missions, and analytics for organizations.",
       tags: ["Teams", "OKRs", "Analytics"],
-      planned: true,
+      href: "/docs",
       accent: "enterprise",
     },
     {
@@ -73,7 +72,7 @@ export default function HomePage() {
       label: "High-Reliability Decision Environment",
       desc: "Decision drills, crisis simulation, protocols, and resilience systems.",
       tags: ["Tactical", "Crisis", "Protocols"],
-      planned: true,
+      href: "/docs",
       accent: "frontier",
     },
     {
@@ -81,7 +80,7 @@ export default function HomePage() {
       label: "Competitive Skill Arena",
       desc: "Gamified drills, interview simulations, and performance scoring modes.",
       tags: ["Drills", "Interviews", "Scoring"],
-      planned: true,
+      href: "/docs",
       accent: "arcade",
     },
   ];
@@ -139,7 +138,10 @@ export default function HomePage() {
                 Enter Platform
               </a>
 
-              <Link href="/docs" className="rounded-xl px-5 py-3 text-center text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5">
+              <Link
+                href="/docs"
+                className="rounded-xl px-5 py-3 text-center text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5"
+              >
                 Read Docs
               </Link>
             </div>
@@ -154,9 +156,7 @@ export default function HomePage() {
                 setGuideOpen(true);
               }}
             />
-            <div className="mt-3 text-xs text-white/60">
-              Click the chamber to activate. The robot responds inside the Guide.
-            </div>
+            <div className="mt-3 text-xs text-white/60">Click the chamber to activate.</div>
           </div>
         </div>
 
@@ -199,14 +199,13 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
       )}
       aria-label="Activate robot"
     >
-      {/* Aspect */}
-      <div className="aspect-[4/3] w-full">
+      <div className="relative aspect-[4/3] w-full">
         {/* Base cinematic gradients */}
         <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_50%_15%,rgba(255,255,255,0.10),transparent_62%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(650px_220px_at_70%_60%,rgba(56,189,248,0.12),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(540px_220px_at_25%_70%,rgba(167,139,250,0.10),transparent_60%)]" />
 
-        {/* Moving light sweep (feels “live”) */}
+        {/* Moving light sweep */}
         <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <div className="sh-sweep absolute -left-[40%] top-0 h-full w-[60%] bg-white/10 blur-2xl" />
         </div>
@@ -221,16 +220,14 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
           <Particles />
         </div>
 
-        {/* “Robot silhouette” (abstract but cinematic + alive via pulsing core) */}
+        {/* “Robot silhouette” */}
         <div className="absolute inset-0 grid place-items-center p-6">
           <div className="relative h-full w-full rounded-2xl border border-white/10 bg-black/20 backdrop-blur-[1px]">
-            {/* inner glow */}
             <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(520px_200px_at_50%_35%,rgba(255,255,255,0.09),transparent_62%)]" />
 
             {/* head */}
             <div className="absolute left-1/2 top-[18%] h-[28%] w-[42%] -translate-x-1/2 rounded-[2rem] border border-white/12 bg-white/5">
               <div className="absolute left-1/2 top-[36%] h-10 w-10 -translate-x-1/2 rounded-full border border-white/15 bg-white/5">
-                {/* eye/core pulse */}
                 <div className={cx("absolute inset-0 rounded-full", hot ? "sh-core-hot" : "sh-core")} />
               </div>
               <div className="absolute left-1/2 top-[72%] h-[2px] w-[54%] -translate-x-1/2 bg-white/20" />
@@ -244,14 +241,13 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
               <div className="absolute left-1/2 top-[62%] h-[2px] w-[70%] -translate-x-1/2 bg-white/20" />
             </div>
 
-            {/* vignette */}
             <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" />
             <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(900px_340px_at_50%_120%,rgba(0,0,0,0.65),transparent_55%)]" />
           </div>
         </div>
 
         {/* Bottom caption */}
-        <div className="absolute left-0 right-0 bottom-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-5 py-3">
+        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-5 py-3">
           <div>
             <div className="text-xs font-semibold text-white/85">Cinematic AI Robot Chamber</div>
             <div className="text-[11px] text-white/55">Tap to activate</div>
@@ -261,7 +257,6 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
           </span>
         </div>
 
-        {/* CSS for animations */}
         <style jsx>{`
           .sh-sweep {
             transform: skewX(-18deg) translateX(0);
@@ -306,12 +301,18 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
           }
 
           .sh-core {
-            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.22), rgba(56, 189, 248, 0.20), transparent 64%);
+            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.22), rgba(56, 189, 248, 0.2), transparent 64%);
             filter: blur(0.2px);
             animation: pulse 2.2s ease-in-out infinite;
           }
           .sh-core-hot {
-            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.28), rgba(56, 189, 248, 0.28), rgba(167, 139, 250, 0.18), transparent 64%);
+            background: radial-gradient(
+              circle at 50% 45%,
+              rgba(255, 255, 255, 0.28),
+              rgba(56, 189, 248, 0.28),
+              rgba(167, 139, 250, 0.18),
+              transparent 64%
+            );
             filter: blur(0.2px);
             animation: pulseHot 1.4s ease-in-out infinite;
           }
@@ -329,7 +330,7 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
           @keyframes pulseHot {
             0%,
             100% {
-              transform: scale(0.90);
+              transform: scale(0.9);
               opacity: 0.78;
             }
             50% {
@@ -344,8 +345,6 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
 }
 
 function Particles() {
-  // lightweight, deterministic “particle” dots via CSS only
-  // (no canvas needed; safe for build and mobile)
   const dots = useMemo(
     () =>
       Array.from({ length: 14 }).map((_, i) => {
@@ -448,17 +447,15 @@ function BuildingCard({ b }: { b: Building }) {
     }
   }, [b.accent]);
 
-  const Wrapper: any = b.href ? "a" : "div";
-  const wrapperProps = b.href ? { href: b.href, "aria-label": `Enter ${b.name}` } : { role: "group", "aria-label": `${b.name} (planned)` };
-
   return (
-    <Wrapper
-      {...wrapperProps}
+    <Link
+      href={b.href}
       className={cx(
         "group relative block rounded-3xl border p-5 transition",
-        b.href ? "cursor-pointer hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]" : "cursor-default opacity-[0.92]",
+        "hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]",
         accent
       )}
+      aria-label={`Enter ${b.name}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -468,10 +465,6 @@ function BuildingCard({ b }: { b: Building }) {
             <div className="mt-0.5 text-xs text-white/60">{b.label}</div>
           </div>
         </div>
-
-        {b.planned || !b.href ? (
-          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/70">Planned</span>
-        ) : null}
       </div>
 
       <p className="mt-4 line-clamp-2 text-sm leading-6 text-white/70">{b.desc}</p>
@@ -485,7 +478,7 @@ function BuildingCard({ b }: { b: Building }) {
       </div>
 
       <div className="mt-5 flex items-center justify-between">
-        <span className="text-sm font-semibold text-white/90 group-hover:text-white">{b.href ? "Enter" : "Preview"}</span>
+        <span className="text-sm font-semibold text-white/90 group-hover:text-white">Enter</span>
         <span className="rounded-full border border-white/10 bg-white/5 p-2">
           <ArrowRightIcon />
         </span>
@@ -494,7 +487,7 @@ function BuildingCard({ b }: { b: Building }) {
       {b.accent === "os" ? (
         <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(800px_220px_at_50%_0%,rgba(255,255,255,0.10),transparent_55%)] opacity-60" />
       ) : null}
-    </Wrapper>
+    </Link>
   );
 }
 
@@ -566,7 +559,7 @@ function ShynvoGuide({
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "guide",
-      text: "Shynvo Guide: Ask anything about the platform, pricing, or trial. (Robot chamber activates this.)",
+      text: "Shynvo Guide: Ask anything about the platform, pricing, docs, or trial.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -596,7 +589,6 @@ function ShynvoGuide({
   }, [open, msgs.length]);
 
   useEffect(() => {
-    // When opening from robot, drop a “wake” message once
     if (!open) return;
     setMsgs((m) => {
       const already = m.some((x) => x.role === "guide" && x.text.includes("Robot online"));
@@ -678,7 +670,10 @@ function ShynvoGuide({
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/20"
                   placeholder="Ask the robot..."
                 />
-                <button onClick={send} className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90">
+                <button
+                  onClick={send}
+                  className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
+                >
                   Send
                 </button>
               </div>
@@ -706,4 +701,5 @@ function CloseIcon() {
       <path d="M17 7 7 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
-}
+
+  }
