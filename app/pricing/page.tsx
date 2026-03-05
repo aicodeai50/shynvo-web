@@ -1,85 +1,56 @@
 import Link from "next/link";
 
-type Plan = {
-  name: string;
-  price: string;
-  bullets: string[];
-  cta: { label: string; href: string };
-  highlight?: boolean;
-};
-
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export default function PricingPage() {
-  const plans: Plan[] = [
-    {
-      name: "Trial",
-      price: "7-day free trial",
-      bullets: [
-        "Full access for 7 days",
-        "University Hub + Shynvo OS + Experiments",
-        "Upgrade required after trial",
-      ],
-      cta: { label: "Create account", href: "/signup" },
-    },
-    {
-      name: "Pro",
-      price: "NOK 250 / month",
-      bullets: ["Higher limits", "Interview simulator", "Resume + skill prep"],
-      cta: { label: "Upgrade to Pro", href: "mailto:hi@shynvo.app?subject=Shynvo%20Pro%20Upgrade" },
-      highlight: true,
-    },
-    {
-      name: "Team",
-      price: "NOK 600 / month",
-      bullets: ["Company admin tools", "Seats (managed per team)", "Skill matrix + upskill plans"],
-      cta: { label: "Upgrade to Team", href: "mailto:hi@shynvo.app?subject=Shynvo%20Team%20Upgrade" },
-    },
-  ];
-
   return (
-    <div className="py-14">
-      <h1 className="text-4xl font-semibold">Pricing</h1>
-      <p className="mt-3 text-white/70">Start with the trial. Upgrade after the trial ends to keep using Shynvo.</p>
-
-      <div className="mt-10 grid gap-4 lg:grid-cols-3">
-        {plans.map((p) => (
-          <div
-            key={p.name}
-            className={cx(
-              "rounded-3xl border p-6",
-              p.highlight ? "border-white/20 bg-white/7" : "border-white/10 bg-white/5"
-            )}
-          >
-            <div className="text-lg font-semibold">{p.name}</div>
-            <div className="mt-2 text-2xl font-semibold">{p.price}</div>
-
-            <ul className="mt-4 space-y-2 text-sm text-white/75">
-              {p.bullets.map((b) => (
-                <li key={b} className="flex gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 flex-none rounded-full bg-white/50" />
-                  <span>{b}</span>
-                </li>
-              ))}
-            </ul>
-
-            <a
-              href={p.cta.href}
-              className={cx(
-                "mt-6 block rounded-xl px-4 py-3 text-center text-sm font-semibold",
-                p.highlight ? "bg-white text-[#0B0F14] hover:bg-white/90" : "ring-1 ring-white/15 hover:bg-white/5"
-              )}
-            >
-              {p.cta.label}
-            </a>
-          </div>
-        ))}
+    <div className="mx-auto w-full max-w-6xl py-16">
+      <div className="mb-8">
+        <h1 className="text-4xl font-semibold">Pricing</h1>
+        <p className="mt-2 text-white/70">Simple plans. Upgrade anytime.</p>
       </div>
 
-      <div className="mt-8">
-        <Link className="text-white/70 hover:text-white underline underline-offset-4" href="/">
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="rounded-3xl border border-white/15 bg-white/5 p-7 backdrop-blur-xl">
+          <div className="text-xl font-semibold">Free</div>
+          <div className="mt-2 text-2xl font-semibold">7 days free trial</div>
+          <ul className="mt-5 space-y-2 text-sm text-white/80">
+            <li>• Limited AI generations</li>
+            <li>• Basic quizzes & flashcards</li>
+            <li>• Community support</li>
+          </ul>
+          <button className="mt-6 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm hover:bg-white/15">
+            Upgrade
+          </button>
+        </div>
+
+        <div className="rounded-3xl border border-white/15 bg-white/5 p-7 backdrop-blur-xl">
+          <div className="text-xl font-semibold">Pro</div>
+          <div className="mt-2 text-2xl font-semibold">NOK 299 / month</div>
+          <ul className="mt-5 space-y-2 text-sm text-white/80">
+            <li>• Higher limits</li>
+            <li>• Interview simulator</li>
+            <li>• Resume + skill prep</li>
+          </ul>
+          <button className="mt-6 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm hover:bg-white/15">
+            Upgrade
+          </button>
+        </div>
+
+        <div className="rounded-3xl border border-white/15 bg-white/5 p-7 backdrop-blur-xl">
+          <div className="text-xl font-semibold">Team</div>
+          <div className="mt-2 text-2xl font-semibold">NOK 999 / month</div>
+          <ul className="mt-5 space-y-2 text-sm text-white/80">
+            <li>• Company admin tools</li>
+            <li>• Seats (managed per team)</li>
+            <li>• Skill matrix + upskill plans</li>
+          </ul>
+          <button className="mt-6 w-full rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm hover:bg-white/15">
+            Upgrade
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-10">
+        <Link className="text-sm underline hover:opacity-80" href="/">
           ← Back
         </Link>
       </div>

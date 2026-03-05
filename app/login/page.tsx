@@ -2,86 +2,86 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    setErr(null);
 
-    const em = email.trim().toLowerCase();
-    if (!em) return setError("Email required");
-    if (!password) return setError("Password required");
+    if (!email.trim()) return setErr("Email is required");
+    if (!password) return setErr("Password is required");
 
     setLoading(true);
     try {
       await api("/auth/login", {
         method: "POST",
-        body: JSON.stringify({ email: em, password }),
+        body: JSON.stringify({ email, password }),
       });
-
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err?.message || "Login failed");
+    } catch (e: any) {
+      setErr(e?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 py-10">
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h1 className="text-2xl font-semibold">Sign in</h1>
-        <p className="mt-1 text-sm text-white/70">Welcome back.</p>
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-black/30 p-6 md:p-8">
+        <h1 className="text-2xl font-semibold">Login</h1>
+        <p className="text-sm text-white/70 mt-1">Welcome back.</p>
 
-        <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="text-sm text-white/80">Email</label>
+            <label className="text-sm text-white/70">Email</label>
             <input
-              className="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2 outline-none"
+              className="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              type="email"
               autoComplete="email"
-              inputMode="email"
+              required
             />
           </div>
 
           <div>
-            <label className="text-sm text-white/80">Password</label>
+            <label className="text-sm text-white/70">Password</label>
             <input
-              className="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2 outline-none"
+              className="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
               autoComplete="current-password"
+              required
             />
           </div>
 
-          {error ? (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm">
-              {error}
+          {err && (
+            <div className="text-sm text-red-400 border border-red-500/30 bg-red-500/10 rounded-xl p-3">
+              {err}
             </div>
-          ) : null}
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-white text-black py-2 font-medium disabled:opacity-60"
+            className="w-full rounded-xl bg-white text-black font-semibold py-2.5 disabled:opacity-60"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
-        <p className="mt-4 text-sm text-white/70">
+        <p className="text-sm text-white/70 mt-5">
           No account?{" "}
-          <Link className="text-white underline" href="/signup">
+          <Link href="/signup" className="underline text-white">
             Create one
           </Link>
         </p>

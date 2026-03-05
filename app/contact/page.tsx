@@ -1,19 +1,15 @@
 export default function ContactPage() {
   return (
-    <div className="py-14">
-      <h1 className="text-4xl font-semibold">Contact</h1>
-      <p className="mt-3 text-white/70">
-        For support or business inquiries:
-      </p>
-
-      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
-        <div className="text-sm text-white/70">Email</div>
-        <a
-          href="mailto:hi@shynvo.app"
-          className="mt-1 block text-lg font-semibold text-white underline underline-offset-4"
-        >
-          hi@shynvo.app
-        </a>
+    <div className="mx-auto w-full max-w-5xl py-16">
+      <div className="rounded-3xl border border-white/15 bg-white/5 p-10 backdrop-blur-xl">
+        <h1 className="text-4xl font-semibold">Contact</h1>
+        <p className="mt-4 text-white/80">For support or business inquiries:</p>
+        <p className="mt-2 text-lg">
+          Email:{" "}
+          <a className="underline hover:opacity-80" href="mailto:hi@shynvo.app">
+            hi@shynvo.app
+          </a>
+        </p>
       </div>
     </div>
   );

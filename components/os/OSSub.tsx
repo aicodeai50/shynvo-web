@@ -1,54 +1,21 @@
 "use client";
 
-import { useMemo } from "react";
-import { useOSState } from "@/components/os/useOSState";
+import Link from "next/link";
 
-export type Locale =
-  | "en"
-  | "es"
-  | "fr"
-  | "pt"
-  | "de"
-  | "it"
-  | "nl"
-  | "tr"
-  | "ar"
-  | "hi"
-  | "zh"
-  | "ja"
-  | "ko";
-
-type I18n = Partial<Record<Locale, string>>;
-
-export function useOSLocale() {
-  const [locale, setLocale] = useOSState<Locale>("os.locale", "en");
-  return { locale, setLocale };
-}
-
-export default function OSSub({
-  en,
-  i18n,
-  showEnglish = true,
-}: {
-  en: string;
-  i18n?: I18n;
-  showEnglish?: boolean;
-}) {
-  const { locale } = useOSLocale();
-
-  const translated = useMemo(() => {
-    if (!i18n) return "";
-    if (locale === "en") return "";
-    return i18n[locale] || "";
-  }, [i18n, locale]);
-
+export default function OSSub({ title, backHref }: { title: string; backHref?: string }) {
   return (
-    <div className="space-y-1">
-      {showEnglish ? <div className="text-sm text-white/60">{en}</div> : null}
-      {translated ? (
-        <div className="text-xs text-white/45">
-          {translated}
-        </div>
+    <div className="mb-6 flex items-center justify-between gap-3">
+      <div>
+        <div className="text-xl font-semibold">{title}</div>
+        <div className="text-xs text-white/60">Shynvo OS</div>
+      </div>
+      {backHref ? (
+        <Link
+          href={backHref}
+          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10"
+        >
+          Back
+        </Link>
       ) : null}
     </div>
   );

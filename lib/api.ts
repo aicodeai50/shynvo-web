@@ -9,23 +9,18 @@ export async function api(path: string, options: RequestInit = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      "x-sh-api-key": KEY, // ✅ MUST MATCH BACKEND
+      "x-sh-api-key": KEY,
       ...(options.headers || {}),
     },
-    credentials: "include", // ✅ cookies for /auth/me
+    credentials: "include",
   });
 
-  // Try to return useful error messages
+  const data = await res.json().catch(() => ({}));
+
   if (!res.ok) {
-    let msg = "Request failed";
-    try {
-      const j = await res.json();
-      msg = j?.error || j?.details || msg;
-    } catch {
-      msg = await res.text();
-    }
-    throw new Error(msg || "Request failed");
+    const msg = data?.error || "Request failed";
+    throw new Error(msg);
   }
 
-  return res.json();
+  return data;
 }
