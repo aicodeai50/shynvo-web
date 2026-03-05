@@ -8,7 +8,7 @@ type Building = {
   label: string;
   desc: string;
   tags: string[];
-  href?: string; // optional now (v1: some are parked)
+  href?: string;
   planned?: boolean;
   accent?: "neutral" | "os" | "university" | "experiments" | "enterprise" | "frontier" | "arcade";
 };
@@ -32,7 +32,9 @@ function cx(...classes: Array<string | false | null | undefined>) {
 }
 
 export default function HomePage() {
-  // v1: we show the platform universe, but park non-shipping routes to avoid broken nav/build confusion
+  // Control Guide from the Robot panel
+  const [guideOpen, setGuideOpen] = useState(false);
+
   const buildings: Building[] = [
     {
       name: "University Hub",
@@ -88,12 +90,7 @@ export default function HomePage() {
     {
       name: "Starter — 7 Day Free Trial",
       subtitle: "Full access for 7 days. Upgrade required after trial.",
-      bullets: [
-        "Full access for 7 days",
-        "Learn + build your workflow baseline",
-        "Upgrade required after day 7",
-        "Support via hi@shynvo.app",
-      ],
+      bullets: ["Full access for 7 days", "Learn + build your workflow baseline", "Upgrade required after day 7", "Support via hi@shynvo.app"],
       cta: "Create account",
       href: "/signup",
     },
@@ -142,10 +139,7 @@ export default function HomePage() {
                 Enter Platform
               </a>
 
-              <Link
-                href="/docs"
-                className="rounded-xl px-5 py-3 text-center text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5"
-              >
+              <Link href="/docs" className="rounded-xl px-5 py-3 text-center text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5">
                 Read Docs
               </Link>
             </div>
@@ -153,20 +147,15 @@ export default function HomePage() {
             <div className="mt-4 text-xs text-white/60">Trial: full access for 7 days. Upgrade required after trial.</div>
           </div>
 
+          {/* Cinematic Robot Chamber */}
           <div className="relative">
-            <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-              <div className="h-full w-full p-6">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-semibold text-white/80">Cinematic Robot Visual</div>
-                  <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/70">
-                    Silent on homepage
-                  </div>
-                </div>
-                <div className="mt-6 h-[70%] rounded-2xl border border-white/10 bg-[radial-gradient(900px_240px_at_50%_20%,rgba(255,255,255,0.08),transparent_60%)]" />
-                <div className="mt-4 text-xs text-white/60">
-                  Robot activates inside <span className="text-white/80">Shynvo OS</span>.
-                </div>
-              </div>
+            <RobotChamber
+              onActivate={() => {
+                setGuideOpen(true);
+              }}
+            />
+            <div className="mt-3 text-xs text-white/60">
+              Click the chamber to activate. The robot responds inside the Guide.
             </div>
           </div>
         </div>
@@ -183,18 +172,223 @@ export default function HomePage() {
         <BuildingsGrid buildings={buildings} />
       </Section>
 
-      <Section
-        id="pricing"
-        eyebrow="Plans"
-        title="Pricing"
-        subtitle="Start with a 7-day free trial. After that, upgrading is required to continue."
-      >
+      <Section id="pricing" eyebrow="Plans" title="Pricing" subtitle="Start with a 7-day free trial. After that, upgrading is required to continue.">
         <Pricing plans={plans} />
       </Section>
 
-      <ShynvoGuide />
+      <ShynvoGuide open={guideOpen} onOpenChange={setGuideOpen} />
 
       <div className="h-10" />
+    </div>
+  );
+}
+
+function RobotChamber({ onActivate }: { onActivate: () => void }) {
+  const [hot, setHot] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={onActivate}
+      onMouseEnter={() => setHot(true)}
+      onMouseLeave={() => setHot(false)}
+      className={cx(
+        "group relative w-full overflow-hidden rounded-3xl border text-left",
+        "border-white/10 bg-white/5",
+        "transition focus:outline-none focus:ring-2 focus:ring-white/20"
+      )}
+      aria-label="Activate robot"
+    >
+      {/* Aspect */}
+      <div className="aspect-[4/3] w-full">
+        {/* Base cinematic gradients */}
+        <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_50%_15%,rgba(255,255,255,0.10),transparent_62%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(650px_220px_at_70%_60%,rgba(56,189,248,0.12),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(540px_220px_at_25%_70%,rgba(167,139,250,0.10),transparent_60%)]" />
+
+        {/* Moving light sweep (feels “live”) */}
+        <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="sh-sweep absolute -left-[40%] top-0 h-full w-[60%] bg-white/10 blur-2xl" />
+        </div>
+
+        {/* Subtle scanlines */}
+        <div className="absolute inset-0 opacity-[0.12] mix-blend-overlay">
+          <div className="sh-scan h-full w-full" />
+        </div>
+
+        {/* Floating particles */}
+        <div className="absolute inset-0">
+          <Particles />
+        </div>
+
+        {/* “Robot silhouette” (abstract but cinematic + alive via pulsing core) */}
+        <div className="absolute inset-0 grid place-items-center p-6">
+          <div className="relative h-full w-full rounded-2xl border border-white/10 bg-black/20 backdrop-blur-[1px]">
+            {/* inner glow */}
+            <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(520px_200px_at_50%_35%,rgba(255,255,255,0.09),transparent_62%)]" />
+
+            {/* head */}
+            <div className="absolute left-1/2 top-[18%] h-[28%] w-[42%] -translate-x-1/2 rounded-[2rem] border border-white/12 bg-white/5">
+              <div className="absolute left-1/2 top-[36%] h-10 w-10 -translate-x-1/2 rounded-full border border-white/15 bg-white/5">
+                {/* eye/core pulse */}
+                <div className={cx("absolute inset-0 rounded-full", hot ? "sh-core-hot" : "sh-core")} />
+              </div>
+              <div className="absolute left-1/2 top-[72%] h-[2px] w-[54%] -translate-x-1/2 bg-white/20" />
+            </div>
+
+            {/* torso */}
+            <div className="absolute left-1/2 top-[48%] h-[36%] w-[56%] -translate-x-1/2 rounded-[2.2rem] border border-white/12 bg-white/5">
+              <div className="absolute left-1/2 top-[18%] h-14 w-14 -translate-x-1/2 rounded-2xl border border-white/15 bg-white/5">
+                <div className={cx("absolute inset-0 rounded-2xl", hot ? "sh-core-hot" : "sh-core")} />
+              </div>
+              <div className="absolute left-1/2 top-[62%] h-[2px] w-[70%] -translate-x-1/2 bg-white/20" />
+            </div>
+
+            {/* vignette */}
+            <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" />
+            <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(900px_340px_at_50%_120%,rgba(0,0,0,0.65),transparent_55%)]" />
+          </div>
+        </div>
+
+        {/* Bottom caption */}
+        <div className="absolute left-0 right-0 bottom-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-5 py-3">
+          <div>
+            <div className="text-xs font-semibold text-white/85">Cinematic AI Robot Chamber</div>
+            <div className="text-[11px] text-white/55">Tap to activate</div>
+          </div>
+          <span className="rounded-full border border-white/10 bg-white/5 p-2 text-white/80">
+            <ArrowRightIcon />
+          </span>
+        </div>
+
+        {/* CSS for animations */}
+        <style jsx>{`
+          .sh-sweep {
+            transform: skewX(-18deg) translateX(0);
+            animation: sweep 2.6s linear infinite;
+          }
+          @keyframes sweep {
+            0% {
+              transform: skewX(-18deg) translateX(-40%);
+              opacity: 0.35;
+            }
+            35% {
+              opacity: 0.6;
+            }
+            100% {
+              transform: skewX(-18deg) translateX(220%);
+              opacity: 0.25;
+            }
+          }
+
+          .sh-scan {
+            background: repeating-linear-gradient(
+              to bottom,
+              rgba(255, 255, 255, 0.22),
+              rgba(255, 255, 255, 0.22) 1px,
+              transparent 1px,
+              transparent 6px
+            );
+            animation: scan 3.2s linear infinite;
+          }
+          @keyframes scan {
+            0% {
+              transform: translateY(0);
+              opacity: 0.12;
+            }
+            50% {
+              opacity: 0.18;
+            }
+            100% {
+              transform: translateY(24px);
+              opacity: 0.12;
+            }
+          }
+
+          .sh-core {
+            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.22), rgba(56, 189, 248, 0.20), transparent 64%);
+            filter: blur(0.2px);
+            animation: pulse 2.2s ease-in-out infinite;
+          }
+          .sh-core-hot {
+            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.28), rgba(56, 189, 248, 0.28), rgba(167, 139, 250, 0.18), transparent 64%);
+            filter: blur(0.2px);
+            animation: pulseHot 1.4s ease-in-out infinite;
+          }
+          @keyframes pulse {
+            0%,
+            100% {
+              transform: scale(0.92);
+              opacity: 0.72;
+            }
+            50% {
+              transform: scale(1.02);
+              opacity: 0.95;
+            }
+          }
+          @keyframes pulseHot {
+            0%,
+            100% {
+              transform: scale(0.90);
+              opacity: 0.78;
+            }
+            50% {
+              transform: scale(1.06);
+              opacity: 1;
+            }
+          }
+        `}</style>
+      </div>
+    </button>
+  );
+}
+
+function Particles() {
+  // lightweight, deterministic “particle” dots via CSS only
+  // (no canvas needed; safe for build and mobile)
+  const dots = useMemo(
+    () =>
+      Array.from({ length: 14 }).map((_, i) => {
+        const left = (i * 7 + 13) % 100;
+        const top = (i * 11 + 9) % 100;
+        const size = 2 + (i % 3);
+        const delay = (i % 7) * 0.35;
+        const dur = 3.5 + (i % 5) * 0.8;
+        return { left, top, size, delay, dur };
+      }),
+    []
+  );
+
+  return (
+    <div className="absolute inset-0">
+      {dots.map((d, idx) => (
+        <span
+          key={idx}
+          className="absolute rounded-full bg-white/35"
+          style={{
+            left: `${d.left}%`,
+            top: `${d.top}%`,
+            width: `${d.size}px`,
+            height: `${d.size}px`,
+            opacity: 0.35,
+            animation: `floaty ${d.dur}s ease-in-out ${d.delay}s infinite`,
+            filter: "blur(0.1px)",
+          }}
+        />
+      ))}
+      <style jsx>{`
+        @keyframes floaty {
+          0%,
+          100% {
+            transform: translate3d(0, 0, 0);
+            opacity: 0.25;
+          }
+          50% {
+            transform: translate3d(0, -16px, 0);
+            opacity: 0.55;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -255,18 +449,14 @@ function BuildingCard({ b }: { b: Building }) {
   }, [b.accent]);
 
   const Wrapper: any = b.href ? "a" : "div";
-  const wrapperProps = b.href
-    ? { href: b.href, "aria-label": `Enter ${b.name}` }
-    : { role: "group", "aria-label": `${b.name} (planned)` };
+  const wrapperProps = b.href ? { href: b.href, "aria-label": `Enter ${b.name}` } : { role: "group", "aria-label": `${b.name} (planned)` };
 
   return (
     <Wrapper
       {...wrapperProps}
       className={cx(
         "group relative block rounded-3xl border p-5 transition",
-        b.href
-          ? "cursor-pointer hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
-          : "cursor-default opacity-[0.92]",
+        b.href ? "cursor-pointer hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]" : "cursor-default opacity-[0.92]",
         accent
       )}
     >
@@ -280,9 +470,7 @@ function BuildingCard({ b }: { b: Building }) {
         </div>
 
         {b.planned || !b.href ? (
-          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/70">
-            Planned
-          </span>
+          <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/70">Planned</span>
         ) : null}
       </div>
 
@@ -290,19 +478,14 @@ function BuildingCard({ b }: { b: Building }) {
 
       <div className="mt-4 flex flex-wrap gap-2">
         {b.tags.map((t) => (
-          <span
-            key={t}
-            className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/70"
-          >
+          <span key={t} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/70">
             {t}
           </span>
         ))}
       </div>
 
       <div className="mt-5 flex items-center justify-between">
-        <span className="text-sm font-semibold text-white/90 group-hover:text-white">
-          {b.href ? "Enter" : "Preview"}
-        </span>
+        <span className="text-sm font-semibold text-white/90 group-hover:text-white">{b.href ? "Enter" : "Preview"}</span>
         <span className="rounded-full border border-white/10 bg-white/5 p-2">
           <ArrowRightIcon />
         </span>
@@ -329,9 +512,7 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
               <div className="mt-1 text-sm text-white/70">{p.subtitle}</div>
             </div>
             {p.highlight ? (
-              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/80">
-                Recommended
-              </span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/80">Recommended</span>
             ) : null}
           </div>
 
@@ -344,7 +525,6 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
             ))}
           </ul>
 
-          {/* Use Link for internal routes to avoid full reload */}
           {p.href.startsWith("/") ? (
             <Link
               href={p.href}
@@ -376,10 +556,18 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
 
 type Msg = { role: "user" | "guide"; text: string };
 
-function ShynvoGuide() {
-  const [open, setOpen] = useState(false);
+function ShynvoGuide({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (next: boolean) => void;
+}) {
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: "guide", text: "Shynvo Guide: quick answers about the platform. Ask about environments, pricing, or trial." },
+    {
+      role: "guide",
+      text: "Shynvo Guide: Ask anything about the platform, pricing, or trial. (Robot chamber activates this.)",
+    },
   ]);
   const [input, setInput] = useState("");
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -394,6 +582,7 @@ function ShynvoGuide() {
       { match: (q) => /trial|7 day|free/.test(q), answer: "Trial gives full access for 7 days. After that you upgrade to continue." },
       { match: (q) => /contact|email|support/.test(q), answer: "Support: hi@shynvo.app" },
       { match: (q) => /docs|documentation/.test(q), answer: "Docs are available at /docs. Pricing is on the homepage (#pricing)." },
+      { match: (q) => /dashboard|login|signup|account/.test(q), answer: "Create an account at /signup, sign in at /login, and access your dashboard at /dashboard." },
     ],
     []
   );
@@ -405,6 +594,16 @@ function ShynvoGuide() {
     }, 50);
     return () => clearTimeout(t);
   }, [open, msgs.length]);
+
+  useEffect(() => {
+    // When opening from robot, drop a “wake” message once
+    if (!open) return;
+    setMsgs((m) => {
+      const already = m.some((x) => x.role === "guide" && x.text.includes("Robot online"));
+      if (already) return m;
+      return [...m, { role: "guide", text: "Robot online. What do you want to build today?" }];
+    });
+  }, [open]);
 
   function reply(qRaw: string) {
     const q = qRaw.trim().toLowerCase();
@@ -422,7 +621,7 @@ function ShynvoGuide() {
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => onOpenChange(true)}
         className="fixed bottom-5 right-5 z-50 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#0B0F14] shadow-lg hover:bg-white/90"
         aria-label="Open Shynvo Guide"
       >
@@ -431,7 +630,7 @@ function ShynvoGuide() {
 
       {open ? (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
+          <div className="absolute inset-0 bg-black/60" onClick={() => onOpenChange(false)} />
 
           <div
             className={cx("absolute right-0 top-0 h-full w-full border-l border-white/10 bg-[#0B0F14]", "sm:w-[420px]")}
@@ -441,10 +640,10 @@ function ShynvoGuide() {
             <div className="flex items-center justify-between border-b border-white/10 p-4">
               <div>
                 <div className="text-sm font-semibold">Shynvo Guide</div>
-                <div className="text-xs text-white/60">Quick answers.</div>
+                <div className="text-xs text-white/60">Robot channel active.</div>
               </div>
               <button
-                onClick={() => setOpen(false)}
+                onClick={() => onOpenChange(false)}
                 className="rounded-xl p-2 ring-1 ring-white/15 hover:bg-white/5"
                 aria-label="Close guide"
               >
@@ -477,7 +676,7 @@ function ShynvoGuide() {
                     if (e.key === "Enter") send();
                   }}
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/20"
-                  placeholder="Ask about Shynvo..."
+                  placeholder="Ask the robot..."
                 />
                 <button onClick={send} className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90">
                   Send
