@@ -8,7 +8,7 @@ type Building = {
   label: string;
   desc: string;
   tags: string[];
-  href: string; // required now (so no “planned” and no dead links)
+  href: string; // required now (no “planned” and no dead links)
   accent?: "neutral" | "os" | "university" | "experiments" | "enterprise" | "frontier" | "arcade";
 };
 
@@ -89,14 +89,24 @@ export default function HomePage() {
     {
       name: "Starter — 7 Day Free Trial",
       subtitle: "Full access for 7 days. Upgrade required after trial.",
-      bullets: ["Full access for 7 days", "Learn + build your workflow baseline", "Upgrade required after day 7", "Support via hi@shynvo.app"],
+      bullets: [
+        "Full access for 7 days",
+        "Learn + build your workflow baseline",
+        "Upgrade required after day 7",
+        "Support via hi@shynvo.app",
+      ],
       cta: "Create account",
       href: "/signup",
     },
     {
       name: "Pro — 299 NOK/month",
       subtitle: "Individual intelligence infrastructure.",
-      bullets: ["Unlimited missions and loops", "Advanced orchestration + analytics", "Full environment access", "Priority support"],
+      bullets: [
+        "Unlimited missions and loops",
+        "Advanced orchestration + analytics",
+        "Full environment access",
+        "Priority support",
+      ],
       cta: "Upgrade to Pro",
       href: "mailto:hi@shynvo.app?subject=Shynvo%20Pro%20Upgrade",
       highlight: true,
@@ -104,7 +114,12 @@ export default function HomePage() {
     {
       name: "Team — 999 NOK/month",
       subtitle: "Organizational intelligence system.",
-      bullets: ["Seats + admin controls", "Skill matrix + org analytics", "Team missions + dashboards", "Enterprise workflows"],
+      bullets: [
+        "Seats + admin controls",
+        "Skill matrix + org analytics",
+        "Team missions + dashboards",
+        "Enterprise workflows",
+      ],
       cta: "Upgrade to Team",
       href: "mailto:hi@shynvo.app?subject=Shynvo%20Team%20Upgrade",
     },
@@ -122,12 +137,17 @@ export default function HomePage() {
               Structured Intelligence Platform
             </div>
 
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Shynvo</h1>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+              Shynvo
+            </h1>
 
-            <p className="mt-2 text-xl text-white/90 sm:text-2xl">Architecture of Applied Intelligence</p>
+            <p className="mt-2 text-xl text-white/90 sm:text-2xl">
+              Architecture of Applied Intelligence
+            </p>
 
             <p className="mt-4 max-w-xl text-sm leading-6 text-white/70 sm:text-base">
-              A multi-environment intelligence platform for learning, execution, strategy, resilience, and organizational growth.
+              A multi-environment intelligence platform for learning, execution,
+              strategy, resilience, and organizational growth.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -146,7 +166,9 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-4 text-xs text-white/60">Trial: full access for 7 days. Upgrade required after trial.</div>
+            <div className="mt-4 text-xs text-white/60">
+              Trial: full access for 7 days. Upgrade required after trial.
+            </div>
           </div>
 
           {/* Cinematic Robot Chamber */}
@@ -156,7 +178,9 @@ export default function HomePage() {
                 setGuideOpen(true);
               }}
             />
-            <div className="mt-3 text-xs text-white/60">Click the chamber to activate.</div>
+            <div className="mt-3 text-xs text-white/60">
+              Click the chamber to activate.
+            </div>
           </div>
         </div>
 
@@ -172,7 +196,12 @@ export default function HomePage() {
         <BuildingsGrid buildings={buildings} />
       </Section>
 
-      <Section id="pricing" eyebrow="Plans" title="Pricing" subtitle="Start with a 7-day free trial. After that, upgrading is required to continue.">
+      <Section
+        id="pricing"
+        eyebrow="Plans"
+        title="Pricing"
+        subtitle="Start with a 7-day free trial. After that, upgrading is required to continue."
+      >
         <Pricing plans={plans} />
       </Section>
 
@@ -182,6 +211,8 @@ export default function HomePage() {
     </div>
   );
 }
+
+/* --------------------------- Robot Chamber (VIDEO) -------------------------- */
 
 function RobotChamber({ onActivate }: { onActivate: () => void }) {
   const [hot, setHot] = useState(false);
@@ -194,63 +225,60 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
       onMouseLeave={() => setHot(false)}
       className={cx(
         "group relative w-full overflow-hidden rounded-3xl border text-left",
-        "border-white/10 bg-white/5",
+        "border-white/10 bg-black",
         "transition focus:outline-none focus:ring-2 focus:ring-white/20"
       )}
       aria-label="Activate robot"
     >
       <div className="relative aspect-[4/3] w-full">
-        {/* Base cinematic gradients */}
-        <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_50%_15%,rgba(255,255,255,0.10),transparent_62%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(650px_220px_at_70%_60%,rgba(56,189,248,0.12),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(540px_220px_at_25%_70%,rgba(167,139,250,0.10),transparent_60%)]" />
+        {/* Robot cinematic VIDEO */}
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src="/robot.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
 
-        {/* Moving light sweep */}
+        {/* Overlay so text stays readable */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Cinematic gradients */}
+        <div className="absolute inset-0 bg-[radial-gradient(900px_280px_at_50%_15%,rgba(255,255,255,0.10),transparent_62%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(650px_220px_at_70%_60%,rgba(56,189,248,0.15),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(540px_220px_at_25%_70%,rgba(167,139,250,0.12),transparent_60%)]" />
+
+        {/* Hover sweep */}
         <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <div className="sh-sweep absolute -left-[40%] top-0 h-full w-[60%] bg-white/10 blur-2xl" />
         </div>
 
-        {/* Subtle scanlines */}
+        {/* Scanlines */}
         <div className="absolute inset-0 opacity-[0.12] mix-blend-overlay">
           <div className="sh-scan h-full w-full" />
         </div>
 
-        {/* Floating particles */}
-        <div className="absolute inset-0">
-          <Particles />
-        </div>
+        {/* Particles */}
+        <Particles />
 
-        {/* “Robot silhouette” */}
-        <div className="absolute inset-0 grid place-items-center p-6">
-          <div className="relative h-full w-full rounded-2xl border border-white/10 bg-black/20 backdrop-blur-[1px]">
-            <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(520px_200px_at_50%_35%,rgba(255,255,255,0.09),transparent_62%)]" />
-
-            {/* head */}
-            <div className="absolute left-1/2 top-[18%] h-[28%] w-[42%] -translate-x-1/2 rounded-[2rem] border border-white/12 bg-white/5">
-              <div className="absolute left-1/2 top-[36%] h-10 w-10 -translate-x-1/2 rounded-full border border-white/15 bg-white/5">
-                <div className={cx("absolute inset-0 rounded-full", hot ? "sh-core-hot" : "sh-core")} />
-              </div>
-              <div className="absolute left-1/2 top-[72%] h-[2px] w-[54%] -translate-x-1/2 bg-white/20" />
-            </div>
-
-            {/* torso */}
-            <div className="absolute left-1/2 top-[48%] h-[36%] w-[56%] -translate-x-1/2 rounded-[2.2rem] border border-white/12 bg-white/5">
-              <div className="absolute left-1/2 top-[18%] h-14 w-14 -translate-x-1/2 rounded-2xl border border-white/15 bg-white/5">
-                <div className={cx("absolute inset-0 rounded-2xl", hot ? "sh-core-hot" : "sh-core")} />
-              </div>
-              <div className="absolute left-1/2 top-[62%] h-[2px] w-[70%] -translate-x-1/2 bg-white/20" />
-            </div>
-
-            <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" />
-            <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(900px_340px_at_50%_120%,rgba(0,0,0,0.65),transparent_55%)]" />
-          </div>
+        {/* Subtle “core” indicator */}
+        <div className="absolute inset-0 grid place-items-center">
+          <div
+            className={cx(
+              "h-16 w-16 rounded-2xl border border-white/10 bg-white/5 backdrop-blur",
+              hot ? "sh-core-hot" : "sh-core"
+            )}
+          />
         </div>
 
         {/* Bottom caption */}
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-5 py-3">
+        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/30 px-5 py-3">
           <div>
-            <div className="text-xs font-semibold text-white/85">Cinematic AI Robot Chamber</div>
-            <div className="text-[11px] text-white/55">Tap to activate</div>
+            <div className="text-xs font-semibold text-white/90">
+              Cinematic AI Robot
+            </div>
+            <div className="text-[11px] text-white/60">Tap to activate</div>
           </div>
           <span className="rounded-full border border-white/10 bg-white/5 p-2 text-white/80">
             <ArrowRightIcon />
@@ -301,8 +329,12 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
           }
 
           .sh-core {
-            background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.22), rgba(56, 189, 248, 0.2), transparent 64%);
-            filter: blur(0.2px);
+            background: radial-gradient(
+              circle at 50% 45%,
+              rgba(255, 255, 255, 0.22),
+              rgba(56, 189, 248, 0.2),
+              transparent 70%
+            );
             animation: pulse 2.2s ease-in-out infinite;
           }
           .sh-core-hot {
@@ -311,9 +343,8 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
               rgba(255, 255, 255, 0.28),
               rgba(56, 189, 248, 0.28),
               rgba(167, 139, 250, 0.18),
-              transparent 64%
+              transparent 70%
             );
-            filter: blur(0.2px);
             animation: pulseHot 1.4s ease-in-out infinite;
           }
           @keyframes pulse {
@@ -323,7 +354,7 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
               opacity: 0.72;
             }
             50% {
-              transform: scale(1.02);
+              transform: scale(1.03);
               opacity: 0.95;
             }
           }
@@ -334,7 +365,7 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
               opacity: 0.78;
             }
             50% {
-              transform: scale(1.06);
+              transform: scale(1.08);
               opacity: 1;
             }
           }
@@ -392,6 +423,8 @@ function Particles() {
   );
 }
 
+/* --------------------------- UI Sections -------------------------- */
+
 function BackgroundFX() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -418,9 +451,15 @@ function Section({
   return (
     <section id={id} className="py-12 sm:py-16">
       <div className="flex flex-col gap-3">
-        <div className="text-xs font-semibold uppercase tracking-wider text-white/60">{eyebrow}</div>
-        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
-        <p className="max-w-3xl text-sm leading-6 text-white/70 sm:text-base">{subtitle}</p>
+        <div className="text-xs font-semibold uppercase tracking-wider text-white/60">
+          {eyebrow}
+        </div>
+        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          {title}
+        </h2>
+        <p className="max-w-3xl text-sm leading-6 text-white/70 sm:text-base">
+          {subtitle}
+        </p>
       </div>
       <div className="mt-8">{children}</div>
     </section>
@@ -467,18 +506,25 @@ function BuildingCard({ b }: { b: Building }) {
         </div>
       </div>
 
-      <p className="mt-4 line-clamp-2 text-sm leading-6 text-white/70">{b.desc}</p>
+      <p className="mt-4 line-clamp-2 text-sm leading-6 text-white/70">
+        {b.desc}
+      </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {b.tags.map((t) => (
-          <span key={t} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/70">
+          <span
+            key={t}
+            className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/70"
+          >
             {t}
           </span>
         ))}
       </div>
 
       <div className="mt-5 flex items-center justify-between">
-        <span className="text-sm font-semibold text-white/90 group-hover:text-white">Enter</span>
+        <span className="text-sm font-semibold text-white/90 group-hover:text-white">
+          Enter
+        </span>
         <span className="rounded-full border border-white/10 bg-white/5 p-2">
           <ArrowRightIcon />
         </span>
@@ -497,7 +543,10 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
       {plans.map((p) => (
         <div
           key={p.name}
-          className={cx("rounded-3xl border p-5", p.highlight ? "border-white/20 bg-white/7" : "border-white/10 bg-white/5")}
+          className={cx(
+            "rounded-3xl border p-5",
+            p.highlight ? "border-white/20 bg-white/7" : "border-white/10 bg-white/5"
+          )}
         >
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -505,7 +554,9 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
               <div className="mt-1 text-sm text-white/70">{p.subtitle}</div>
             </div>
             {p.highlight ? (
-              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/80">Recommended</span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-white/80">
+                Recommended
+              </span>
             ) : null}
           </div>
 
@@ -523,7 +574,9 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
               href={p.href}
               className={cx(
                 "mt-5 block rounded-xl px-4 py-3 text-center text-sm font-semibold",
-                p.highlight ? "bg-white text-[#0B0F14] hover:bg-white/90" : "ring-1 ring-white/15 hover:bg-white/5"
+                p.highlight
+                  ? "bg-white text-[#0B0F14] hover:bg-white/90"
+                  : "ring-1 ring-white/15 hover:bg-white/5"
               )}
             >
               {p.cta}
@@ -533,7 +586,9 @@ function Pricing({ plans }: { plans: PricingPlan[] }) {
               href={p.href}
               className={cx(
                 "mt-5 block rounded-xl px-4 py-3 text-center text-sm font-semibold",
-                p.highlight ? "bg-white text-[#0B0F14] hover:bg-white/90" : "ring-1 ring-white/15 hover:bg-white/5"
+                p.highlight
+                  ? "bg-white text-[#0B0F14] hover:bg-white/90"
+                  : "ring-1 ring-white/15 hover:bg-white/5"
               )}
             >
               {p.cta}
@@ -569,13 +624,31 @@ function ShynvoGuide({
     () => [
       {
         match: (q) => /what is shynvo\??|shynvo\??\s*$/.test(q),
-        answer: "Shynvo is a multi-environment intelligence platform built around structured systems for learning and execution.",
+        answer:
+          "Shynvo is a multi-environment intelligence platform built around structured systems for learning and execution.",
       },
-      { match: (q) => /pricing|plans|cost|price/.test(q), answer: "Start with a 7-day free trial. Upgrade is required after trial." },
-      { match: (q) => /trial|7 day|free/.test(q), answer: "Trial gives full access for 7 days. After that you upgrade to continue." },
-      { match: (q) => /contact|email|support/.test(q), answer: "Support: hi@shynvo.app" },
-      { match: (q) => /docs|documentation/.test(q), answer: "Docs are available at /docs. Pricing is on the homepage (#pricing)." },
-      { match: (q) => /dashboard|login|signup|account/.test(q), answer: "Create an account at /signup, sign in at /login, and access your dashboard at /dashboard." },
+      {
+        match: (q) => /pricing|plans|cost|price/.test(q),
+        answer: "Start with a 7-day free trial. Upgrade is required after trial.",
+      },
+      {
+        match: (q) => /trial|7 day|free/.test(q),
+        answer:
+          "Trial gives full access for 7 days. After that you upgrade to continue.",
+      },
+      {
+        match: (q) => /contact|email|support/.test(q),
+        answer: "Support: hi@shynvo.app",
+      },
+      {
+        match: (q) => /docs|documentation/.test(q),
+        answer: "Docs are available at /docs. Pricing is on the homepage (#pricing).",
+      },
+      {
+        match: (q) => /dashboard|login|signup|account/.test(q),
+        answer:
+          "Create an account at /signup, sign in at /login, and access your dashboard at /dashboard.",
+      },
     ],
     []
   );
@@ -583,7 +656,10 @@ function ShynvoGuide({
   useEffect(() => {
     if (!open) return;
     const t = setTimeout(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+      listRef.current?.scrollTo({
+        top: listRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }, 50);
     return () => clearTimeout(t);
   }, [open, msgs.length]);
@@ -591,7 +667,9 @@ function ShynvoGuide({
   useEffect(() => {
     if (!open) return;
     setMsgs((m) => {
-      const already = m.some((x) => x.role === "guide" && x.text.includes("Robot online"));
+      const already = m.some(
+        (x) => x.role === "guide" && x.text.includes("Robot online")
+      );
       if (already) return m;
       return [...m, { role: "guide", text: "Robot online. What do you want to build today?" }];
     });
@@ -622,10 +700,16 @@ function ShynvoGuide({
 
       {open ? (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/60" onClick={() => onOpenChange(false)} />
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => onOpenChange(false)}
+          />
 
           <div
-            className={cx("absolute right-0 top-0 h-full w-full border-l border-white/10 bg-[#0B0F14]", "sm:w-[420px]")}
+            className={cx(
+              "absolute right-0 top-0 h-full w-full border-l border-white/10 bg-[#0B0F14]",
+              "sm:w-[420px]"
+            )}
             role="dialog"
             aria-modal="true"
           >
@@ -650,7 +734,9 @@ function ShynvoGuide({
                     key={idx}
                     className={cx(
                       "max-w-[92%] rounded-2xl border px-4 py-3 text-sm leading-6",
-                      m.role === "user" ? "ml-auto border-white/10 bg-white/10 text-white" : "border-white/10 bg-white/5 text-white/85"
+                      m.role === "user"
+                        ? "ml-auto border-white/10 bg-white/10 text-white"
+                        : "border-white/10 bg-white/5 text-white/85"
                     )}
                   >
                     {m.text}
@@ -677,7 +763,9 @@ function ShynvoGuide({
                   Send
                 </button>
               </div>
-              <div className="mt-2 text-[11px] text-white/50">Support: hi@shynvo.app</div>
+              <div className="mt-2 text-[11px] text-white/50">
+                Support: hi@shynvo.app
+              </div>
             </div>
           </div>
         </div>
@@ -686,10 +774,18 @@ function ShynvoGuide({
   );
 }
 
+/* --------------------------- Icons -------------------------- */
+
 function ArrowRightIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M10 7 15 12 10 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M10 7 15 12 10 17"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -701,5 +797,4 @@ function CloseIcon() {
       <path d="M17 7 7 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
-
-  }
+}
