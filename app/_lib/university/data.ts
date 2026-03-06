@@ -1,146 +1,186 @@
-export type UniDepartmentKey =
-  | "student-hub"
-  | "teacher-office"
-  | "tutor-center"
-  | "library"
-  | "classrooms"
-  | "research-lab"
-  | "career-services";
+export type FacultyKey =
+  | "it"
+  | "business"
+  | "law"
+  | "health"
+  | "engineering"
+  | "education"
+  | "arts"
+  | "interdisciplinary";
 
-export type UniDepartment = {
-  key: UniDepartmentKey;
+export type TrackKey =
+  | "cs"
+  | "it"
+  | "software"
+  | "data"
+  | "ai"
+  | "cybersecurity"
+  | "math"
+  | "finance"
+  | "marketing"
+  | "management"
+  | "accounting"
+  | "law"
+  | "politics"
+  | "nursing"
+  | "medicine"
+  | "public-health"
+  | "mechanical"
+  | "electrical"
+  | "civil"
+  | "teacher-ed"
+  | "design"
+  | "media"
+  | "psychology"
+  | "philosophy";
+
+export type UniRole = "teacher" | "tutor" | "assistant";
+
+export type UniTrack = {
+  key: TrackKey;
   title: string;
   subtitle: string;
   tags: string[];
-  highlights: string[];
 };
 
 export type UniFaculty = {
-  slug: string;
-  key: string;
-  name: string;
-  degree: "BA" | "BSc" | "BEng" | "LLB" | "BBA" | "BEd" | "BHealth";
-  summary: string;
-  departments: UniDepartmentKey[];
-  focusAreas: string[];
-  featuredBooks: Array<{ title: string; author: string; year?: string }>;
-};
-
-export const DEPARTMENTS: Record<UniDepartmentKey, UniDepartment> = {
-  "student-hub": {
-    key: "student-hub",
-    title: "Student Hub",
-    subtitle: "Enrollment, schedules, study planning, and student success support.",
-    tags: ["Planning", "Support", "Resources"],
-    highlights: ["Study roadmap builder", "Semester planning", "Student support desk", "Success check-ins"],
-  },
-  "teacher-office": {
-    key: "teacher-office",
-    title: "Teacher Office",
-    subtitle: "Faculty office hours, feedback, grading policies, and course guidance.",
-    tags: ["Office hours", "Feedback", "Guidance"],
-    highlights: ["Book office hours", "Feedback workflow", "Assessment rubrics", "Course guidance"],
-  },
-  "tutor-center": {
-    key: "tutor-center",
-    title: "Tutor Center",
-    subtitle: "Targeted help for assignments, exam preparation, and learning gaps.",
-    tags: ["Tutoring", "Assignments", "Exams"],
-    highlights: ["Tutor matching", "Exam drill sessions", "Study technique coaching", "Problem walkthroughs"],
-  },
-  library: {
-    key: "library",
-    title: "Library",
-    subtitle: "Curated books, reading lists, notes, and high-quality learning material.",
-    tags: ["Books", "Reading lists", "Notes"],
-    highlights: ["Faculty reading lists", "Digital shelves", "Searchable notes", "Citation helpers"],
-  },
-  classrooms: {
-    key: "classrooms",
-    title: "Classrooms",
-    subtitle: "Structured lessons, modules, and practice-based learning experiences.",
-    tags: ["Lessons", "Modules", "Practice"],
-    highlights: ["Lesson modules", "Exercises", "Progress tracking", "Peer discussion boards"],
-  },
-  "research-lab": {
-    key: "research-lab",
-    title: "Research Lab",
-    subtitle: "For researchers and advanced learners: projects, papers, and methods.",
-    tags: ["Research", "Methods", "Projects"],
-    highlights: ["Research templates", "Paper reading workflow", "Method guides", "Project boards"],
-  },
-  "career-services": {
-    key: "career-services",
-    title: "Career Services",
-    subtitle: "Career planning, CV review, interview practice, and internship navigation.",
-    tags: ["Career", "CV", "Interviews"],
-    highlights: ["CV review", "Interview drills", "Portfolio guidance", "Internship roadmap"],
-  },
+  key: FacultyKey;
+  title: string;
+  subtitle: string;
+  areas: string[];     // left-side “areas” like Algorithms/Systems/Data…
+  tracks: UniTrack[];  // right-side “fields” like CS/AI/Cybersecurity…
 };
 
 export const FACULTIES: UniFaculty[] = [
   {
-    slug: "bsc-computer-science",
-    key: "bsc-compsci",
-    name: "Computer Science",
-    degree: "BSc",
-    summary: "Software engineering foundations, systems thinking, and practical computing skills.",
-    departments: ["student-hub", "teacher-office", "tutor-center", "library", "classrooms", "research-lab", "career-services"],
-    focusAreas: ["Programming", "Algorithms", "Databases", "Web", "AI Foundations", "Systems"],
-    featuredBooks: [
-      { title: "Introduction to Algorithms", author: "Cormen et al.", year: "2009" },
-      { title: "Clean Code", author: "Robert C. Martin", year: "2008" },
-      { title: "Designing Data-Intensive Applications", author: "Martin Kleppmann", year: "2017" },
+    key: "it",
+    title: "IT & Computer Science",
+    subtitle: "Computing, software, systems, data, and security — built for serious learners.",
+    areas: ["Algorithms", "Systems", "Mathematics", "Data", "Engineering"],
+    tracks: [
+      { key: "cs", title: "Computer Science", subtitle: "Theory + practice of computation.", tags: ["Algorithms", "Complexity", "Systems"] },
+      { key: "it", title: "Information Technology", subtitle: "Infrastructure, platforms, and operations.", tags: ["Cloud", "Networks", "Ops"] },
+      { key: "software", title: "Software Engineering", subtitle: "Building robust products and systems.", tags: ["Architecture", "Testing", "DevOps"] },
+      { key: "data", title: "Data Science", subtitle: "Statistics, analysis, and decision intelligence.", tags: ["ML", "Stats", "Pipelines"] },
+      { key: "ai", title: "Artificial Intelligence", subtitle: "Models, reasoning, and applied AI.", tags: ["LLMs", "Agents", "ML"] },
+      { key: "cybersecurity", title: "Cybersecurity", subtitle: "Defense, offense, and secure design.", tags: ["Threats", "Security", "Risk"] },
+      { key: "math", title: "Mathematics", subtitle: "Foundations for CS, AI, and engineering.", tags: ["Linear Algebra", "Calculus", "Discrete Math"] },
     ],
   },
   {
-    slug: "ba-business-administration",
-    key: "ba-business",
-    name: "Business Administration",
-    degree: "BA",
-    summary: "Professional business education: management, strategy, operations, and finance literacy.",
-    departments: ["student-hub", "teacher-office", "tutor-center", "library", "classrooms", "career-services"],
-    focusAreas: ["Strategy", "Management", "Operations", "Finance Basics", "Leadership"],
-    featuredBooks: [
-      { title: "Good Strategy Bad Strategy", author: "Richard Rumelt", year: "2011" },
-      { title: "The Lean Startup", author: "Eric Ries", year: "2011" },
-      { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", year: "2011" },
+    key: "business",
+    title: "Business & Management",
+    subtitle: "Professional decision-making, strategy, markets, and execution.",
+    areas: ["Strategy", "Markets", "Operations", "Leadership", "Analysis"],
+    tracks: [
+      { key: "finance", title: "Finance", subtitle: "Capital, valuation, and financial analysis.", tags: ["Valuation", "Accounting", "Risk"] },
+      { key: "marketing", title: "Marketing", subtitle: "Brand, growth, research, and positioning.", tags: ["Research", "Growth", "Brand"] },
+      { key: "management", title: "Management", subtitle: "Teams, execution, and organizational design.", tags: ["Leadership", "Ops", "Systems"] },
+      { key: "accounting", title: "Accounting", subtitle: "Reporting, auditing, and financial truth.", tags: ["Reporting", "Auditing", "Controls"] },
     ],
   },
   {
-    slug: "beng-engineering",
-    key: "beng",
-    name: "Engineering",
-    degree: "BEng",
-    summary: "Engineering fundamentals with practical problem solving and applied design systems.",
-    departments: ["student-hub", "teacher-office", "tutor-center", "library", "classrooms", "research-lab", "career-services"],
-    focusAreas: ["Mathematics", "Mechanics", "Design", "Systems", "Project Work"],
-    featuredBooks: [
-      { title: "Engineering Mechanics", author: "J.L. Meriam", year: "2012" },
-      { title: "The Design of Everyday Things", author: "Don Norman", year: "2013" },
-      { title: "Project Management", author: "Harold Kerzner", year: "2017" },
+    key: "law",
+    title: "Law & Politics",
+    subtitle: "Legal reasoning, governance, and public institutions.",
+    areas: ["Law", "Policy", "Governance", "Ethics", "Institutions"],
+    tracks: [
+      { key: "law", title: "Law", subtitle: "Contracts, rights, liability, and case reasoning.", tags: ["Contracts", "Casework", "Ethics"] },
+      { key: "politics", title: "Politics & Policy", subtitle: "Institutions, strategy, and policy design.", tags: ["Policy", "Governance", "Debate"] },
     ],
   },
   {
-    slug: "llb-law",
-    key: "llb",
-    name: "Law",
-    degree: "LLB",
-    summary: "Legal reasoning, argumentation, and professional case analysis workflows.",
-    departments: ["student-hub", "teacher-office", "tutor-center", "library", "classrooms", "career-services"],
-    focusAreas: ["Legal Writing", "Case Analysis", "Ethics", "Research", "Argumentation"],
-    featuredBooks: [
-      { title: "Learning Legal Reasoning", author: "John Delaney", year: "2017" },
-      { title: "Legal Writing in Plain English", author: "Bryan A. Garner", year: "2013" },
-      { title: "The Rule of Law", author: "Tom Bingham", year: "2011" },
+    key: "health",
+    title: "Health Sciences",
+    subtitle: "Clinical learning, public health, and patient-centered knowledge.",
+    areas: ["Clinical", "Research", "Public Health", "Practice", "Ethics"],
+    tracks: [
+      { key: "nursing", title: "Nursing", subtitle: "Patient care, practice, and clinical excellence.", tags: ["Clinical", "Care", "Practice"] },
+      { key: "medicine", title: "Medicine", subtitle: "Core medical sciences and patient reasoning.", tags: ["Clinical", "Diagnosis", "Systems"] },
+      { key: "public-health", title: "Public Health", subtitle: "Population health and prevention systems.", tags: ["Epidemiology", "Policy", "Prevention"] },
+    ],
+  },
+  {
+    key: "engineering",
+    title: "Engineering",
+    subtitle: "Design, systems thinking, and real-world engineering practice.",
+    areas: ["Design", "Systems", "Mechanics", "Electrics", "Materials"],
+    tracks: [
+      { key: "mechanical", title: "Mechanical Engineering", subtitle: "Mechanics, design, and manufacturing.", tags: ["Design", "Thermo", "CAD"] },
+      { key: "electrical", title: "Electrical Engineering", subtitle: "Circuits, signals, and power.", tags: ["Circuits", "Signals", "Power"] },
+      { key: "civil", title: "Civil Engineering", subtitle: "Structures, cities, and infrastructure.", tags: ["Structures", "Infrastructure", "Planning"] },
+    ],
+  },
+  {
+    key: "education",
+    title: "Education",
+    subtitle: "Teaching science, pedagogy, and learning design.",
+    areas: ["Pedagogy", "Assessment", "Classroom", "Learning Design", "Research"],
+    tracks: [
+      { key: "teacher-ed", title: "Teacher Education", subtitle: "Professional teaching methods and curriculum.", tags: ["Curriculum", "Assessment", "Practice"] },
+    ],
+  },
+  {
+    key: "arts",
+    title: "Creative Arts",
+    subtitle: "Craft, design, media, and creative production with professional standards.",
+    areas: ["Design", "Media", "Production", "Critique", "Portfolio"],
+    tracks: [
+      { key: "design", title: "Design", subtitle: "Visual systems, product design, and interaction.", tags: ["UX", "Systems", "Portfolio"] },
+      { key: "media", title: "Media & Production", subtitle: "Storytelling and production pipelines.", tags: ["Video", "Audio", "Narrative"] },
+    ],
+  },
+  {
+    key: "interdisciplinary",
+    title: "Interdisciplinary Studies",
+    subtitle: "Cross-disciplinary thinking for modern problems.",
+    areas: ["Systems", "Human Behavior", "Reasoning", "Ethics", "Research"],
+    tracks: [
+      { key: "psychology", title: "Psychology", subtitle: "Mind, behavior, and research methods.", tags: ["Behavior", "Methods", "Cognition"] },
+      { key: "philosophy", title: "Philosophy", subtitle: "Reasoning, ethics, and argument quality.", tags: ["Logic", "Ethics", "Debate"] },
     ],
   },
 ];
 
-export function getFaculty(slug: string) {
-  return FACULTIES.find((f) => f.slug === slug) ?? null;
+export function getFaculty(key: string) {
+  return FACULTIES.find((f) => f.key === key) ?? null;
 }
 
-export function isDepartmentKey(x: string): x is UniDepartmentKey {
-  return Object.prototype.hasOwnProperty.call(DEPARTMENTS, x);
+export function getTrack(facultyKey: string, trackKey: string) {
+  const f = getFaculty(facultyKey);
+  if (!f) return null;
+  return f.tracks.find((t) => t.key === trackKey) ?? null;
 }
+
+export const ROLE_LABELS: Record<UniRole, { title: string; subtitle: string; responsibilities: string[] }> = {
+  teacher: {
+    title: "Teacher",
+    subtitle: "Teaches the full course material like a professional educator.",
+    responsibilities: [
+      "Explain concepts step-by-step with structure",
+      "Build complete lesson plans from provided materials",
+      "Teach fundamentals → advanced",
+      "Use examples and practice questions",
+    ],
+  },
+  tutor: {
+    title: "Tutor",
+    subtitle: "Helps with assignments, exam preparation, and targeted understanding.",
+    responsibilities: [
+      "Solve problems with the student (guided)",
+      "Review assignments and improve reasoning",
+      "Prepare exam-style drills and feedback",
+      "Spot weaknesses and fix them",
+    ],
+  },
+  assistant: {
+    title: "Assistant",
+    subtitle: "Fast helper for study workflows: summaries, notes, planning, and quick support.",
+    responsibilities: [
+      "Summarize notes/material quickly",
+      "Create study plans and checklists",
+      "Generate flashcards and quizzes",
+      "Help with formatting and clarity",
+    ],
+  },
+};
