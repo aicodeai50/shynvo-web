@@ -3,6 +3,7 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import BackgroundVideo from "@/components/home/BackgroundVideo";
 
 type Building = {
   name: string;
@@ -136,7 +137,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <BackgroundFX />
+      <BackgroundVideo />
 
       <section className="relative pt-10 sm:pt-14 lg:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
