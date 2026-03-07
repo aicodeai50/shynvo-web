@@ -3,7 +3,7 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import BackgroundVideo from "@/components/home/BackgroundVideo";
+import ShynvoWallpaper from "@/components/home/ShynvoWallpaper";
 
 type Building = {
   name: string;
@@ -137,7 +137,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <BackgroundVideo />
+      <ShynvoWallpaper />
 
       <section className="relative pt-10 sm:pt-14 lg:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
@@ -204,6 +204,18 @@ export default function HomePage() {
 
 function RobotChamber({ onActivate }: { onActivate: () => void }) {
   const [hot, setHot] = useState(false);
+  const [typed, setTyped] = useState("");
+  const teaser = "Welcome to Shynvo Robot. Click to enter the multilingual robot experience.";
+
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      i += 1;
+      setTyped(teaser.slice(0, i));
+      if (i >= teaser.length) clearInterval(timer);
+    }, 26);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <button
@@ -258,14 +270,20 @@ function RobotChamber({ onActivate }: { onActivate: () => void }) {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 border-t border-white/10 bg-black/20 px-5 py-3">
-          <div>
-            <div className="text-xs font-semibold text-white/85">Cinematic Robot</div>
-            <div className="text-[11px] text-white/55">Open trial experience</div>
+        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-black/30 px-5 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-xs font-semibold text-white/85">Shynvo Robot</div>
+              <div className="text-[11px] text-white/55">Open multilingual robot experience</div>
+            </div>
+            <span className="rounded-full border border-white/10 bg-white/5 p-2 text-white/80">
+              <ArrowRightIcon />
+            </span>
           </div>
-          <span className="rounded-full border border-white/10 bg-white/5 p-2 text-white/80">
-            <ArrowRightIcon />
-          </span>
+
+          <div className="mt-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/80">
+            {typed}<span className="animate-pulse text-white/50">|</span>
+          </div>
         </div>
 
         <style jsx>{`
