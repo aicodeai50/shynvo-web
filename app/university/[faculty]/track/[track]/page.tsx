@@ -1,12 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import UniversityNav from "@/components/university/UniversityNav";
-import { getTrack } from "@/_lib/university/data";
+import { getFaculty } from "@/_lib/university/data";
 import TrackPageClient from "./track-client";
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
+
+const REDIRECT_MAP: Record<string, string> = {
+  it: "Health Sciences",
+  business: "IT & Computer Science",
+  law: "Business & Management",
+  health: "IT & Computer Science",
+  engineering: "IT & Computer Science",
+  education: "Health Sciences",
+  arts: "Business & Management",
+  interdisciplinary: "University Hub",
+};
 
 export default async function UniversityCourseRoomPage({
   params,
@@ -14,11 +25,14 @@ export default async function UniversityCourseRoomPage({
   params: Promise<{ faculty: string; track: string }>;
 }) {
   const { faculty, track } = await params;
-  const result = getTrack(faculty, track);
 
-  if (!result) notFound();
+  const facultyData = getFaculty(faculty);
+  if (!facultyData) notFound();
 
-  const { faculty: facultyData, track: trackData } = result;
+  const trackData = facultyData.tracks.find((item) => item.key === track);
+  if (!trackData) notFound();
+
+  const redirectLabel = REDIRECT_MAP[faculty] ?? "University Hub";
 
   const quickCards = [
     {
@@ -181,7 +195,7 @@ export default async function UniversityCourseRoomPage({
 
       <TrackPageClient
         facultyTitle={facultyData.title}
-        redirectLabel={facultyData.redirectLabel}
+        redirectLabel={redirectLabel}
         trackTitle={trackData.title}
       />
     </section>
