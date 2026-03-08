@@ -84,7 +84,7 @@ export default function HomePage() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="grid items-start gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[2rem] border border-white/10 bg-black/20 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] backdrop-blur-sm sm:p-8">
+          <div className="rounded-[2rem] border border-white/10 bg-black/20 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] backdrop-blur-sm sm:p-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/80">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.85)]" />
               Structured Intelligence Platform
@@ -94,16 +94,16 @@ export default function HomePage() {
               Shynvo
             </h1>
 
-            <h2 className="mt-4 max-w-3xl text-2xl font-medium tracking-tight text-white/92 sm:text-5xl">
+            <h2 className="mt-3 max-w-3xl text-xl font-medium tracking-tight text-white/92 sm:text-5xl">
               Architecture of Applied Intelligence
             </h2>
 
-            <p className="mt-8 max-w-3xl text-lg leading-9 text-white/78">
+            <p className="mt-5 max-w-3xl text-base leading-9 text-white/78">
               A multi-environment intelligence platform for learning, execution, strategy,
               resilience, organizational growth, coding, and skill development.
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="#environments"
                 className="inline-flex items-center rounded-2xl bg-white px-7 py-4 text-base font-semibold text-[#0B0F14] transition hover:bg-white/90"
@@ -119,7 +119,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <p className="mt-8 text-base leading-7 text-white/64">
+            <p className="mt-5 text-sm leading-6 text-white/64">
               Trial: full access for 7 days. Robot is included during trial; upgrade required after.
             </p>
           </div>
