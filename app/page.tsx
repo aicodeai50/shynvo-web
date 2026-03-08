@@ -68,7 +68,7 @@ export default function HomePage() {
     <section className="relative overflow-hidden py-8 sm:py-10">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
         <video
-          className="h-full w-full object-cover opacity-28"
+          className="h-full w-full object-cover opacity-22"
           src="/shynvo-wallpaper.mp4"
           autoPlay
           muted
@@ -76,16 +76,16 @@ export default function HomePage() {
           playsInline
           preload="auto"
         />
-        <div className="absolute inset-0 bg-[#05070b]/72" />
+        <div className="absolute inset-0 bg-[#07090d]/62" />
         <div className="absolute inset-0 bg-[radial-gradient(1200px_700px_at_18%_12%,rgba(255,255,255,0.05),transparent_52%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1000px_620px_at_78%_18%,rgba(86,196,255,0.06),transparent_48%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_620px_at_78%_18%,rgba(86,196,255,0.05),transparent_48%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(1200px_720px_at_50%_100%,rgba(255,255,255,0.03),transparent_55%)]" />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] backdrop-blur-sm sm:p-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/75">
+        <div className="grid items-stretch gap-6 lg:grid-cols-[1.12fr_0.88fr]">
+          <div className="rounded-[2rem] border border-white/10 bg-black/20 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] backdrop-blur-sm sm:p-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/80">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.85)]" />
               Structured Intelligence Platform
             </div>
@@ -94,7 +94,7 @@ export default function HomePage() {
               Shynvo
             </h1>
 
-            <h2 className="mt-4 text-2xl font-medium tracking-tight text-white/90 sm:text-5xl">
+            <h2 className="mt-4 max-w-3xl text-2xl font-medium tracking-tight text-white/92 sm:text-5xl">
               Architecture of Applied Intelligence
             </h2>
 
@@ -119,14 +119,14 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <p className="mt-8 text-base leading-7 text-white/62">
+            <p className="mt-8 text-base leading-7 text-white/64">
               Trial: full access for 7 days. Robot is included during trial; upgrade required after.
             </p>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] shadow-[0_0_0_1px_rgba(255,255,255,0.03)] backdrop-blur-sm overflow-hidden">
-            <Link href="/robot" className="group block">
-              <div className="relative h-[350px] w-full overflow-hidden border-b border-white/10 bg-black/30">
+          <div className="rounded-[2rem] border border-white/10 bg-black/20 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] backdrop-blur-sm overflow-hidden">
+            <Link href="/robot" className="group block h-full">
+              <div className="relative h-[255px] w-full overflow-hidden border-b border-white/10 bg-black/30 sm:h-[285px]">
                 <video
                   className="h-full w-full object-cover"
                   src="/robot.mp4"
@@ -136,7 +136,7 @@ export default function HomePage() {
                   playsInline
                   preload="auto"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
               </div>
 
               <div className="p-5">
