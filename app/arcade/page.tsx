@@ -3,7 +3,7 @@ import Link from "next/link";
 const quickStats = [
   { label: "Level", value: "7" },
   { label: "XP", value: "840 / 1000" },
-  { label: "Rank", value: "Silver" },
+  { label: "Rank", value: "Silver Engineer" },
   { label: "Streak", value: "12 rounds" },
 ];
 
@@ -45,6 +45,8 @@ const zones = [
     tags: ["Daily", "Bonus", "Rewards"],
   },
 ];
+
+const badges = ["Logic Rookie", "Speed Thinker", "Quest Starter", "Daily Streak"];
 
 export default function ArcadeSimPage() {
   return (
@@ -95,18 +97,23 @@ export default function ArcadeSimPage() {
         </div>
       </div>
 
-      <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-              Progress Core
+      <div className="mt-8 grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-pink-300/20 bg-pink-400/10 text-xl font-semibold text-pink-100">
+              SH
             </div>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-              Level up through skill-based repetition
-            </h2>
+
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
+                Player Profile
+              </div>
+              <div className="mt-1 text-2xl font-semibold text-white">Shynvo Player</div>
+              <div className="mt-1 text-sm text-white/65">Silver Engineer • Level 7</div>
+            </div>
           </div>
 
-          <div className="min-w-[220px]">
+          <div className="mt-6">
             <div className="mb-2 flex items-center justify-between text-sm text-white/70">
               <span>XP Progress</span>
               <span>840 / 1000</span>
@@ -115,15 +122,40 @@ export default function ArcadeSimPage() {
               <div className="h-3 w-[84%] rounded-full bg-gradient-to-r from-pink-400 via-fuchsia-400 to-violet-400" />
             </div>
           </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {quickStats.map((item) => (
+              <div key={item.label} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="text-sm text-white/60">{item.label}</div>
+                <div className="mt-2 text-xl font-semibold text-white">{item.value}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {quickStats.map((item) => (
-            <div key={item.label} className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              <div className="text-sm text-white/60">{item.label}</div>
-              <div className="mt-2 text-2xl font-semibold text-white">{item.value}</div>
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+            Active Badges
+          </div>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+            Recent unlocked identity
+          </h2>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {badges.map((badge) => (
+              <div key={badge} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
+                <div className="text-sm font-semibold text-white">{badge}</div>
+                <div className="mt-1 text-xs text-white/55">Achievement active</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-pink-400/20 bg-pink-400/10 p-4">
+            <div className="text-sm font-semibold text-pink-100">Next unlock</div>
+            <div className="mt-2 text-sm leading-6 text-pink-50/90">
+              Reach 1000 XP to unlock the next player level and move closer to Gold Strategist.
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
