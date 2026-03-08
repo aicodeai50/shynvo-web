@@ -1,111 +1,106 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import ExperimentsNav from "@/components/experiments/ExperimentsNav";
 
-type SimMode = "Academic" | "Career" | "Product" | "Life";
+type Scenario = "Academic" | "Career" | "Product" | "Life";
 
-export default function ExperimentsSimulationPage() {
-  const [mode, setMode] = useState<SimMode>("Academic");
-  const [scenario, setScenario] = useState("");
-  const [result, setResult] = useState<null | {
-    pathA: string;
-    pathB: string;
-    risk: string;
-    move: string;
-  }>(null);
+export default function SimulationPage() {
+  const [scenario, setScenario] = useState<Scenario>("Academic");
+  const [input, setInput] = useState("");
+  const [pathA, setPathA] = useState("Waiting for simulation...");
+  const [pathB, setPathB] = useState("Waiting for simulation...");
+  const [risk, setRisk] = useState("Waiting for simulation...");
+  const [move, setMove] = useState("Waiting for simulation...");
 
   function runSimulation() {
-    const s = scenario.trim();
-    if (!s) return;
+    const text = input.trim();
+    if (!text) return;
 
-    setResult({
-      pathA: `Path A: If you follow "${s}" with discipline and consistency, the most likely result is gradual progress with moderate pressure.`,
-      pathB: `Path B: If execution becomes inconsistent, the result may be fragmented progress and higher stress later.`,
-      risk: `Risk level for ${mode.toLowerCase()} mode: medium. Main risks include overload, weak prioritization, and underestimating effort.`,
-      move: `Suggested next move: reduce the scenario into smaller checkpoints, define a realistic timeline, and protect one high-value priority first.`
-    });
+    setPathA(`Likely Path A (${scenario}): proceed with the plan carefully and monitor results weekly.`);
+    setPathB(`Likely Path B (${scenario}): reduce scope, preserve energy, and move in smaller steps.`);
+    setRisk(`Risk Level: medium risk if assumptions are weak, lower risk if execution is structured.`);
+    setMove(`Best Next Move: test one small version of "${text}" before making a full commitment.`);
   }
 
   return (
     <section className="py-10 sm:py-14">
-      <Link href="/experiments" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white">
-        ← Back to Experiments
-      </Link>
+      <ExperimentsNav />
 
-      <div className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+      <div className="text-xs font-semibold uppercase tracking-wider text-cyan-100/70">
         Experiments
       </div>
 
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-5xl">
+      <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-6xl">
         Simulation Lab
       </h1>
 
-      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/70 sm:text-base">
-        Run what-if scenarios before taking action. This lab helps users explore possible
-        outcomes, risks, and better next moves.
+      <p className="mt-4 max-w-4xl text-sm leading-6 text-white/70 sm:text-base">
+        Run what-if scenarios before taking action. This lab helps users explore possible outcomes,
+        risks, and better next moves.
       </p>
 
       <div className="mt-8 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="text-sm font-semibold text-white">Scenario Input</div>
+        <div className="rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
+          <div className="text-lg font-semibold text-white">Scenario Input</div>
 
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {(["Academic", "Career", "Product", "Life"] as SimMode[]).map((m) => (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {(["Academic", "Career", "Product", "Life"] as Scenario[]).map((item) => (
               <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={
-                  m === mode
-                    ? "rounded-2xl border border-white bg-white px-4 py-2 text-sm font-semibold text-[#0B0F14]"
-                    : "rounded-2xl border border-white/10 bg-black/20 px-4 py-2 text-sm text-white/80 hover:bg-white/5"
-                }
+                key={item}
+                type="button"
+                onClick={() => setScenario(item)}
+                className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                  scenario === item
+                    ? "border-white bg-white text-[#0B0F14]"
+                    : "border-white/10 bg-black/20 text-white/80 hover:bg-white/10"
+                }`}
               >
-                {m}
+                {item}
               </button>
             ))}
           </div>
 
           <textarea
-            rows={8}
-            value={scenario}
-            onChange={(e) => setScenario(e.target.value)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             placeholder="Example: If I study 2 hours daily for 6 weeks, can I pass my exams and still keep building my app?"
-            className="mt-4 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/40"
+            className="mt-5 min-h-[220px] w-full rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white outline-none placeholder:text-white/35"
           />
 
           <div className="mt-4 flex justify-end">
             <button
+              type="button"
               onClick={runSimulation}
-              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
+              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90"
             >
               Run Simulation
             </button>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="text-sm font-semibold text-white">Simulation Output</div>
+        <div className="rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
+          <div className="text-lg font-semibold text-white">Simulation Output</div>
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 space-y-4">
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
               <div className="text-sm font-semibold text-white">Likely Path A</div>
-              <div className="mt-2 text-sm text-white/70">{result?.pathA ?? "Waiting for simulation..."}</div>
+              <div className="mt-2 text-sm text-white/70">{pathA}</div>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
               <div className="text-sm font-semibold text-white">Likely Path B</div>
-              <div className="mt-2 text-sm text-white/70">{result?.pathB ?? "Waiting for simulation..."}</div>
+              <div className="mt-2 text-sm text-white/70">{pathB}</div>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
               <div className="text-sm font-semibold text-white">Risk Level</div>
-              <div className="mt-2 text-sm text-white/70">{result?.risk ?? "Waiting for simulation..."}</div>
+              <div className="mt-2 text-sm text-white/70">{risk}</div>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
               <div className="text-sm font-semibold text-white">Best Next Move</div>
-              <div className="mt-2 text-sm text-white/70">{result?.move ?? "Waiting for simulation..."}</div>
+              <div className="mt-2 text-sm text-white/70">{move}</div>
             </div>
           </div>
         </div>
