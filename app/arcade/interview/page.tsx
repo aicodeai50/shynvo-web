@@ -12,6 +12,7 @@ const questData = {
     meter: "75%",
     streak: "3 answers",
     placeholder: "Example: Act as an interviewer and ask me one frontend question at a time.",
+    result: "Frontend quest result: your answers are judged on clarity, structure, UI reasoning, and implementation detail.",
   },
   backend: {
     title: "Backend Quest",
@@ -19,6 +20,7 @@ const questData = {
     meter: "68%",
     streak: "2 answers",
     placeholder: "Example: Ask me backend system design or API questions one by one.",
+    result: "Backend quest result: your answers are judged on systems thinking, data flow, scale, and trade-offs.",
   },
   product: {
     title: "Product Quest",
@@ -26,6 +28,7 @@ const questData = {
     meter: "72%",
     streak: "4 answers",
     placeholder: "Example: Interview me for product thinking, prioritization, and roadmap judgment.",
+    result: "Product quest result: your answers are judged on prioritization, decision quality, and user understanding.",
   },
   general: {
     title: "General Quest",
@@ -33,12 +36,15 @@ const questData = {
     meter: "70%",
     streak: "1 answer",
     placeholder: "Example: Give me mixed interview questions and score my clarity.",
+    result: "General quest result: your answers are judged on communication, confidence, and response quality.",
   },
 } as const;
 
 export default function InterviewQuestPage() {
   const [mode, setMode] = useState<QuestMode>("frontend");
   const [prompt, setPrompt] = useState("");
+  const [started, setStarted] = useState(false);
+
   const active = useMemo(() => questData[mode], [mode]);
 
   return (
@@ -74,7 +80,10 @@ export default function InterviewQuestPage() {
               <button
                 key={value}
                 type="button"
-                onClick={() => setMode(value)}
+                onClick={() => {
+                  setMode(value);
+                  setStarted(false);
+                }}
                 className={`rounded-2xl border px-4 py-4 text-left transition ${
                   mode === value
                     ? "border-pink-300/30 bg-pink-400/15 text-white"
@@ -98,15 +107,22 @@ export default function InterviewQuestPage() {
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <button className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90">
+            <button
+              type="button"
+              onClick={() => setStarted(true)}
+              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
+            >
               Start quest
             </button>
             <button
               type="button"
-              onClick={() => setPrompt("")}
+              onClick={() => {
+                setPrompt("");
+                setStarted(false);
+              }}
               className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
             >
-              Clear prompt
+              Reset
             </button>
           </div>
         </div>
@@ -122,6 +138,15 @@ export default function InterviewQuestPage() {
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
               <div className="text-sm text-white/60">Response streak</div>
               <div className="mt-1 text-white">{active.streak}</div>
+            </div>
+
+            <div className="rounded-2xl border border-pink-400/20 bg-pink-400/10 p-4">
+              <div className="text-sm font-semibold text-pink-100">Quest result</div>
+              <div className="mt-2 text-sm leading-6 text-pink-50/90">
+                {started
+                  ? `${active.result} Prompt used: ${prompt || "Default interview challenge."}`
+                  : "Press Start quest to generate the quest result panel."}
+              </div>
             </div>
           </div>
         </div>

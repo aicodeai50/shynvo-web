@@ -11,35 +11,50 @@ const modeData = {
     timer: "45 sec",
     multiplier: "x1.8",
     bonus: "Reasoning bonus",
-    prompt: "Example: Give me a fast logic challenge about priorities, sequence, or hidden assumptions.",
+    placeholder: "Example: Give me a fast logic challenge about priorities, sequence, or hidden assumptions.",
+    response: "Logic result: this mode rewards structured thinking, sequence detection, and clean reasoning.",
   },
   speed: {
     title: "Speed Drill",
     timer: "20 sec",
     multiplier: "x2.4",
     bonus: "Reaction bonus",
-    prompt: "Example: Give me a rapid pattern or short-answer challenge to solve under pressure.",
+    placeholder: "Example: Give me a rapid pattern or short-answer challenge to solve under pressure.",
+    response: "Speed result: this mode rewards quick recognition, fast reaction, and short high-pressure decisions.",
   },
   focus: {
     title: "Focus Drill",
     timer: "60 sec",
     multiplier: "x1.5",
     bonus: "Consistency bonus",
-    prompt: "Example: Give me a task that requires attention, filtering, and careful response.",
+    placeholder: "Example: Give me a task that requires attention, filtering, and careful response.",
+    response: "Focus result: this mode rewards concentration, reduced distraction, and stable performance.",
   },
   memory: {
     title: "Memory Drill",
     timer: "30 sec",
     multiplier: "x1.7",
     bonus: "Recall bonus",
-    prompt: "Example: Give me a challenge that tests working memory and sequence retention.",
+    placeholder: "Example: Give me a challenge that tests working memory and sequence retention.",
+    response: "Memory result: this mode rewards retention, ordered recall, and pattern memory under time pressure.",
   },
 } as const;
 
 export default function DrillArenaPage() {
   const [mode, setMode] = useState<DrillMode>("logic");
   const [prompt, setPrompt] = useState("");
+  const [started, setStarted] = useState(false);
+
   const active = useMemo(() => modeData[mode], [mode]);
+
+  function startDrill() {
+    setStarted(true);
+  }
+
+  function resetDrill() {
+    setPrompt("");
+    setStarted(false);
+  }
 
   return (
     <section className="relative py-10 sm:py-14">
@@ -74,7 +89,10 @@ export default function DrillArenaPage() {
               <button
                 key={value}
                 type="button"
-                onClick={() => setMode(value)}
+                onClick={() => {
+                  setMode(value);
+                  setStarted(false);
+                }}
                 className={`rounded-2xl border px-4 py-4 text-left transition ${
                   mode === value
                     ? "border-pink-300/30 bg-pink-400/15 text-white"
@@ -91,22 +109,26 @@ export default function DrillArenaPage() {
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder={active.prompt}
+              placeholder={active.placeholder}
               rows={7}
               className="mt-3 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
             />
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <button className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90">
+            <button
+              type="button"
+              onClick={startDrill}
+              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
+            >
               Start drill
             </button>
             <button
               type="button"
-              onClick={() => setPrompt("")}
+              onClick={resetDrill}
               className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
             >
-              Clear prompt
+              Reset
             </button>
           </div>
         </div>
@@ -128,6 +150,15 @@ export default function DrillArenaPage() {
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
               <div className="text-sm text-white/60">Accuracy bonus</div>
               <div className="mt-1 text-white">{active.bonus}</div>
+            </div>
+
+            <div className="rounded-2xl border border-pink-400/20 bg-pink-400/10 p-4">
+              <div className="text-sm font-semibold text-pink-100">Live result</div>
+              <div className="mt-2 text-sm leading-6 text-pink-50/90">
+                {started
+                  ? `${active.response} Prompt used: ${prompt || "Default challenge."}`
+                  : "Press Start drill to generate the round result panel."}
+              </div>
             </div>
           </div>
         </div>
