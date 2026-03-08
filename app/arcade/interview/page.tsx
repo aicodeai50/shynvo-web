@@ -13,6 +13,7 @@ const questData = {
     streak: "3 answers",
     placeholder: "Example: Act as an interviewer and ask me one frontend question at a time.",
     result: "Frontend quest result: your answers are judged on clarity, structure, UI reasoning, and implementation detail.",
+    reward: "+60 XP",
   },
   backend: {
     title: "Backend Quest",
@@ -21,6 +22,7 @@ const questData = {
     streak: "2 answers",
     placeholder: "Example: Ask me backend system design or API questions one by one.",
     result: "Backend quest result: your answers are judged on systems thinking, data flow, scale, and trade-offs.",
+    reward: "+70 XP",
   },
   product: {
     title: "Product Quest",
@@ -29,6 +31,7 @@ const questData = {
     streak: "4 answers",
     placeholder: "Example: Interview me for product thinking, prioritization, and roadmap judgment.",
     result: "Product quest result: your answers are judged on prioritization, decision quality, and user understanding.",
+    reward: "+58 XP",
   },
   general: {
     title: "General Quest",
@@ -37,6 +40,7 @@ const questData = {
     streak: "1 answer",
     placeholder: "Example: Give me mixed interview questions and score my clarity.",
     result: "General quest result: your answers are judged on communication, confidence, and response quality.",
+    reward: "+50 XP",
   },
 } as const;
 
@@ -146,6 +150,9 @@ export default function InterviewQuestPage() {
                 {started
                   ? `${active.result} Prompt used: ${prompt || "Default interview challenge."}`
                   : "Press Start quest to generate the quest result panel."}
+              </div>
+              <div className="mt-3 inline-flex rounded-full border border-pink-300/20 bg-black/20 px-3 py-1 text-xs text-pink-100">
+                Reward: {active.reward}
               </div>
             </div>
           </div>

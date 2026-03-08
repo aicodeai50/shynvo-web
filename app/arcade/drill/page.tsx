@@ -13,6 +13,7 @@ const modeData = {
     bonus: "Reasoning bonus",
     placeholder: "Example: Give me a fast logic challenge about priorities, sequence, or hidden assumptions.",
     response: "Logic result: this mode rewards structured thinking, sequence detection, and clean reasoning.",
+    xp: "+40 XP",
   },
   speed: {
     title: "Speed Drill",
@@ -21,6 +22,7 @@ const modeData = {
     bonus: "Reaction bonus",
     placeholder: "Example: Give me a rapid pattern or short-answer challenge to solve under pressure.",
     response: "Speed result: this mode rewards quick recognition, fast reaction, and short high-pressure decisions.",
+    xp: "+55 XP",
   },
   focus: {
     title: "Focus Drill",
@@ -29,6 +31,7 @@ const modeData = {
     bonus: "Consistency bonus",
     placeholder: "Example: Give me a task that requires attention, filtering, and careful response.",
     response: "Focus result: this mode rewards concentration, reduced distraction, and stable performance.",
+    xp: "+35 XP",
   },
   memory: {
     title: "Memory Drill",
@@ -37,6 +40,7 @@ const modeData = {
     bonus: "Recall bonus",
     placeholder: "Example: Give me a challenge that tests working memory and sequence retention.",
     response: "Memory result: this mode rewards retention, ordered recall, and pattern memory under time pressure.",
+    xp: "+42 XP",
   },
 } as const;
 
@@ -158,6 +162,9 @@ export default function DrillArenaPage() {
                 {started
                   ? `${active.response} Prompt used: ${prompt || "Default challenge."}`
                   : "Press Start drill to generate the round result panel."}
+              </div>
+              <div className="mt-3 inline-flex rounded-full border border-pink-300/20 bg-black/20 px-3 py-1 text-xs text-pink-100">
+                Reward: {active.xp}
               </div>
             </div>
           </div>

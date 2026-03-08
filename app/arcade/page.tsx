@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const quickStats = [
   { label: "Level", value: "7" },
@@ -23,7 +26,7 @@ const zones = [
   {
     href: "/arcade/score",
     title: "Score Chamber",
-    desc: "Track performance, streaks, levels, and challenge scores across Arcade Sim.",
+    desc: "Track performance, streaks, levels, challenge scores, and XP flow.",
     tags: ["Scores", "Levels", "Ranking"],
   },
   {
@@ -48,7 +51,35 @@ const zones = [
 
 const badges = ["Logic Rookie", "Speed Thinker", "Quest Starter", "Daily Streak"];
 
+const STORAGE_KEY = "shynvo_arcade_player_name";
+
 export default function ArcadeSimPage() {
+  const [playerName, setPlayerName] = useState("Shynvo Player");
+  const [draftName, setDraftName] = useState("Shynvo Player");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved?.trim()) {
+        setPlayerName(saved);
+        setDraftName(saved);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  function saveName() {
+    const next = draftName.trim() || "Shynvo Player";
+    setPlayerName(next);
+    setDraftName(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      // ignore
+    }
+  }
+
   return (
     <section className="relative py-10 sm:py-14">
       <div
@@ -101,16 +132,32 @@ export default function ArcadeSimPage() {
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-pink-300/20 bg-pink-400/10 text-xl font-semibold text-pink-100">
-              SH
+              {playerName.slice(0, 2).toUpperCase()}
             </div>
 
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
                 Player Profile
               </div>
-              <div className="mt-1 text-2xl font-semibold text-white">Shynvo Player</div>
+              <div className="mt-1 text-2xl font-semibold text-white">{playerName}</div>
               <div className="mt-1 text-sm text-white/65">Silver Engineer • Level 7</div>
             </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]">
+            <input
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              placeholder="Type player name"
+              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+            />
+            <button
+              type="button"
+              onClick={saveName}
+              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
+            >
+              Save name
+            </button>
           </div>
 
           <div className="mt-6">
