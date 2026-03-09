@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { getSupabaseClient } from "@/lib/supabase/client";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -15,6 +15,14 @@ export default function SignUpPage() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      setMessage("Sign up is not configured yet. Add Supabase environment variables first.");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.signUp({
       email,

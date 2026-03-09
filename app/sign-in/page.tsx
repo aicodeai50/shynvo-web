@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { getSupabaseClient } from "@/lib/supabase/client";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -16,6 +16,14 @@ export default function SignInPage() {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      setMessage("Sign in is not configured yet. Add Supabase environment variables first.");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
