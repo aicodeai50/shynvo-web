@@ -68,7 +68,7 @@ export default function SiteNav() {
 
         {/* Center nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          <a href="#pricing" className="text-sm text-white/80 hover:text-white">
+          <a href="/pricing" className="text-sm text-white/80 hover:text-white">
             Pricing
           </a>
           <Link href="/docs" className="text-sm text-white/80 hover:text-white">
@@ -185,7 +185,7 @@ export default function SiteNav() {
 
           <div className="mt-4 space-y-2">
             <a
-              href="#pricing"
+              href="/pricing"
               onClick={() => setOpen(false)}
               className="block rounded-xl px-4 py-3 text-sm text-white/85 ring-1 ring-white/10 hover:bg-white/5"
             >
