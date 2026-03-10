@@ -1,8 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import SiteNav from "@/app/components/SiteNav";
-import SiteFooter from "@/app/components/SiteFooter";
-import { LanguageProvider } from "@/app/lib/i18n/LanguageContext";
+import SiteNav from "@/components/SiteNav";
+import SiteFooter from "@/components/SiteFooter";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 export const metadata: Metadata = {
   title: "Shynvo",
