@@ -30,10 +30,16 @@ export default function SignUpPage() {
     }
 
     try {
+      const redirectTo =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/auth/callback?next=/account`
+          : undefined;
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: redirectTo,
           data: {
             full_name: fullName,
           },
@@ -61,11 +67,11 @@ export default function SignUpPage() {
       }
 
       if (session) {
-        router.push("/");
+        router.push("/account");
         return;
       }
 
-      setMessage("Account created. Check your email to confirm your account, then sign in.");
+      setMessage("Account created. Check your email and click the verification link to activate your account.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Sign up failed.");
     } finally {
