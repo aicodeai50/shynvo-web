@@ -1,17 +1,14 @@
-// app/components/SiteFooter.tsx
 import Link from "next/link";
 
 type FooterLink = {
   label: string;
   href: string;
-  external?: boolean;
 };
 
 const LINKS: FooterLink[] = [
   { label: "Docs", href: "/docs" },
-  { label: "Pricing", href: "/#pricing" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Contact", href: "/contact" },
-  { label: "Email", href: "mailto:hi@shynvo.app", external: true },
 ];
 
 export default function SiteFooter() {
@@ -24,32 +21,18 @@ export default function SiteFooter() {
             <p className="mt-2 max-w-sm text-sm text-white/70">
               Multi-environment AI platform for learning, building, and deploying.
             </p>
-            <p className="mt-3 text-sm text-white/70">
-              Email:{" "}
-              <a className="underline" href="mailto:hi@shynvo.app">
-                hi@shynvo.app
-              </a>
-            </p>
           </div>
 
-          <nav className="grid grid-cols-2 gap-x-10 gap-y-3 sm:grid-cols-4" aria-label="Footer">
-            {LINKS.map((x) =>
-              x.external ? (
-                <a
-                  key={x.label}
-                  href={x.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm text-white/70 hover:text-white"
-                >
-                  {x.label}
-                </a>
-              ) : (
-                <Link key={x.label} href={x.href} className="text-sm text-white/70 hover:text-white">
-                  {x.label}
-                </Link>
-              )
-            )}
+          <nav className="grid grid-cols-2 gap-x-10 gap-y-3 sm:grid-cols-3" aria-label="Footer">
+            {LINKS.map((x) => (
+              <Link
+                key={x.label}
+                href={x.href}
+                className="text-sm text-white/70 hover:text-white"
+              >
+                {x.label}
+              </Link>
+            ))}
           </nav>
         </div>
 
