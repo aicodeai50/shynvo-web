@@ -1,16 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
-type Props = {
-  code: string;
-  next: string;
-};
-
-export default function AuthCallbackClient({ code, next }: Props) {
+export default function AuthCallbackClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [message, setMessage] = useState("Completing account verification...");
 
   useEffect(() => {
@@ -24,19 +20,47 @@ export default function AuthCallbackClient({ code, next }: Props) {
         return;
       }
 
-      if (!code) {
-        if (active) setMessage("Missing verification code.");
+      const next = searchParams.get("next") || "/account";
+      const code = searchParams.get("code") || "";
+      const tokenHash = searchParams.get("token_hash") || "";
+      const type = searchParams.get("type") || "";
+
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+        if (error) {
+          if (active) setMessage(error.message);
+          return;
+        }
+
+        router.replace(next);
         return;
       }
 
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (tokenHash && type) {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: type as
+            | "signup"
+            | "invite"
+            | "magiclink"
+            | "recovery"
+            | "email_change"
+            | "email",
+        });
 
-      if (error) {
-        if (active) setMessage(error.message);
+        if (error) {
+          if (active) setMessage(error.message);
+          return;
+        }
+
+        router.replace(next);
         return;
       }
 
-      router.replace(next || "/account");
+      if (active) {
+        setMessage("Verification link is invalid or incomplete. Please request a new confirmation email.");
+      }
     }
 
     completeAuth();
@@ -44,7 +68,7 @@ export default function AuthCallbackClient({ code, next }: Props) {
     return () => {
       active = false;
     };
-  }, [code, next, router]);
+  }, [router, searchParams]);
 
   return (
     <section className="relative py-10 sm:py-14">

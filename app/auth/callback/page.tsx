@@ -1,18 +1,7 @@
 import { Suspense } from "react";
 import AuthCallbackClient from "./AuthCallbackClient";
 
-type CallbackPageProps = {
-  searchParams: Promise<{
-    code?: string;
-    next?: string;
-  }>;
-};
-
-export default async function AuthCallbackPage({ searchParams }: CallbackPageProps) {
-  const params = await searchParams;
-  const code = params.code ?? "";
-  const next = params.next ?? "/account";
-
+export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
@@ -23,7 +12,7 @@ export default async function AuthCallbackPage({ searchParams }: CallbackPagePro
         </section>
       }
     >
-      <AuthCallbackClient code={code} next={next} />
+      <AuthCallbackClient />
     </Suspense>
   );
 }
