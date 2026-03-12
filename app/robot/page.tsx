@@ -219,10 +219,19 @@ Your behavior:
   };
 
   const supabase = getSupabaseClient();
-  const session = supabase ? await supabase.auth.getSession() : { data: { session: null } };
-  const token = session.data.session?.access_token || "";
 
-  const res = await fetch("/api/public/chat", {
+  let token = "";
+  if (supabase) {
+    const sessionResult = await supabase.auth.getSession();
+    token = sessionResult.data.session?.access_token || "";
+
+    if (!token) {
+      const refreshed = await supabase.auth.refreshSession();
+      token = refreshed.data.session?.access_token || "";
+    }
+  }
+
+  let res = await fetch("/api/public/chat", {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -230,6 +239,20 @@ Your behavior:
     },
     body: JSON.stringify(payload),
   });
+
+  if (res.status === 401 && supabase) {
+    const refreshed = await supabase.auth.refreshSession();
+    const retryToken = refreshed.data.session?.access_token || "";
+
+    res = await fetch("/api/public/chat", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(retryToken ? { authorization: `Bearer ${retryToken}` } : {}),
+      },
+      body: JSON.stringify(payload),
+    });
+  }
 
   const raw = await res.text();
 
