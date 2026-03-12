@@ -1,11 +1,20 @@
 "use client";
 
 import React, { useMemo, useRef, useState } from "react";
+import UpgradeModal from "@/components/UpgradeModal";
+import { getSupabaseClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
 
 type UniRole = "teacher" | "tutor" | "assistant";
 type HelpMode = "teaching" | "exam" | "explanation" | "assignment" | "revision";
 type Msg = { role: "user" | "ai"; text: string };
+
+declare global {
+  interface Window {
+    SpeechRecognition?: any;
+    webkitSpeechRecognition?: any;
+  }
+}
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -145,9 +154,70 @@ export default function TrackPageClient({
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const listRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const recognitionRef = useRef<any>(null);
+
+  function startVoiceInput() {
+    try {
+      const SpeechRecognition =
+        typeof window !== "undefined"
+          ? window.SpeechRecognition || window.webkitSpeechRecognition
+          : null;
+
+      if (!SpeechRecognition) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "ai",
+            text: "Voice input is not supported in this browser. Try Chrome or Edge, or use text mode.",
+          },
+        ]);
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = true;
+      recognition.continuous = false;
+
+      recognition.onstart = () => {
+        setListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0]?.transcript || "")
+          .join(" ")
+          .trim();
+
+        setInput(transcript);
+      };
+
+      recognition.onerror = () => {
+        setListening(false);
+      };
+
+      recognition.onend = () => {
+        setListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch {
+      setListening(false);
+    }
+  }
+
+  function stopVoiceInput() {
+    try {
+      recognitionRef.current?.stop();
+    } catch {}
+    setListening(false);
+  }
 
   const roleInfo = useMemo(() => ROLE_INFO[selectedRole], [selectedRole]);
 
@@ -190,9 +260,18 @@ export default function TrackPageClient({
         helpMode
       );
 
-      const res = await fetch("/api/public/chat", {
+      const supabase = getSupabaseClient();
+      const session = supabase
+        ? await supabase.auth.getSession()
+        : { data: { session: null } };
+      const token = session.data.session?.access_token || "";
+
+      const res = await fetch("/api/university-chat", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           message: text,
           systemPrompt,
@@ -204,6 +283,10 @@ export default function TrackPageClient({
       });
 
       const data = await res.json().catch(() => null);
+
+      if (data?.upgradeUrl) {
+        setShowUpgrade(true);
+      }
 
       const answer =
         data?.answer ||
@@ -281,6 +364,38 @@ export default function TrackPageClient({
             </button>
           ))}
         </div>
+
+        {mode === "voice" ? (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="text-sm font-semibold text-white">Voice input</div>
+            <div className="mt-2 text-sm leading-6 text-white/70">
+              Speak your question, review the text, then send it to the selected academic role.
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={listening ? stopVoiceInput : startVoiceInput}
+                className={cx(
+                  "rounded-xl px-3 py-2 text-sm font-semibold transition",
+                  listening
+                    ? "bg-red-500 text-white hover:bg-red-400"
+                    : "bg-white text-[#0B0F14] hover:bg-white/90"
+                )}
+              >
+                {listening ? "Stop listening" : "Start voice input"}
+              </button>
+
+              {input ? (
+                <button
+                  onClick={() => setInput("")}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/80 hover:bg-white/10"
+                >
+                  Clear
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
@@ -398,6 +513,7 @@ export default function TrackPageClient({
         </div>
 
         {mode === "voice" ? <audio ref={audioRef} className="hidden" /> : null}
+      <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
 
         <div className="mt-3 text-xs text-white/50">
           Tip: choose Voice mode if you want spoken answers.
