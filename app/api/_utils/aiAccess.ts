@@ -40,7 +40,7 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
     return {
       ok: false,
       status: 401,
-      message: "Create an account or sign in to use AI inside Shynvo.",
+      message: "Create an account or sign in to use AI tools in Shynvo.",
     };
   }
 
