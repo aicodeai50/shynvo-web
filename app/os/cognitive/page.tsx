@@ -11,7 +11,10 @@ type CognitiveSnapshot = {
   summary: string;
   recommendation: string;
   intensity: string;
+  note: string;
 };
+
+const STORAGE_KEY = "shynvo_os_cognitive_snapshot";
 
 const EXAMPLES = [
   "I feel tired and overloaded.",
@@ -69,6 +72,7 @@ function analyzeMentalCheck(input: string): CognitiveSnapshot {
       recommendation:
         "Lower the work intensity today. Choose a small, safe, clearly finishable task. Reduce pressure, avoid harsh self-judgment, and prioritize recovery-supportive structure.",
       intensity: "Light mode recommended",
+      note: input,
     };
   }
 
@@ -82,6 +86,7 @@ function analyzeMentalCheck(input: string): CognitiveSnapshot {
       recommendation:
         "Use a shorter session, simplify expectations, and focus on one clearly bounded task. Recovery should be part of the plan, not something postponed indefinitely.",
       intensity: "Reduced intensity recommended",
+      note: input,
     };
   }
 
@@ -95,6 +100,7 @@ function analyzeMentalCheck(input: string): CognitiveSnapshot {
       recommendation:
         "Do not force a large session. First reduce ambiguity: choose one task, define the first 10-minute action, and begin with a smaller controlled work block.",
       intensity: "Moderate-light intensity recommended",
+      note: input,
     };
   }
 
@@ -108,6 +114,7 @@ function analyzeMentalCheck(input: string): CognitiveSnapshot {
       recommendation:
         "Keep today's workload structured and realistic. Work in one focused block at a time and avoid overloading the day with too many priorities.",
       intensity: "Moderate intensity recommended",
+      note: input,
     };
   }
 
@@ -121,6 +128,7 @@ function analyzeMentalCheck(input: string): CognitiveSnapshot {
       recommendation:
         "Lower entry resistance. Remove extra choices, define one target, and begin with the smallest concrete starting action possible.",
       intensity: "Moderate intensity recommended",
+      note: input,
     };
   }
 
@@ -134,6 +142,7 @@ function analyzeMentalCheck(input: string): CognitiveSnapshot {
       recommendation:
         "This is a good time for focused execution. Use a strong work block and direct this state toward one important mission.",
       intensity: "Deep work intensity available",
+      note: input,
     };
   }
 
@@ -146,7 +155,16 @@ function analyzeMentalCheck(input: string): CognitiveSnapshot {
     recommendation:
       "Proceed with a clear task and measured session length. If resistance appears, reduce the scope and simplify the entry point.",
     intensity: "Standard intensity recommended",
+    note: input,
   };
+}
+
+function saveSnapshot(snapshot: CognitiveSnapshot) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+  } catch {
+    // ignore storage write issues
+  }
 }
 
 export default function CognitivePage() {
@@ -176,6 +194,7 @@ export default function CognitivePage() {
     setFocusState(result.focusState);
     setRecovery(result.recovery);
     setFriction(result.friction);
+    saveSnapshot(result);
 
     setAnalysis(
       [
@@ -195,6 +214,21 @@ export default function CognitivePage() {
         `${result.recommendation}`,
       ].join("\n")
     );
+  }
+
+  function clearAll() {
+    setNote("");
+    setFocusState("Stable");
+    setRecovery("Moderate");
+    setFriction("Low");
+    setAnalysis(
+      "No cognitive analysis yet. Write a mental check and Cognitive will assess your current execution condition."
+    );
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore storage issues
+    }
   }
 
   return (
@@ -289,15 +323,7 @@ export default function CognitivePage() {
 
             <button
               type="button"
-              onClick={() => {
-                setNote("");
-                setFocusState("Stable");
-                setRecovery("Moderate");
-                setFriction("Low");
-                setAnalysis(
-                  "No cognitive analysis yet. Write a mental check and Cognitive will assess your current execution condition."
-                );
-              }}
+              onClick={clearAll}
               className="rounded-2xl border border-white/10 bg-black/20 px-5 py-3 text-sm font-semibold text-white/85 transition hover:bg-white/10"
             >
               Clear
