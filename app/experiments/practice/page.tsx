@@ -67,22 +67,39 @@ function parsePracticeAnswer(text: string): PracticeResult {
     nextDrill
   ) {
     return {
-      sessionBrief: sessionBrief || "No session brief returned.",
-      firstChallenge: firstChallenge || "No first challenge returned.",
-      evaluatorFocus: evaluatorFocus || "No evaluator focus returned.",
-      strongPattern: strongPattern || "No strong pattern returned.",
-      mistakes: mistakes || "No mistakes guidance returned.",
-      nextDrill: nextDrill || "No next drill returned.",
+      sessionBrief:
+        sessionBrief ||
+        "This session will help you rehearse the scenario in a clearer, more structured way.",
+      firstChallenge:
+        firstChallenge ||
+        "Start by giving your strongest opening response to the scenario.",
+      evaluatorFocus:
+        evaluatorFocus ||
+        "The other side is likely judging clarity, confidence, structure, and relevance.",
+      strongPattern:
+        strongPattern ||
+        "Give a direct answer first, support it with one clear example, and close with confidence.",
+      mistakes:
+        mistakes ||
+        "Avoid rambling, vague language, low confidence, and missing the core question.",
+      nextDrill:
+        nextDrill ||
+        "Repeat the same scenario once more, but tighten the answer and improve clarity.",
     };
   }
 
   return {
-    sessionBrief: "AI response received, but it was not structured as expected.",
+    sessionBrief:
+      "Your practice session is ready. Use the guidance below to rehearse the scenario step by step.",
     firstChallenge: clean,
-    evaluatorFocus: "Please retry with a clearer practice prompt.",
-    strongPattern: "Ask for a more specific rehearsal scenario.",
-    mistakes: "Generic or unstructured prompts reduce practice quality.",
-    nextDrill: "Refine the prompt and rerun the practice session.",
+    evaluatorFocus:
+      "Focus on clarity, relevance, calm delivery, and whether your answer matches the situation.",
+    strongPattern:
+      "Start directly, stay structured, support your answer with one strong example, and close clearly.",
+    mistakes:
+      "Do not over-explain, go off-topic, sound uncertain, or leave your answer without a conclusion.",
+    nextDrill:
+      "Rerun the scenario and give a shorter, sharper second version of your answer.",
   };
 }
 
@@ -93,13 +110,13 @@ You are Shynvo Practice Arena inside the Experiments environment.
 Your role:
 - You help users rehearse real situations professionally.
 - You prepare them for performance, pressure, clarity, and confident delivery.
-- You are not a generic chatbot. You are a structured practice trainer.
+- You are a structured practice trainer, not a generic chatbot.
 
 Current practice mode:
 - ${selected}
 
 Behavior:
-- Be practical, direct, and realistic.
+- Be practical, direct, realistic, and structured.
 - Do not be vague.
 - Do not mention backend systems, models, APIs, or infrastructure.
 - Stay fully in the role of Practice Arena.
@@ -207,16 +224,32 @@ Rules:
   }
 }
 
+function OutputCard({
+  title,
+  body,
+}: {
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <div className="text-sm font-semibold text-white">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-white/75">{body}</div>
+    </div>
+  );
+}
+
 export default function PracticePage() {
   const [selected, setSelected] = useState<PracticeType>("Interview");
   const [prompt, setPrompt] = useState("");
-  const [sessionBrief, setSessionBrief] = useState("Describe your practice scenario to begin.");
-  const [firstChallenge, setFirstChallenge] = useState("Waiting for practice...");
-  const [evaluatorFocus, setEvaluatorFocus] = useState("Waiting for practice...");
-  const [strongPattern, setStrongPattern] = useState("Waiting for practice...");
-  const [mistakes, setMistakes] = useState("Waiting for practice...");
-  const [nextDrill, setNextDrill] = useState("Waiting for practice...");
+  const [sessionBrief, setSessionBrief] = useState("");
+  const [firstChallenge, setFirstChallenge] = useState("");
+  const [evaluatorFocus, setEvaluatorFocus] = useState("");
+  const [strongPattern, setStrongPattern] = useState("");
+  const [mistakes, setMistakes] = useState("");
+  const [nextDrill, setNextDrill] = useState("");
   const [loading, setLoading] = useState(false);
+  const [hasRun, setHasRun] = useState(false);
 
   const starterItems = useMemo(() => STARTERS[selected], [selected]);
 
@@ -228,13 +261,15 @@ export default function PracticePage() {
       setPrompt(customText);
     }
 
+    setHasRun(true);
     setLoading(true);
+
     setSessionBrief("Preparing your practice session...");
-    setFirstChallenge("Generating first challenge...");
-    setEvaluatorFocus("Analyzing evaluator focus...");
-    setStrongPattern("Preparing strong response pattern...");
+    setFirstChallenge("Generating the first challenge...");
+    setEvaluatorFocus("Analyzing what the other side is likely judging...");
+    setStrongPattern("Preparing your strongest response structure...");
     setMistakes("Listing mistakes to avoid...");
-    setNextDrill("Preparing next drill...");
+    setNextDrill("Preparing the next drill...");
 
     try {
       const answer = await fetchPracticeReply(text, selected);
@@ -246,18 +281,25 @@ export default function PracticePage() {
       setStrongPattern(parsed.strongPattern);
       setMistakes(parsed.mistakes);
       setNextDrill(parsed.nextDrill);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Practice Arena could not respond right now.";
-
-      setSessionBrief("Practice session failed.");
-      setFirstChallenge(message);
-      setEvaluatorFocus("Please try again.");
-      setStrongPattern("No structure returned.");
-      setMistakes("No guidance returned.");
-      setNextDrill("Retry with a clearer scenario.");
+    } catch {
+      setSessionBrief(
+        "Your practice session could not be prepared right now, but you can retry with a clearer prompt."
+      );
+      setFirstChallenge(
+        "Restate the scenario more specifically so the trainer can prepare a sharper rehearsal."
+      );
+      setEvaluatorFocus(
+        "The evaluator focus could not be generated for this run."
+      );
+      setStrongPattern(
+        "Start directly, stay structured, support your point with one example, and close clearly."
+      );
+      setMistakes(
+        "Avoid vague wording, weak openings, overlong answers, and low-confidence delivery."
+      );
+      setNextDrill(
+        "Retry the session with a clearer exact role, topic, or speaking situation."
+      );
     } finally {
       setLoading(false);
     }
@@ -279,21 +321,6 @@ export default function PracticePage() {
         Practice Arena helps users rehearse real situations with structured AI guidance. It is built
         for interviews, oral exams, presentations, pitches, and difficult conversations.
       </p>
-
-      <div className="mt-6 rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
-        <div className="text-sm font-semibold text-white">What this lab does</div>
-        <div className="mt-3 grid gap-3 md:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/75">
-            Turns your situation into a real practice session.
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/75">
-            Shows what the other side is likely judging or listening for.
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/75">
-            Gives structure, mistakes to avoid, and a next drill.
-          </div>
-        </div>
-      </div>
 
       <div className="mt-8 flex flex-wrap gap-3">
         {(["Interview", "Oral Exam", "Presentation", "Difficult Conversation"] as PracticeType[]).map((item) => (
@@ -353,43 +380,43 @@ export default function PracticePage() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
-          <div className="text-sm font-semibold text-white">Session Brief</div>
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-6 text-white/75">
-            {sessionBrief}
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">First Challenge</div>
-            <div className="mt-2 text-sm leading-6 text-white/75">{firstChallenge}</div>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">Evaluator Focus</div>
-            <div className="mt-2 text-sm leading-6 text-white/75">{evaluatorFocus}</div>
+      {!hasRun ? (
+        <div className="mt-6 rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
+          <div className="text-sm font-semibold text-white">Training Structure</div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <OutputCard
+              title="What happens here"
+              body="Once you start, Practice Arena prepares a structured rehearsal session instead of returning a random paragraph."
+            />
+            <OutputCard
+              title="What you will receive"
+              body="You will get a session brief, a first challenge, evaluator focus, a strong response pattern, mistakes to avoid, and a next drill."
+            />
           </div>
         </div>
+      ) : (
+        <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
+            <div className="text-sm font-semibold text-white">Session Flow</div>
 
-        <div className="rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
-          <div className="text-sm font-semibold text-white">Performance Guidance</div>
-
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">Strong Response Pattern</div>
-            <div className="mt-2 text-sm leading-6 text-white/75">{strongPattern}</div>
+            <div className="mt-4 space-y-4">
+              <OutputCard title="Session Brief" body={sessionBrief} />
+              <OutputCard title="First Challenge" body={firstChallenge} />
+              <OutputCard title="Evaluator Focus" body={evaluatorFocus} />
+            </div>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">Common Mistakes</div>
-            <div className="mt-2 text-sm leading-6 text-white/75">{mistakes}</div>
-          </div>
+          <div className="rounded-3xl border border-cyan-300/15 bg-white/5 p-6">
+            <div className="text-sm font-semibold text-white">Performance Guidance</div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">Next Drill</div>
-            <div className="mt-2 text-sm leading-6 text-white/75">{nextDrill}</div>
+            <div className="mt-4 space-y-4">
+              <OutputCard title="Strong Response Pattern" body={strongPattern} />
+              <OutputCard title="Common Mistakes" body={mistakes} />
+              <OutputCard title="Next Drill" body={nextDrill} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
