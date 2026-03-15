@@ -17,11 +17,15 @@ const PRIMARY_LINKS = [
   { href: "/enterprise/os", label: "OS Core" },
 ];
 
-const SYSTEM_LINKS = [
-  { href: "/enterprise/admin", label: "Admin" },
-  { href: "/enterprise/security", label: "Security" },
-  { href: "/enterprise/settings", label: "Settings" },
-  { href: "/enterprise/help", label: "Help" },
+const OS_BRIDGE_LINKS = [
+  { href: "/os", label: "OS Legacy" },
+  { href: "/os/focus", label: "Focus" },
+  { href: "/os/missions", label: "OS Missions" },
+  { href: "/os/robots", label: "Robots" },
+  { href: "/os/timeline", label: "Timeline" },
+  { href: "/os/logbook", label: "Logbook" },
+  { href: "/os/cognitive", label: "Cognitive" },
+  { href: "/os/council", label: "Council" },
 ];
 
 function cx(...classes: Array<string | false | null | undefined>) {
@@ -100,11 +104,11 @@ export default function EnterpriseNav({
         </div>
 
         <div className="mt-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">
-          Workspace Controls
+          OS Bridge
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
-          {SYSTEM_LINKS.map((item) => {
+          {OS_BRIDGE_LINKS.map((item) => {
             const active =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
 

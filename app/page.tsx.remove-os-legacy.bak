@@ -26,9 +26,17 @@ const ENVIRONMENTS = [
     key: "enterprise",
     title: "Shynvo Enterprise",
     subtitle: "Unified Operating Environment",
-    desc: "Missions, teams, analytics, strategy, automation, support, and OS intelligence in one enterprise environment.",
+    desc: "Missions, teams, analytics, strategy, automation, and OS intelligence in one enterprise environment.",
     tags: ["Missions", "Teams", "Analytics"],
     href: "/enterprise",
+  },
+  {
+    key: "os",
+    title: "Shynvo OS Legacy",
+    subtitle: "Execution Core Bridge",
+    desc: "Legacy orbital execution environment. Existing OS routes stay live while the system is unified under Enterprise.",
+    tags: ["Focus", "Robots", "Timeline"],
+    href: "/os",
   },
   {
     key: "experiments",
