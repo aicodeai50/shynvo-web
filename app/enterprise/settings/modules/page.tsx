@@ -9,22 +9,22 @@ export default function Page() {
       intro="Control which enterprise modules are emphasized and how the workspace is organized around them."
       focusTitle="Focus Areas"
       focusItems={[
-        { title: "Module Visibility", desc: "Decide which areas matter most in the enterprise environment." },
-        { title: "Workspace Structure", desc: "Support a cleaner experience by shaping visible priorities." },
-        { title: "Operational Relevance", desc: "Keep important modules prominent for users." },
-        { title: "Enterprise Simplicity", desc: "Reduce clutter and improve navigation confidence." }
+        { title: "Module Visibility", desc: "Decide which areas matter most in the enterprise environment.", href: "/enterprise/dashboard" },
+        { title: "Workspace Structure", desc: "Support a cleaner experience by shaping visible priorities.", href: "/enterprise/settings/profile" },
+        { title: "Operational Relevance", desc: "Keep important modules prominent for users.", href: "/enterprise/analytics" },
+        { title: "Enterprise Simplicity", desc: "Reduce clutter and improve navigation confidence.", href: "/enterprise/help/workspace-support" },
       ]}
       actionTitle="Recommended Actions"
       actionItems={[
-        { title: "Review visible modules", desc: "Check whether the workspace reflects current priorities." },
-        { title: "Align with user needs", desc: "Support clearer navigation and adoption." },
-        { title: "Coordinate with settings", desc: "Keep module emphasis aligned with identity and automation." }
+        { title: "Review visible modules", desc: "Check whether the workspace reflects current priorities.", href: "/enterprise/dashboard" },
+        { title: "Align with user needs", desc: "Support clearer navigation and adoption.", href: "/enterprise/help/workspace-support" },
+        { title: "Coordinate with settings", desc: "Keep module emphasis aligned with identity and automation.", href: "/enterprise/settings/identity" },
       ]}
       relatedTitle="Related Areas"
       relatedLinks={[
         { label: "Settings Home", href: "/enterprise/settings" },
-        { label: "Automation", href: "/enterprise/settings/automation" },
-        { label: "Overview", href: "/enterprise" }
+        { label: "Identity", href: "/enterprise/settings/identity" },
+        { label: "Dashboard", href: "/enterprise/dashboard" },
       ]}
     />
   );

@@ -4,12 +4,27 @@ import EnterpriseNav from "@/components/enterprise/EnterpriseNav";
 type DetailCard = {
   title: string;
   desc: string;
+  href?: string;
 };
 
 type QuickLink = {
   label: string;
   href: string;
 };
+
+function CardBody({ item }: { item: DetailCard }) {
+  return (
+    <>
+      <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+      <p className="mt-2 text-sm leading-6 text-white/65">{item.desc}</p>
+      {item.href ? (
+        <div className="mt-4 text-sm font-semibold text-emerald-100/80">
+          Open →
+        </div>
+      ) : null}
+    </>
+  );
+}
 
 export default function EnterpriseDetailPage({
   label,
@@ -59,15 +74,24 @@ export default function EnterpriseDetailPage({
           </div>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {focusItems.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
-              >
-                <h2 className="text-lg font-semibold text-white">{item.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-white/65">{item.desc}</p>
-              </div>
-            ))}
+            {focusItems.map((item) =>
+              item.href ? (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:bg-white/[0.06]"
+                >
+                  <CardBody item={item} />
+                </Link>
+              ) : (
+                <div
+                  key={item.title}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                >
+                  <CardBody item={item} />
+                </div>
+              )
+            )}
           </div>
         </div>
 
@@ -78,15 +102,29 @@ export default function EnterpriseDetailPage({
             </div>
 
             <div className="mt-4 space-y-3">
-              {actionItems.map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
-                >
-                  <div className="text-sm font-semibold text-white">{item.title}</div>
-                  <div className="mt-1 text-sm text-white/60">{item.desc}</div>
-                </div>
-              ))}
+              {actionItems.map((item) =>
+                item.href ? (
+                  <Link
+                    key={item.title}
+                    href={item.href}
+                    className="block rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:bg-white/[0.06]"
+                  >
+                    <div className="text-sm font-semibold text-white">{item.title}</div>
+                    <div className="mt-1 text-sm text-white/60">{item.desc}</div>
+                    <div className="mt-3 text-sm font-semibold text-emerald-100/80">
+                      Open →
+                    </div>
+                  </Link>
+                ) : (
+                  <div
+                    key={item.title}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                  >
+                    <div className="text-sm font-semibold text-white">{item.title}</div>
+                    <div className="mt-1 text-sm text-white/60">{item.desc}</div>
+                  </div>
+                )
+              )}
             </div>
           </div>
 
