@@ -23,11 +23,19 @@ const ENVIRONMENTS = [
     href: "/academy",
   },
   {
+    key: "enterprise",
+    title: "Shynvo Enterprise",
+    subtitle: "Unified Operating Environment",
+    desc: "Missions, teams, analytics, strategy, automation, and OS intelligence in one enterprise environment.",
+    tags: ["Missions", "Teams", "Analytics"],
+    href: "/enterprise",
+  },
+  {
     key: "os",
-    title: "Shynvo OS",
-    subtitle: "Dimensional Execution Cockpit",
-    desc: "Missions, focus systems, AI agents, and strategic orchestration in one cockpit.",
-    tags: ["Missions", "Focus", "Terminal"],
+    title: "Shynvo OS Legacy",
+    subtitle: "Execution Core Bridge",
+    desc: "Legacy orbital execution environment. Existing OS routes stay live while the system is unified under Enterprise.",
+    tags: ["Focus", "Robots", "Timeline"],
     href: "/os",
   },
   {
@@ -37,14 +45,6 @@ const ENVIRONMENTS = [
     desc: "Standalone worlds for thinking, debate, simulation, and concept development.",
     tags: ["Debate", "Simulation", "Concepts"],
     href: "/experiments",
-  },
-  {
-    key: "enterprise",
-    title: "Enterprise Suite",
-    subtitle: "Organizational Intelligence System",
-    desc: "Admin tools, skill matrices, team missions, and analytics for organizations.",
-    tags: ["Teams", "OKRs", "Analytics"],
-    href: "/enterprise",
   },
   {
     key: "frontier",
