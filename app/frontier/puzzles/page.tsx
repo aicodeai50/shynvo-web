@@ -5,22 +5,19 @@ import { useState } from "react";
 
 const PUZZLES = [
   {
-    title: "System Lock Puzzle",
     question: "A system has 3 switches. B must come after A, and C cannot be last. Which order can unlock the system?",
-    hint: "Place A before B, then check where C can safely fit.",
-    answer: "A, C, B",
+    hint: "Start by testing the valid positions for C.",
+    answer: "A, C, B works because B comes after A and C is not last.",
   },
   {
-    title: "Signal Route Puzzle",
-    question: "A message must pass through X or Y before reaching Z. Y depends on X. What valid order sends the message?",
-    hint: "Y cannot happen before X.",
-    answer: "X, Y, Z",
+    question: "Three services depend on each other: API before UI, Database before API. What is the safe build order?",
+    hint: "Find the deepest dependency first.",
+    answer: "Database, API, UI.",
   },
   {
-    title: "Server Queue Puzzle",
-    question: "Task D depends on B and C. B depends on A. What is one valid execution order?",
-    hint: "Start with what has no dependency.",
-    answer: "A, C, B, D",
+    question: "A robot can move left, right, or forward. It must visit the sensor before the gate and cannot end at the charger. What should you track first?",
+    hint: "Track order rules before path choices.",
+    answer: "Start with the ordering constraints: sensor before gate, charger not final.",
   },
 ];
 
@@ -68,15 +65,15 @@ export default function FrontierPuzzlesPage() {
         </h1>
         <p className="mt-3 max-w-5xl text-sm leading-6 text-white/70 sm:text-base">
           Train deep reasoning through interactive logic challenges. Reveal hints, test yourself,
-          then move to the next puzzle.
+          then move to the next puzzle without leaving the environment.
         </p>
       </div>
 
-      <div className="mt-8 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
+      <div className="mt-8 grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="text-sm font-semibold text-white">{active.title}</div>
+          <div className="text-sm font-semibold text-white">System Lock Puzzle</div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-5 text-sm leading-7 text-white/85">
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-7 text-white/90">
             {active.question}
           </div>
 
@@ -84,7 +81,7 @@ export default function FrontierPuzzlesPage() {
             <button
               type="button"
               onClick={() => setShowHint(true)}
-              className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
+              className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
             >
               Show hint
             </button>
@@ -98,33 +95,35 @@ export default function FrontierPuzzlesPage() {
             <button
               type="button"
               onClick={nextPuzzle}
-              className="rounded-2xl border border-lime-400/20 bg-lime-400/10 px-5 py-3 text-sm font-semibold text-lime-100 hover:bg-lime-400/15"
+              className="rounded-2xl border border-lime-300/30 bg-lime-400/10 px-5 py-3 text-sm font-semibold text-lime-100 hover:bg-lime-400/15"
             >
               Next puzzle
             </button>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="text-sm font-semibold text-white">Puzzle panel</div>
+        <div className="space-y-5">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="text-sm font-semibold text-white">Puzzle panel</div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">Hint</div>
-            <div className="mt-2 text-sm leading-6 text-white/70">
-              {showHint ? active.hint : "Hint hidden until you reveal it."}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-sm font-semibold text-white">Hint</div>
+              <div className="mt-2 text-sm leading-6 text-white/75">
+                {showHint ? active.hint : "Hint hidden until you reveal it."}
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-lime-400/20 bg-lime-400/10 p-4">
+              <div className="text-sm font-semibold text-lime-100">Answer</div>
+              <div className="mt-2 text-sm leading-6 text-lime-50/90">
+                {showAnswer ? active.answer : "Answer hidden until reveal."}
+              </div>
             </div>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-lime-400/20 bg-lime-400/10 p-4">
-            <div className="text-sm font-semibold text-lime-100">Answer</div>
-            <div className="mt-2 text-sm leading-6 text-lime-50/90">
-              {showAnswer ? active.answer : "Answer hidden until reveal."}
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
             <div className="text-sm font-semibold text-white">Why this page is different</div>
-            <div className="mt-2 text-sm leading-6 text-white/70">
+            <div className="mt-3 text-sm leading-6 text-white/75">
               This is the reasoning chamber of Frontier Lab. It is not for building like Coding
               Arena, and not for AI behaviour testing like AI Bot Lab.
             </div>

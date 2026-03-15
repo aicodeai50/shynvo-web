@@ -23,6 +23,8 @@ const BUILD_OPTIONS: Record<
     stack: string[];
     steps: string[];
     starterPrompt: string;
+    aiMode: string;
+    outputLabel: string;
   }
 > = {
   website: {
@@ -30,78 +32,90 @@ const BUILD_OPTIONS: Record<
     desc: "Create pages, sections, layouts, and interaction using core web technologies.",
     stack: ["HTML", "CSS", "JavaScript"],
     steps: [
-      "Step 1: Plan pages and structure",
-      "Step 2: Build layout with HTML",
-      "Step 3: Style with CSS",
-      "Step 4: Add interaction",
-      "Step 5: Test and deploy",
+      "Plan pages and structure",
+      "Build layout with HTML",
+      "Style with CSS",
+      "Add interaction",
+      "Test and deploy",
     ],
     starterPrompt: "I want to build a personal portfolio website with a projects section and contact form.",
+    aiMode: "Frontend Builder",
+    outputLabel: "Launch-ready site planning",
   },
   chatbot: {
     title: "Build a Chatbot",
     desc: "Learn chatbot flow, prompts, APIs, Python basics, and assistant behaviour.",
     stack: ["Python", "Prompts", "APIs"],
     steps: [
-      "Step 1: Define chatbot purpose",
-      "Step 2: Design prompt flow",
-      "Step 3: Connect an API or model",
-      "Step 4: Handle user messages",
-      "Step 5: Improve responses",
+      "Define chatbot purpose",
+      "Design prompt flow",
+      "Connect an API or model",
+      "Handle user messages",
+      "Improve responses",
     ],
     starterPrompt: "I want to build a chatbot that helps students revise for science exams.",
+    aiMode: "Assistant Architect",
+    outputLabel: "Conversation system planning",
   },
   business: {
     title: "Build a Business Tool",
     desc: "Design dashboards, admin panels, and internal tools for real company workflows.",
     stack: ["React", "Database", "Auth"],
     steps: [
-      "Step 1: Define business workflow",
-      "Step 2: Choose data model",
-      "Step 3: Build dashboard UI",
-      "Step 4: Add actions and permissions",
-      "Step 5: Test company usage",
+      "Define business workflow",
+      "Choose data model",
+      "Build dashboard UI",
+      "Add actions and permissions",
+      "Test company usage",
     ],
     starterPrompt: "I want to build an internal dashboard for tracking missions and team progress.",
+    aiMode: "Workflow Engineer",
+    outputLabel: "Operational tool planning",
   },
   automation: {
     title: "Build an Automation Tool",
     desc: "Create helper scripts, task flows, and repeatable automation systems.",
     stack: ["Python", "Scripts", "Workflow"],
     steps: [
-      "Step 1: Identify repeat task",
-      "Step 2: Define input and output",
-      "Step 3: Write automation script",
-      "Step 4: Add error handling",
-      "Step 5: Schedule or trigger it",
+      "Identify repeat task",
+      "Define input and output",
+      "Write automation script",
+      "Add error handling",
+      "Schedule or trigger it",
     ],
     starterPrompt: "I want to automate renaming files and sorting them into folders.",
+    aiMode: "Automation Planner",
+    outputLabel: "Repeat-task automation design",
   },
   game: {
     title: "Build a Game",
     desc: "Learn game loops, interaction, state, scoring, and player logic.",
     stack: ["JavaScript", "Canvas", "Game Logic"],
     steps: [
-      "Step 1: Define the game idea",
-      "Step 2: Build player controls",
-      "Step 3: Add game state and scoring",
-      "Step 4: Add enemies or obstacles",
-      "Step 5: Polish and test gameplay",
+      "Define the game idea",
+      "Build player controls",
+      "Add game state and scoring",
+      "Add enemies or obstacles",
+      "Polish and test gameplay",
     ],
     starterPrompt: "I want to build a simple browser game where the player avoids obstacles and scores points.",
+    aiMode: "Game Systems Coach",
+    outputLabel: "Interactive gameplay planning",
   },
   python: {
     title: "Learn Python by Building",
     desc: "Use Python to build scripts, tools, bots, and smart beginner-friendly projects.",
     stack: ["Python", "Functions", "Projects"],
     steps: [
-      "Step 1: Learn variables and input",
-      "Step 2: Use conditions and loops",
-      "Step 3: Write functions",
-      "Step 4: Build a small project",
-      "Step 5: Improve and refactor",
+      "Learn variables and input",
+      "Use conditions and loops",
+      "Write functions",
+      "Build a small project",
+      "Improve and refactor",
     ],
     starterPrompt: "I want to learn Python by building a simple expense tracker.",
+    aiMode: "Python Mentor",
+    outputLabel: "Beginner-to-project learning path",
   },
 };
 
@@ -117,6 +131,24 @@ export default function FrontierCodingPage() {
     setIdea(BUILD_OPTIONS[type].starterPrompt);
     setGenerated(false);
   }
+
+  const aiSummary = generated
+    ? `AI mode: ${active.aiMode}. Project received: "${idea || active.starterPrompt}". Frontier recommends starting with ${active.steps[0].toLowerCase()}, then moving through a structured build sequence with emphasis on ${active.stack.join(", ")}.`
+    : "Choose a build type, describe your idea, then generate an AI build plan.";
+
+  const buildNotes = generated
+    ? [
+        `Primary outcome: ${active.outputLabel}.`,
+        `Best stack match: ${active.stack.join(" • ")}.`,
+        `Suggested first milestone: ${active.steps[0]}.`,
+        `Suggested delivery rhythm: one focused implementation block per step.`,
+      ]
+    : [
+        "Primary outcome will appear here.",
+        "Best stack match will appear here.",
+        "Suggested first milestone will appear here.",
+        "Delivery rhythm will appear here.",
+      ];
 
   return (
     <section className="relative py-10 sm:py-14">
@@ -148,14 +180,19 @@ export default function FrontierCodingPage() {
           Coding Arena
         </h1>
         <p className="mt-3 max-w-5xl text-sm leading-6 text-white/70 sm:text-base">
-          Learn how to build things with code and programming languages. Choose what you want to
-          create, then follow the structure needed to build it.
+          This is an AI-assisted build workspace. Choose what you want to create, describe the goal,
+          and let Frontier shape the next technical path without changing the environment around you.
         </p>
       </div>
 
       <div className="mt-8 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="text-sm font-semibold text-white">What do you want to build?</div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm font-semibold text-white">What do you want to build?</div>
+            <div className="rounded-full border border-lime-400/20 bg-lime-400/10 px-3 py-1 text-[11px] text-lime-100">
+              AI Build Routing
+            </div>
+          </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {(Object.keys(BUILD_OPTIONS) as BuildType[]).map((type) => {
@@ -196,7 +233,7 @@ export default function FrontierCodingPage() {
               onClick={() => setGenerated(true)}
               className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
             >
-              Generate build plan
+              Generate AI build plan
             </button>
             <button
               type="button"
@@ -211,35 +248,49 @@ export default function FrontierCodingPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="text-lg font-semibold text-white">{active.title}</div>
-          <div className="mt-2 text-sm leading-6 text-white/70">{active.desc}</div>
-
-          <div className="mt-5 text-sm font-semibold text-white">Main stack</div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {active.stack.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-white/75"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-5 text-sm font-semibold text-white">Suggested path</div>
-          <div className="mt-3 space-y-3">
-            {active.steps.map((step) => (
-              <div key={step} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80">
-                {step}
+        <div className="space-y-5">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-lg font-semibold text-white">{active.title}</div>
+              <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/70">
+                {active.aiMode}
               </div>
-            ))}
+            </div>
+            <div className="mt-2 text-sm leading-6 text-white/70">{active.desc}</div>
+
+            <div className="mt-5 text-sm font-semibold text-white">Main stack</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {active.stack.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-white/75"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-5 text-sm font-semibold text-white">AI build sequence</div>
+            <div className="mt-3 space-y-3">
+              {active.steps.map((step, index) => (
+                <div key={step} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/80">
+                  Step {index + 1}: {step}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-5 rounded-2xl border border-lime-400/20 bg-lime-400/10 p-4 text-sm text-lime-100">
-            {generated
-              ? `Build plan ready: start with "${idea || active.starterPrompt}" and follow the path shown in this panel.`
-              : "Choose a build type, write your idea, then click Generate build plan."}
+          <div className="rounded-3xl border border-lime-400/20 bg-lime-400/10 p-6">
+            <div className="text-sm font-semibold text-lime-100">Live AI output</div>
+            <div className="mt-3 text-sm leading-6 text-lime-50/90">{aiSummary}</div>
+
+            <div className="mt-4 space-y-3">
+              {buildNotes.map((note) => (
+                <div key={note} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/85">
+                  {note}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

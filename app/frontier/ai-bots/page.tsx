@@ -9,47 +9,61 @@ function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-const BOT_MODES: Record<
+const MODES: Record<
   BotMode,
   {
     title: string;
     desc: string;
-    outputLabel: string;
-    outputText: string;
+    tone: string;
+    output: string;
+    tags: string[];
+    starter: string;
   }
 > = {
   assistant: {
     title: "AI Assistant",
     desc: "General support, planning help, quick answers, and structured next steps.",
-    outputLabel: "Assistant mode",
-    outputText: "Ask something and this lab will generate a structured support response.",
+    tone: "Supportive and direct",
+    output: "The assistant mode organizes the request into clear next steps and practical guidance.",
+    tags: ["Support", "Planning", "Guidance"],
+    starter: "Help me design an AI assistant for students learning coding.",
   },
   builder: {
     title: "AI Builder",
     desc: "Turns product ideas into features, workflows, and build direction.",
-    outputLabel: "Builder mode",
-    outputText: "Describe what you want to create and this lab will turn it into a build direction.",
+    tone: "Constructive and implementation-focused",
+    output: "The builder mode turns a prompt into structure, modules, scope, and build priorities.",
+    tags: ["Product", "Workflow", "Build"],
+    starter: "Help me turn an internal knowledge tool idea into a usable product plan.",
   },
   teacher: {
     title: "AI Teacher",
     desc: "Explains ideas step by step for beginners and growing learners.",
-    outputLabel: "Teacher mode",
-    outputText: "Write what you want to learn and this lab will respond in a teaching style.",
+    tone: "Clear and educational",
+    output: "The teacher mode slows down, explains terms, and turns complexity into guided understanding.",
+    tags: ["Learning", "Explanation", "Clarity"],
+    starter: "Explain APIs to a beginner who has never built a web app before.",
   },
   analyst: {
     title: "AI Analyst",
     desc: "Compares options, trade-offs, risks, and strong recommendations.",
-    outputLabel: "Analyst mode",
-    outputText: "Write a decision or scenario and this lab will return analysis and trade-offs.",
+    tone: "Structured and evaluative",
+    output: "The analyst mode compares paths, highlights trade-offs, and recommends a direction with reasons.",
+    tags: ["Decision", "Trade-offs", "Strategy"],
+    starter: "Compare whether a startup should build mobile first or web first.",
   },
 };
 
 export default function FrontierAIBotsPage() {
   const [mode, setMode] = useState<BotMode>("assistant");
-  const [prompt, setPrompt] = useState("Help me design an AI assistant for students learning coding.");
+  const [prompt, setPrompt] = useState(MODES.assistant.starter);
   const [generated, setGenerated] = useState(false);
 
-  const active = useMemo(() => BOT_MODES[mode], [mode]);
+  const active = useMemo(() => MODES[mode], [mode]);
+
+  const liveResponse = generated
+    ? `${active.output} Prompt received: "${prompt || active.starter}". Tone selected: ${active.tone}.`
+    : "Choose a mode, write a prompt, then generate a response style.";
 
   return (
     <section className="relative py-10 sm:py-14">
@@ -73,36 +87,36 @@ export default function FrontierAIBotsPage() {
         </Link>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-200/70">
-            Frontier Lab
-          </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            AI Bot Lab
-          </h1>
-          <p className="mt-3 max-w-5xl text-sm leading-6 text-white/70 sm:text-base">
-            Experiment with AI behaviour models. Choose a mode, type a prompt, and see how the
-            response changes by purpose.
-          </p>
+      <div className="mt-6">
+        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-200/70">
+          Frontier Lab
         </div>
-
-        <div className="rounded-full border border-lime-400/20 bg-lime-400/10 px-4 py-2 text-sm text-lime-100">
-          Bot Modes: Active
-        </div>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+          AI Bot Lab
+        </h1>
+        <p className="mt-3 max-w-5xl text-sm leading-6 text-white/70 sm:text-base">
+          Experiment with AI behaviour models. Choose a mode, type a prompt, and compare how the
+          response changes by purpose and operating style.
+        </p>
       </div>
 
-      <div className="mt-8 grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+      <div className="mt-8 grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="text-sm font-semibold text-white">Choose bot behaviour</div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm font-semibold text-white">Choose bot behaviour</div>
+            <div className="rounded-full border border-lime-400/20 bg-lime-400/10 px-3 py-1 text-[11px] text-lime-100">
+              Mode Simulation
+            </div>
+          </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {(Object.keys(BOT_MODES) as BotMode[]).map((item) => (
+            {(Object.keys(MODES) as BotMode[]).map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => {
                   setMode(item);
+                  setPrompt(MODES[item].starter);
                   setGenerated(false);
                 }}
                 className={cx(
@@ -112,8 +126,8 @@ export default function FrontierAIBotsPage() {
                     : "border-white/10 bg-black/20 text-white/80 hover:bg-white/7"
                 )}
               >
-                <div className="text-base font-semibold">{BOT_MODES[item].title}</div>
-                <div className="mt-2 text-sm leading-6 text-white/70">{BOT_MODES[item].desc}</div>
+                <div className="text-base font-semibold">{MODES[item].title}</div>
+                <div className="mt-2 text-sm leading-6 text-white/70">{MODES[item].desc}</div>
               </button>
             ))}
           </div>
@@ -123,8 +137,8 @@ export default function FrontierAIBotsPage() {
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              rows={7}
-              placeholder="Write a prompt to test how the selected AI mode should respond..."
+              rows={6}
+              placeholder="Type a prompt to test how the mode behaves..."
               className="mt-3 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
             />
           </div>
@@ -140,7 +154,7 @@ export default function FrontierAIBotsPage() {
             <button
               type="button"
               onClick={() => {
-                setPrompt("");
+                setPrompt(active.starter);
                 setGenerated(false);
               }}
               className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
@@ -150,26 +164,40 @@ export default function FrontierAIBotsPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-            Live Output
-          </div>
+        <div className="space-y-5">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="text-sm font-semibold uppercase tracking-[0.18em] text-white/45">
+              Live output
+            </div>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-2xl font-semibold text-white">{active.title}</div>
+              <div className="mt-2 text-sm leading-6 text-white/70">{active.desc}</div>
+            </div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-xl font-semibold text-white">{active.title}</div>
-            <div className="mt-2 text-sm leading-6 text-white/70">{active.desc}</div>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-lime-400/20 bg-lime-400/10 p-4">
-            <div className="text-sm font-semibold text-lime-100">{active.outputLabel}</div>
-            <div className="mt-2 text-sm leading-6 text-lime-50/90">
-              {generated ? `${active.outputText} Prompt: ${prompt || "No prompt written yet."}` : active.outputText}
+            <div className="mt-4 rounded-2xl border border-lime-400/20 bg-lime-400/10 p-4">
+              <div className="text-sm font-semibold text-lime-100">Assistant mode</div>
+              <div className="mt-2 text-sm leading-6 text-lime-50/90">{liveResponse}</div>
             </div>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">Why this is different</div>
-            <div className="mt-2 text-sm leading-6 text-white/70">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+            <div className="text-sm font-semibold text-white">Mode properties</div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {active.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-white/75"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/80">
+              Tone: {active.tone}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/75">
               This lab is for behaviour testing. Same prompt, different intelligence mode.
             </div>
           </div>
