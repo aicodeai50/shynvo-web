@@ -1,50 +1,38 @@
 import Link from "next/link";
 import EnterpriseNav from "@/components/enterprise/EnterpriseNav";
 
-const TEAMS = [
-  {
-    title: "Engineering",
-    href: "/enterprise/teams/engineering",
-    desc: "Members, mission ownership, and internal coordination.",
-  },
-  {
-    title: "Marketing",
-    href: "/enterprise/teams/marketing",
-    desc: "Members, mission ownership, and internal coordination.",
-  },
-  {
-    title: "Product",
-    href: "/enterprise/teams/product",
-    desc: "Members, mission ownership, and internal coordination.",
-  },
+const teams = [
+  { title: "Engineering", href: "/enterprise/teams/engineering", desc: "Product engineering, platform systems, and technical delivery." },
+  { title: "Marketing", href: "/enterprise/teams/marketing", desc: "Campaigns, growth, communication, and audience reach." },
+  { title: "Product", href: "/enterprise/teams/product", desc: "Product direction, planning, research, and roadmap ownership." },
 ];
 
 export default function EnterpriseTeamsPage() {
   return (
     <section className="py-10 sm:py-14">
-      <EnterpriseNav hubHref="/enterprise" hubTitle="Shynvo Enterprise" />
+      <EnterpriseNav label="Enterprise Teams" />
 
-      <div className="text-xs font-semibold uppercase tracking-wider text-emerald-100/70">
-        Shynvo Enterprise
+      <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm sm:p-8">
+        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/65">
+          Teams
+        </div>
+        <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-6xl">
+          Teams
+        </h1>
+        <p className="mt-4 max-w-4xl text-sm leading-6 text-white/70 sm:text-base">
+          Open a team workspace below.
+        </p>
       </div>
 
-      <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-6xl">
-        Teams
-      </h1>
-
-      <p className="mt-4 max-w-4xl text-sm leading-6 text-white/70 sm:text-base">
-        Teams organizes departments, members, responsibilities, and collaboration structure across the company.
-      </p>
-
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        {TEAMS.map((team) => (
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {teams.map((team) => (
           <Link
-            key={team.title}
+            key={team.href}
             href={team.href}
-            className="rounded-3xl border border-emerald-300/15 bg-white/5 p-6 transition hover:bg-white/10"
+            className="rounded-[1.75rem] border border-white/10 bg-black/20 p-5 transition hover:bg-white/[0.06]"
           >
-            <div className="text-2xl font-semibold text-white">{team.title}</div>
-            <div className="mt-3 text-sm leading-6 text-white/70">{team.desc}</div>
+            <h2 className="text-2xl font-semibold text-white">{team.title}</h2>
+            <p className="mt-3 text-sm leading-6 text-white/68">{team.desc}</p>
             <div className="mt-5 text-sm font-semibold text-white/90">Open team →</div>
           </Link>
         ))}

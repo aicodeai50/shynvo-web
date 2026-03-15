@@ -73,15 +73,8 @@ const ENVIRONMENTS = [
 export default function HomePage() {
   return (
     <main className="relative overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-20 bg-[#070B11]"
-      />
-
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-      >
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-20 bg-[#070B11]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <video
           className="absolute inset-0 h-full w-full object-cover opacity-[0.12]"
           autoPlay
@@ -92,26 +85,8 @@ export default function HomePage() {
         >
           <source src="/shynvo-wallpaper.mp4" type="video/mp4" />
         </video>
-
         <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_10%_10%,rgba(59,130,246,0.08),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(800px_420px_at_85%_20%,rgba(16,185,129,0.08),transparent_58%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(700px_380px_at_55%_90%,rgba(99,102,241,0.06),transparent_55%)]" />
-
-        <div className="absolute inset-0 opacity-[0.12]">
-          <div className="absolute left-[8%] top-[18%] h-2 w-2 animate-pulse rounded-full bg-cyan-300" />
-          <div className="absolute left-[18%] top-[32%] h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-          <div className="absolute left-[28%] top-[22%] h-2 w-2 animate-pulse rounded-full bg-emerald-300" />
-          <div className="absolute left-[40%] top-[30%] h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-200" />
-          <div className="absolute left-[58%] top-[18%] h-2 w-2 animate-pulse rounded-full bg-blue-300" />
-          <div className="absolute left-[72%] top-[28%] h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-          <div className="absolute left-[82%] top-[20%] h-2 w-2 animate-pulse rounded-full bg-emerald-300" />
-          <div className="absolute left-[65%] top-[42%] h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-200" />
-          <div className="absolute left-[48%] top-[48%] h-2 w-2 animate-pulse rounded-full bg-white" />
-          <div className="absolute left-[25%] top-[55%] h-1.5 w-1.5 animate-pulse rounded-full bg-blue-200" />
-          <div className="absolute left-[78%] top-[62%] h-2 w-2 animate-pulse rounded-full bg-cyan-300" />
-          <div className="absolute left-[55%] top-[72%] h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-200" />
-        </div>
-
         <div className="absolute inset-0 bg-black/50" />
       </div>
 
@@ -133,8 +108,7 @@ export default function HomePage() {
 
             <p className="mt-5 max-w-3xl text-base leading-7 text-white/78 sm:text-lg">
               A multi-environment intelligence platform for learning, execution,
-              strategy, resilience, organizational growth, coding, and skill
-              development.
+              strategy, resilience, organizational growth, coding, and skill development.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -151,11 +125,6 @@ export default function HomePage() {
                 Read Docs
               </Link>
             </div>
-
-            <p className="mt-5 text-sm leading-6 text-white/65">
-              Trial: full access for 7 days. Robot is included during trial;
-              upgrade required after.
-            </p>
           </div>
 
           <Link
@@ -173,21 +142,14 @@ export default function HomePage() {
               >
                 <source src="/robot.mp4" type="video/mp4" />
               </video>
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
             </div>
 
             <div className="border-t border-white/10 p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-2xl font-semibold text-white">
-                    Shynvo Robot
-                  </div>
-                  <div className="mt-1 text-sm text-white/70">
-                    Open multilingual robot experience
-                  </div>
+                  <div className="text-2xl font-semibold text-white">Shynvo Robot</div>
+                  <div className="mt-1 text-sm text-white/70">Open multilingual robot experience</div>
                 </div>
-
                 <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-lg text-white/80 transition group-hover:bg-white group-hover:text-[#0B0F14]">
                   →
                 </div>
@@ -196,10 +158,6 @@ export default function HomePage() {
               <div className="mt-4">
                 <RobotTypingLine />
               </div>
-
-              <p className="mt-4 text-sm text-white/68">
-                Click the chamber to open the robot trial experience.
-              </p>
             </div>
           </Link>
         </div>
@@ -212,8 +170,7 @@ export default function HomePage() {
             Explore the buildings
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72 sm:text-base">
-            Each building is a purpose-built system with its own departments,
-            identity, and workflows.
+            Each building is a purpose-built system with its own departments, identity, and workflows.
           </p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -235,15 +192,11 @@ export default function HomePage() {
                   </div>
 
                   <div className="mt-4">
-                    <h3 className="text-2xl font-semibold text-white">
-                      {item.title}
-                    </h3>
+                    <h3 className="text-2xl font-semibold text-white">{item.title}</h3>
                     <p className="mt-1 text-sm text-white/62">{item.subtitle}</p>
                   </div>
 
-                  <p className="mt-4 text-base leading-7 text-white/74">
-                    {item.desc}
-                  </p>
+                  <p className="mt-4 text-base leading-7 text-white/74">{item.desc}</p>
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     {item.tags.map((tag) => (
