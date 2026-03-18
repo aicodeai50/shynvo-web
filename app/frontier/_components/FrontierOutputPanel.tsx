@@ -1,19 +1,23 @@
 type FrontierOutputPanelProps = {
   title?: string;
   summary: string;
+  meaning?: string;
   nextAction: string;
   why: string[];
   deliverables: string[];
   risk?: string;
+  encouragement?: string;
 };
 
 export default function FrontierOutputPanel({
   title = "AI guidance",
   summary,
+  meaning,
   nextAction,
   why,
   deliverables,
   risk,
+  encouragement,
 }: FrontierOutputPanelProps) {
   return (
     <div className="rounded-3xl border border-lime-400/20 bg-lime-400/10 p-5">
@@ -24,6 +28,17 @@ export default function FrontierOutputPanel({
           Summary
         </div>
         <p className="mt-2 text-sm leading-6 text-white/88">{summary}</p>
+
+      {meaning ? (
+        <div className="mt-4">
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+            What this means
+          </div>
+          <p className="mt-2 text-sm leading-6 text-white/75">
+            {meaning}
+          </p>
+        </div>
+      ) : null}
       </div>
 
       <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">

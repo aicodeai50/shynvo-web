@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -9,10 +9,17 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 export default function SignInPage() {
   const { t } = useLanguage();
   const router = useRouter();
+  const [nextUrl, setNextUrl] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setNextUrl(params.get("next") || "");
+  }, []);
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
@@ -49,6 +56,12 @@ export default function SignInPage() {
 
     setMessage("Signed in successfully.");
     setLoading(false);
+
+    if (nextUrl) {
+      window.location.href = nextUrl;
+      return;
+    }
+
     router.push("/");
   }
 
@@ -120,7 +133,7 @@ export default function SignInPage() {
               {t("nav.createAccount")}
             </Link>
           </div>
-        
+
           <div className="mt-4 text-right">
             <Link
               href="/forgot-password"

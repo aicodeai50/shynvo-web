@@ -25,7 +25,7 @@ const plans = [
     price: "$25",
     period: "/ month",
     bestFor: "Best for individuals",
-    href: "/sign-up",
+    href: "/checkout/pro",
     highlighted: true,
     cta: "Get Pro",
     features: [
@@ -42,7 +42,7 @@ const plans = [
     price: "$50",
     period: "/ month",
     bestFor: "Best for teams",
-    href: "/sign-up",
+    href: "/checkout/team",
     highlighted: false,
     cta: "Get Team",
     features: [

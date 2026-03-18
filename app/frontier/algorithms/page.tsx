@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import FrontierOutputPanel from "@/app/frontier/_components/FrontierOutputPanel";
-import { buildAlgorithmOutput } from "@/app/frontier/_lib/frontierProfessionalCopy";
+import FrontierOutputPanel from "@/frontier/_components/FrontierOutputPanel";
+import { buildAlgorithmOutput } from "@/frontier/_lib/frontierProfessionalCopy";
 
 type ChallengeType = "shortest-path" | "sorting" | "scheduling" | "graphs";
 type ReasonMode = "coach" | "solver" | "teacher";
@@ -77,7 +77,7 @@ export default function FrontierAlgorithmsPage() {
     () =>
       buildAlgorithmOutput({
         challengeTitle: active.title,
-        modeTitle: MODES[mode].title,
+        mode: MODES[mode].title,
         problem: problem || "Use the selected challenge template.",
         hint: active.hint,
         route: active.route,
