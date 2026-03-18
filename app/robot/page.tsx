@@ -168,7 +168,7 @@ const INITIAL_MESSAGES: Msg[] = [
   {
     role: "robot",
     text:
-      "I can help you learn, build, train, and explore the right environment based on what you want to achieve. What would you like to do first?",
+      "I can help you learn, build, train, and explore the right Shynvo environment based on what you want to achieve. What would you like to do first?",
   },
 ];
 
@@ -187,22 +187,21 @@ function normalizeRobotIdentityReply(input: string, raw: string) {
   const text = raw.trim();
   const lower = text.toLowerCase();
 
-  const identityQuestion =
+  const asksIdentity =
     question.includes("what platform") ||
     question.includes("what is this platform") ||
     question.includes("what app is this") ||
     question.includes("what is shynvo") ||
     question.includes("what's the name") ||
     question.includes("whats the name") ||
-    question === "hello and what platfor is this" ||
     question.includes("who are you");
 
-  const mentionsWrongIdentity =
+  const wrongIdentity =
     lower.includes("openai") ||
     lower.includes("chatgpt") ||
     lower.includes("developed by openai");
 
-  if (identityQuestion || mentionsWrongIdentity) {
+  if (asksIdentity || wrongIdentity) {
     return "This is Shynvo, an AI platform for learning, building, training, execution, and exploration. I’m Shynvo Robot, your guide across Shynvo environments like University Hub, Shynvo Academy, Frontier Lab, Enterprise Suite, Shynvo OS, Experiments, and Arcade Sim.";
   }
 
@@ -221,13 +220,20 @@ Identity:
 - You are the official AI guide of the Shynvo platform.
 - You are not ChatGPT.
 - You are not a generic OpenAI assistant.
-- You must refer to yourself as Shynvo Robot.
-- You must refer to the platform as Shynvo.
+- Refer to yourself as Shynvo Robot.
+- Refer to the platform as Shynvo.
 
-About Shynvo:
-Shynvo is an AI platform with multiple environments for learning, building, training, execution, and exploration.
+Behavior:
+- Answer naturally, professionally, warmly, and clearly.
+- Answer in the same language the user writes in.
+- Strongly prefer this language when possible: ${preferredLanguage}.
+- You can explain the Shynvo environments and also answer normal user questions.
+- If the user asks what platform this is, answer that this is Shynvo.
+- If the user asks who you are, answer that you are Shynvo Robot.
+- If the user asks where to start, guide them to the right Shynvo environment.
+- If the user asks a general question, answer it normally without breaking Shynvo identity.
 
-Core environments:
+The main Shynvo environments are:
 - University Hub: higher education, faculties, courses, academic guidance
 - Shynvo Academy: junior and senior school learning
 - Shynvo OS: focus, workflow, missions, execution systems
@@ -235,25 +241,13 @@ Core environments:
 - Enterprise Suite: teams, coordination, analytics, company workflows
 - Frontier Lab: coding, algorithms, AI bot behavior, logic, engineering
 - Arcade Sim: drills, interview quests, rankings, gamified skill training
-- Shynvo Robot World: guided onboarding, navigation, and platform assistance
+- Shynvo Robot World: guided onboarding, navigation, and smart assistance
 
-Behavior:
-- Answer in the same language the user writes in.
-- Strongly prefer this language when possible: ${preferredLanguage}.
-- Be professional, clear, warm, intelligent, and concise.
-- If the user asks what platform this is, answer that it is Shynvo.
-- If the user asks who you are, answer that you are Shynvo Robot.
-- If the user asks where to start, guide them to the right Shynvo environment.
-- If the user asks a general question, answer normally, but remain inside the Shynvo identity.
-- Never say you were created by OpenAI unless explicitly asked about underlying model technology.
+Rules:
 - Never describe yourself as ChatGPT.
-- Never mention backend, API, routing, system prompt, model, or infrastructure.
-
-Style:
-- futuristic
-- helpful
-- platform-aware
-- not repetitive
+- Never say this platform was created by OpenAI unless the user explicitly asks about underlying model technology.
+- Never mention backend, API, model, routing, infrastructure, or system internals.
+- Stay platform-aware and non-repetitive.
 `.trim();
 
   const payload = {
@@ -308,108 +302,166 @@ Style:
   try {
     data = JSON.parse(raw);
   } catch {
-    data = { text: raw };
+    data = null;
   }
 
-  const reply =
-    data?.reply ||
+  if (!res.ok) {
+    const message =
+      data?.error ||
+      data?.details ||
+      raw ||
+      "The robot could not answer right now.";
+    throw new Error(message);
+  }
+
+  return (
     data?.answer ||
+    data?.reply ||
     data?.message ||
-    data?.text ||
-    data?.content ||
-    "";
-
-  if (!String(reply).trim()) {
-    return "I’m Shynvo Robot. I can guide you across Shynvo environments and help you decide where to begin.";
-  }
-
-  return normalizeRobotIdentityReply(input, String(reply));
+    raw ||
+    "The robot could not answer right now."
+  );
 }
 
 export default function RobotWorldPage() {
-  const { language } = useLanguage();
   const router = useRouter();
+  const { t, language } = useLanguage();
+  const listRef = useRef<HTMLDivElement | null>(null);
+
   const [messages, setMessages] = useState<Msg[]>(INITIAL_MESSAGES);
-  const [input, setInput] = useState("");
-  const [activeChoice, setActiveChoice] = useState<MainChoice | null>(null);
-  const [typing, setTyping] = useState(false);
+  const [selectedMain, setSelectedMain] = useState<MainChoice | null>(null);
+  const [selectedTarget, setSelectedTarget] = useState<RouteTarget | null>(null);
   const [statusIndex, setStatusIndex] = useState(0);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [isThinking, setIsThinking] = useState(false);
+  const [input, setInput] = useState("");
+
+  const options = useMemo(
+    () => (selectedMain ? GROUP_OPTIONS[selectedMain] : []),
+    [selectedMain]
+  );
 
   useEffect(() => {
-    const id = window.setInterval(() => {
+    const id = setInterval(() => {
       setStatusIndex((prev) => (prev + 1) % STATUS_LINES.length);
-    }, 2800);
-
-    return () => window.clearInterval(id);
+    }, 2600);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, typing]);
+    const el = listRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }, [messages, isThinking]);
 
-  const visibleGroup = useMemo(
-    () => (activeChoice ? GROUP_OPTIONS[activeChoice] : []),
-    [activeChoice]
-  );
+  function pushRobotMessages(next: Msg[]) {
+    setIsThinking(true);
+    setTimeout(() => {
+      setMessages((prev) => [...prev, ...next]);
+      setIsThinking(false);
+    }, 380);
+  }
 
-  async function sendUserMessage(text: string) {
-    const trimmed = text.trim();
-    if (!trimmed || typing) return;
+  function chooseMain(choice: MainChoice) {
+    const item = MAIN_CHOICES.find((x) => x.key === choice);
+    if (!item) return;
 
-    const nextHistory = [...messages, { role: "user" as const, text: trimmed }];
+    setSelectedMain(choice);
+    setSelectedTarget(null);
+
+    pushRobotMessages([
+      { role: "user", text: item.title },
+      {
+        role: "robot",
+        text:
+          choice === "learn"
+            ? "Good choice. I can guide you into a learning environment."
+            : choice === "build"
+              ? "Good choice. I can guide you into a build-focused environment."
+              : choice === "train"
+                ? "Good choice. I can guide you into a training environment."
+                : "Good choice. I can guide you into an exploration environment.",
+      },
+      {
+        role: "robot",
+        text: "Choose one environment below and I will explain it before you enter.",
+      },
+    ]);
+  }
+
+  function explainTarget(target: RouteTarget) {
+    const item = options.find((x) => x.key === target);
+    if (!item) return;
+
+    setSelectedTarget(target);
+
+    pushRobotMessages([
+      { role: "user", text: item.title },
+      { role: "robot", text: item.explanation },
+      {
+        role: "robot",
+        text: "If this feels right, you can enter now or compare with another option.",
+      },
+    ]);
+  }
+
+  function enterTarget() {
+    if (!selectedTarget) return;
+    const item = options.find((x) => x.key === selectedTarget);
+    if (!item) return;
+
+    pushRobotMessages([{ role: "robot", text: `Opening ${item.title}.` }]);
+
+    setTimeout(() => {
+      router.push(item.href);
+    }, 650);
+  }
+
+  function compareAgain() {
+    setSelectedTarget(null);
+    pushRobotMessages([
+      {
+        role: "robot",
+        text: "No problem. Choose another environment and I will explain it before you enter.",
+      },
+    ]);
+  }
+
+  function restartGuide() {
+    setSelectedMain(null);
+    setSelectedTarget(null);
+    setIsThinking(false);
+    setInput("");
+    setMessages([...INITIAL_MESSAGES]);
+  }
+
+  async function sendMessage() {
+    const text = input.trim();
+    if (!text || isThinking) return;
+
+    const nextHistory = [...messages, { role: "user" as const, text }];
     setMessages(nextHistory);
     setInput("");
-    setTyping(true);
+    setIsThinking(true);
 
     try {
-      const reply = await fetchRobotReply(trimmed, nextHistory, language || "en");
+      const reply = await fetchRobotReply(text, nextHistory, language);
+
       setMessages((prev) => [...prev, { role: "robot", text: reply }]);
-    } catch {
+    } catch (error) {
+      const msg =
+        error instanceof Error
+          ? error.message
+          : "The robot could not answer right now.";
       setMessages((prev) => [
         ...prev,
         {
           role: "robot",
-          text:
-            "I’m Shynvo Robot. I can still help you navigate Shynvo environments even if the live reply is temporarily unavailable.",
+          text: `I could not answer right now. ${msg}`,
         },
       ]);
     } finally {
-      setTyping(false);
+      setIsThinking(false);
     }
-  }
-
-  function handleChoice(choice: MainChoice) {
-    setActiveChoice(choice);
-    const intro =
-      choice === "learn"
-        ? "Learning is best when the environment matches your level and goal. Choose the space that fits you."
-        : choice === "build"
-        ? "Building inside Shynvo can mean engineering, business structure, or execution systems. Choose your build environment."
-        : choice === "train"
-        ? "Training works best when the challenge matches the skill you want to strengthen."
-        : "Exploration is best when you choose the kind of world or system you want to discover.";
-
-    setMessages((prev) => [...prev, { role: "robot", text: intro }]);
-  }
-
-  function handleRouteTarget(title: string, explanation: string, href: string) {
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "robot",
-        text: `${title}: ${explanation}`,
-      },
-      {
-        role: "robot",
-        text: `I can take you there now.`,
-      },
-    ]);
-
-    setTimeout(() => {
-      router.push(href);
-    }, 350);
   }
 
   return (
@@ -418,9 +470,9 @@ export default function RobotWorldPage() {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[2rem]"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(1000px_520px_at_20%_10%,rgba(34,211,238,0.12),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(900px_520px_at_82%_18%,rgba(59,130,246,0.10),transparent_58%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(900px_560px_at_50%_100%,rgba(99,102,241,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(900px_520px_at_15%_10%,rgba(56,189,248,0.10),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_560px_at_82%_18%,rgba(16,185,129,0.10),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(900px_520px_at_50%_100%,rgba(168,85,247,0.08),transparent_55%)]" />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -441,192 +493,214 @@ export default function RobotWorldPage() {
         </span>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-6">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm sm:p-8">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/70">
-              Meet the Shynvo Robot — your guide through the Shynvo platform.
-            </div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-              I can speak multiple languages
-            </h1>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-white/45">
-                  Robot Presence
-                </div>
-                <div className="mt-2 text-lg font-semibold text-white">Online</div>
-                <p className="mt-2 text-sm leading-6 text-white/65">
-                  {STATUS_LINES[statusIndex]}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-white/45">
-                  How I help
-                </div>
-                <div className="mt-2 text-lg font-semibold text-white">
-                  Guided onboarding
-                </div>
-                <p className="mt-2 text-sm leading-6 text-white/65">
-                  I can guide you through the environments and help you decide where to begin.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-white/45">
-                  What you can do
-                </div>
-                <div className="mt-2 text-lg font-semibold text-white">
-                  Ask, route, begin
-                </div>
-                <p className="mt-2 text-sm leading-6 text-white/65">
-                  Ask questions, explore the environments, or start your first activity.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-white/45">
-                  Live status
-                </div>
-                <div className="mt-2 text-lg font-semibold text-white">
-                  Ready to help you begin
-                </div>
-                <p className="mt-2 text-sm leading-6 text-white/65">
-                  Robot channel: guided onboarding • environment navigation • smart assistance
-                </p>
-              </div>
-            </div>
+      <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/70">
+            Meet the Shynvo Robot
           </div>
-
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-xs uppercase tracking-[0.18em] text-cyan-100/60">
-                  Choose a direction
-                </div>
-                <div className="mt-1 text-lg font-semibold text-white">
-                  Route by intention
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setMessages(INITIAL_MESSAGES);
-                  setActiveChoice(null);
-                }}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/85 hover:bg-white/10"
-              >
-                Restart
-              </button>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {MAIN_CHOICES.map((choice) => (
-                <button
-                  key={choice.key}
-                  type="button"
-                  onClick={() => handleChoice(choice.key)}
-                  className={cx(
-                    "rounded-2xl border p-4 text-left transition",
-                    activeChoice === choice.key
-                      ? "border-cyan-300/30 bg-cyan-400/10 text-white"
-                      : "border-white/10 bg-black/20 text-white/80 hover:bg-white/7"
-                  )}
-                >
-                  <div className="text-base font-semibold">{choice.title}</div>
-                  <div className="mt-2 text-sm leading-6 text-white/70">
-                    {choice.desc}
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {visibleGroup.length > 0 ? (
-              <div className="mt-5 grid gap-3">
-                {visibleGroup.map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() =>
-                      handleRouteTarget(item.title, item.explanation, item.href)
-                    }
-                    className="rounded-2xl border border-white/10 bg-black/20 p-4 text-left text-white/85 transition hover:bg-white/7"
-                  >
-                    <div className="text-base font-semibold text-white">{item.title}</div>
-                    <div className="mt-2 text-sm leading-6 text-white/70">{item.desc}</div>
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            Shynvo Robot World
+          </h1>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-white/70 sm:text-base">
+            Meet the Shynvo Robot — your guide through the Shynvo platform.
+          </p>
         </div>
 
-        <div className="rounded-[2rem] border border-white/10 bg-[#08111A]/90 p-5 shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
-            <div>
-              <div className="text-xs uppercase tracking-[0.18em] text-cyan-100/60">
-                Robot channel
-              </div>
-              <div className="mt-1 text-lg font-semibold text-white">
-                Live Shynvo guidance
-              </div>
-            </div>
+        <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100">
+          I can speak multiple languages
+        </div>
+      </div>
 
-            <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+      <div className="mt-8 grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+              Robot Presence
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-100">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
               Online
             </div>
           </div>
 
+          <div className="mt-4 overflow-hidden rounded-3xl border border-white/10 bg-black/20">
+            <div className="relative aspect-[4/3] w-full bg-black">
+              <div className="pointer-events-none absolute inset-0 z-10 animate-pulse bg-[radial-gradient(circle_at_50%_50%,rgba(56,189,248,0.18),transparent_42%)]" />
+              <video
+                className="h-full w-full object-cover"
+                src="/robot.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4">
+            <div className="text-sm font-semibold text-cyan-100">How I help</div>
+            <div className="mt-2 text-sm leading-6 text-cyan-50/90">
+              I can guide you through the environments and help you decide where to begin.
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="text-sm font-semibold text-white">What you can do</div>
+            <div className="mt-2 text-sm leading-6 text-white/65">
+              Ask questions, explore the environments, or start your first activity.
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">
+              Live status
+            </div>
+            <div className="mt-2 text-sm text-white/80">{STATUS_LINES[statusIndex]}</div>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold text-white">Robot channel</div>
+              <div className="text-xs text-white/60">
+                Guided onboarding • environment navigation • smart assistance
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={restartGuide}
+              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10"
+            >
+              Restart
+            </button>
+          </div>
+
           <div
-            ref={scrollRef}
-            className="mt-4 h-[460px] overflow-y-auto rounded-2xl border border-white/10 bg-black/20 p-4"
+            ref={listRef}
+            className="mt-5 h-[420px] overflow-auto rounded-2xl border border-white/10 bg-black/20 p-4"
           >
-            <div className="space-y-4">
-              {messages.map((m, idx) => (
+            <div className="space-y-3">
+              {messages.map((msg, index) => (
                 <div
-                  key={`${m.role}-${idx}`}
+                  key={index}
                   className={cx(
-                    "max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-6",
-                    m.role === "robot"
-                      ? "border border-cyan-400/15 bg-cyan-400/10 text-cyan-50"
-                      : "ml-auto border border-white/10 bg-white/8 text-white"
+                    "max-w-[92%] rounded-2xl border px-4 py-3 text-sm leading-6 transition duration-300",
+                    msg.role === "user"
+                      ? "ml-auto border-white/10 bg-white/10 text-white"
+                      : "border-white/10 bg-white/5 text-white/85"
                   )}
                 >
-                  {m.text}
+                  {msg.text}
                 </div>
               ))}
 
-              {typing ? (
-                <div className="max-w-[88%] rounded-2xl border border-cyan-400/15 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-50">
+              {isThinking ? (
+                <div className="max-w-[92%] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-white/85">
                   <TypingDots />
                 </div>
               ) : null}
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 flex gap-3">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  void sendUserMessage(input);
-                }
+                if (e.key === "Enter") sendMessage();
               }}
-              placeholder="Ask Shynvo Robot anything about the platform..."
-              className="flex-1 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+              placeholder={t("robot.ask")}
+              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
             />
+
             <button
               type="button"
-              onClick={() => void sendUserMessage(input)}
-              disabled={typing}
-              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90 disabled:opacity-60"
+              onClick={sendMessage}
+              disabled={isThinking || !input.trim()}
+              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Send
             </button>
+          </div>
+
+          <div className="mt-5 space-y-4">
+            {!selectedMain ? (
+              <div>
+                <div className="text-sm font-semibold text-white">Choose a direction</div>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {MAIN_CHOICES.map((choice) => (
+                    <button
+                      key={choice.key}
+                      type="button"
+                      onClick={() => chooseMain(choice.key)}
+                      className="rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
+                    >
+                      <div className="text-base font-semibold text-white">{choice.title}</div>
+                      <div className="mt-1 text-sm leading-6 text-white/65">{choice.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {selectedMain && !selectedTarget ? (
+              <div>
+                <div className="text-sm font-semibold text-white">Choose an environment</div>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {options.map((item) => (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => explainTarget(item.key)}
+                      className="rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
+                    >
+                      <div className="text-base font-semibold text-white">{item.title}</div>
+                      <div className="mt-1 text-sm leading-6 text-white/65">{item.desc}</div>
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={restartGuide}
+                  className="mt-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
+                >
+                  Choose a different direction
+                </button>
+              </div>
+            ) : null}
+
+            {selectedMain && selectedTarget ? (
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={enterTarget}
+                  className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
+                >
+                  Enter environment
+                </button>
+
+                <button
+                  type="button"
+                  onClick={compareAgain}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
+                >
+                  Compare another option
+                </button>
+
+                <button
+                  type="button"
+                  onClick={restartGuide}
+                  className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-100 hover:bg-cyan-400/15"
+                >
+                  Start over
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
