@@ -3,6 +3,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
+import { renderAssistantHtml } from "@/lib/sh-assistant/render";
 
 type Role = "teacher" | "tutor" | "assistant";
 type HelpMode = "teaching" | "exam" | "explanation" | "assignment" | "revision";

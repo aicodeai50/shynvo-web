@@ -3,6 +3,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { renderAssistantHtml } from "@/lib/sh-assistant/render";
 
 type UniRole = "teacher" | "tutor" | "assistant";
 type Msg = { role: "user" | "ai"; text: string };
