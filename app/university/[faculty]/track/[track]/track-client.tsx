@@ -486,7 +486,16 @@ export default function TrackPageClient({
                     : "border-white/10 bg-white/5 text-white/85"
                 )}
               >
-                {m.text}
+                {m.role === "user" ? (
+                  <div className="whitespace-pre-wrap">{m.text}</div>
+                ) : (
+                  <div
+                    className="assistant-html"
+                    dangerouslySetInnerHTML={{
+                      __html: renderAssistantHtml(m.text),
+                    }}
+                  />
+                )}
               </div>
             ))}
           </div>
