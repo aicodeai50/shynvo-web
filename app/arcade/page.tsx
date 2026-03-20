@@ -109,6 +109,25 @@ export default function ArcadeSimPage() {
         </span>
       </div>
 
+      <div className="mt-6 flex flex-wrap gap-2">
+        {[
+          { href: "/arcade/drill", label: "Drills" },
+          { href: "/arcade/interview", label: "Interviews" },
+          { href: "/arcade/score", label: "Scores" },
+          { href: "/arcade/achievements", label: "Achievements" },
+          { href: "/arcade/ranks", label: "Ranks" },
+          { href: "/arcade/daily", label: "Daily" },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/70 hover:bg-white/10 hover:text-white transition"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+
       <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-pink-200/70">

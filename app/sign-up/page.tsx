@@ -12,6 +12,7 @@ export default function SignUpPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -127,13 +128,21 @@ export default function SignUpPage() {
             <div>
               <label className="text-sm font-semibold text-white">{t("auth.password")}</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Create a password"
                 className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
                 required
               />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="mt-2 text-xs text-white/60 hover:text-white"
+              >
+                {showPassword ? "Hide password" : "Show password"}
+              </button>
             </div>
           </div>
 

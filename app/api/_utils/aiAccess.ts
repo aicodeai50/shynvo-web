@@ -59,7 +59,7 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
 
   let { data: profile } = await admin
     .from("profiles")
-    .select("plan, trial_ends_at")
+    .select("plan, trial_ends_at, role")
     .eq("id", user.id)
     .single();
 
@@ -77,7 +77,7 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
 
     const { data: newProfile } = await admin
       .from("profiles")
-      .select("plan, trial_ends_at")
+      .select("plan, trial_ends_at, role")
       .eq("id", user.id)
       .single();
 
@@ -85,9 +85,22 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
   }
 
   const plan = String(profile?.plan || "trial").toLowerCase();
+  const role = String((profile as any)?.role || "user").toLowerCase();
+  const isFounder = role === "founder";
   const trialEndsAt = profile?.trial_ends_at ? new Date(profile.trial_ends_at).getTime() : 0;
   const trialActive = plan === "trial" && trialEndsAt > Date.now();
   const paid = plan === "plus" || plan === "pro" || plan === "team" || plan === "enterprise";
+
+  if (isFounder) {
+    return {
+      ok: true,
+      mode: "auth",
+      userId: user.id,
+      plan,
+      trialActive: true,
+      remaining: null,
+    };
+  }
 
   if (paid || trialActive) {
     return {
@@ -143,6 +156,25 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
 export async function recordAiUsage(access: Extract<AuthAccessResult, { ok: true }>): Promise<void> {
   const admin = getSupabaseAdmin();
   if (!admin) return;
+
+  if (
+    access.plan === "team" ||
+    access.plan === "pro" ||
+    access.plan === "plus" ||
+    access.plan === "enterprise"
+  ) {
+    return;
+  }
+
+  const { data: founderProfile } = await admin
+    .from("profiles")
+    .select("role")
+    .eq("id", access.userId)
+    .single();
+
+  if (String((founderProfile as any)?.role || "").toLowerCase() === "founder") {
+    return;
+  }
 
   const usageDate = todayUtc();
 
