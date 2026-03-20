@@ -270,6 +270,8 @@ export default function RobotWorldPage() {
   const [statusIndex, setStatusIndex] = useState(0);
   const [isThinking, setIsThinking] = useState(false);
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState<"text" | "voice">("text");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const options = useMemo(
     () => (selectedMain ? GROUP_OPTIONS[selectedMain] : []),
@@ -370,6 +372,30 @@ export default function RobotWorldPage() {
     setMessages([...INITIAL_MESSAGES]);
   }
 
+
+  async function playVoice(text: string) {
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!res.ok) return;
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      if (!audioRef.current) return;
+      audioRef.current.src = url;
+      await audioRef.current.play();
+    } catch {
+      // ignore voice playback errors
+    }
+  }
+
   async function sendMessage() {
     const text = input.trim();
     if (!text || isThinking) return;
@@ -383,6 +409,14 @@ export default function RobotWorldPage() {
       const reply = await fetchRobotReply(text, nextHistory, language);
 
       setMessages((prev) => [...prev, { role: "robot", text: reply }]);
+
+      if (mode === "voice") {
+        await playVoice(reply);
+      }
+
+      if (mode === "voice") {
+        await playVoice(reply);
+      }
     } catch (error) {
       const msg =
         error instanceof Error
@@ -551,6 +585,24 @@ export default function RobotWorldPage() {
             </div>
           </div>
 
+          <div className="mt-4 flex flex-wrap gap-2">
+            {(["text", "voice"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className={cx(
+                  "rounded-xl px-3 py-2 text-sm font-semibold transition",
+                  mode === m
+                    ? "bg-white text-[#0B0F14]"
+                    : "border border-white/10 bg-white/5 text-white/80 hover:bg-white/10"
+                )}
+              >
+                {m === "text" ? "Text" : "Voice"}
+              </button>
+            ))}
+          </div>
+
           <div className="mt-4 flex gap-3">
             <input
               value={input}
@@ -571,6 +623,8 @@ export default function RobotWorldPage() {
               Send
             </button>
           </div>
+
+          {mode === "voice" ? <audio ref={audioRef} className="hidden" /> : null}
 
           <div className="mt-5 space-y-4">
             {!selectedMain ? (
