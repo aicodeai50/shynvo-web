@@ -61,7 +61,7 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
     .from("profiles")
     .select("plan, trial_ends_at, role")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile) {
     await admin.from("profiles").upsert(
@@ -79,7 +79,7 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
       .from("profiles")
       .select("plan, trial_ends_at, role")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     profile = newProfile ?? null;
   }
@@ -130,7 +130,7 @@ export async function checkAiAccess(req: NextRequest): Promise<AuthAccessResult>
     .select("usage_count")
     .eq("user_id", user.id)
     .eq("usage_date", usageDate)
-    .single();
+    .maybeSingle();
 
   const usageCount = Number(usageRow?.usage_count || 0);
   const remaining = Math.max(0, FREE_DAILY_LIMIT - usageCount);
@@ -170,7 +170,7 @@ export async function recordAiUsage(access: Extract<AuthAccessResult, { ok: true
     .from("profiles")
     .select("role")
     .eq("id", access.userId)
-    .single();
+    .maybeSingle();
 
   if (String((founderProfile as any)?.role || "").toLowerCase() === "founder") {
     return;
@@ -183,7 +183,7 @@ export async function recordAiUsage(access: Extract<AuthAccessResult, { ok: true
     .select("usage_count")
     .eq("user_id", access.userId)
     .eq("usage_date", usageDate)
-    .single();
+    .maybeSingle();
 
   const nextCount = Number(usageRow?.usage_count || 0) + 1;
 

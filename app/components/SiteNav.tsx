@@ -91,7 +91,7 @@ export default function SiteNav() {
         .from("profiles")
         .select("full_name, email, plan, trial_ends_at")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
 
       const name =
         (profile?.full_name || "").trim() ||
@@ -115,7 +115,7 @@ export default function SiteNav() {
           .select("usage_count")
           .eq("user_id", session.user.id)
           .eq("usage_date", today)
-          .single();
+          .maybeSingle();
 
         const used = Number(usageRow?.usage_count || 0);
         const remaining = Math.max(0, 5 - used);

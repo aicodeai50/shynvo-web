@@ -55,7 +55,7 @@ export default function AccountPage() {
         .from("profiles")
         .select("email, full_name, language, plan, trial_started_at, trial_ends_at")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       const today = new Date().toISOString().slice(0, 10);
       const { data: usageData } = await supabase
@@ -63,7 +63,7 @@ export default function AccountPage() {
         .select("usage_count")
         .eq("user_id", user.id)
         .eq("usage_date", today)
-        .single();
+        .maybeSingle();
 
       if (mounted) {
         if (profileError) {
