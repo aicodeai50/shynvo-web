@@ -263,7 +263,6 @@ export default function RobotWorldPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const listRef = useRef<HTMLDivElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [messages, setMessages] = useState<Msg[]>(INITIAL_MESSAGES);
   const [selectedMain, setSelectedMain] = useState<MainChoice | null>(null);
@@ -272,9 +271,6 @@ export default function RobotWorldPage() {
   const [isThinking, setIsThinking] = useState(false);
   const [input, setInput] = useState("");
   const [mode] = useState<"text">("text");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [imageNotice, setImageNotice] = useState("");
 
   const options = useMemo(
     () => (selectedMain ? GROUP_OPTIONS[selectedMain] : []),
@@ -293,57 +289,6 @@ export default function RobotWorldPage() {
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages, isThinking]);
-
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
-
-  function clearImage() {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImageFile(null);
-    setImagePreview("");
-    setImageNotice("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  }
-
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    const maxSize = 5 * 1024 * 1024;
-
-    if (!allowed.includes(file.type)) {
-      clearImage();
-      setImageNotice("Please upload a JPG, PNG, or WEBP image.");
-      return;
-    }
-
-    if (file.size > maxSize) {
-      clearImage();
-      setImageNotice("Please keep the image under 5 MB.");
-      return;
-    }
-
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    setImageFile(file);
-    setImagePreview(previewUrl);
-    setImageNotice(
-      "Photo attached. Preview is ready. Visual AI analysis will be enabled when backend image support is connected."
-    );
-  }
 
   function pushRobotMessages(next: Msg[]) {
     setIsThinking(true);
@@ -423,23 +368,14 @@ export default function RobotWorldPage() {
     setSelectedTarget(null);
     setIsThinking(false);
     setInput("");
-    clearImage();
     setMessages([...INITIAL_MESSAGES]);
   }
 
+
+
   async function sendMessage() {
     const text = input.trim();
-
-    if (isThinking) return;
-
-    if (!text) {
-      if (imageFile) {
-        setImageNotice(
-          "The photo is attached, but image analysis is not live yet. Add a text question for now."
-        );
-      }
-      return;
-    }
+    if (!text || isThinking) return;
 
     const nextHistory = [...messages, { role: "user" as const, text }];
     setMessages(nextHistory);
@@ -448,7 +384,10 @@ export default function RobotWorldPage() {
 
     try {
       const reply = await fetchRobotReply(text, nextHistory, language);
+
       setMessages((prev) => [...prev, { role: "robot", text: reply }]);
+
+
     } catch (error) {
       const msg =
         error instanceof Error
@@ -617,90 +556,33 @@ export default function RobotWorldPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="mt-4">
             <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
               Text
             </span>
-            <span className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100">
-              Photo preview beta
-            </span>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3">
-            <div className="flex flex-wrap gap-3">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={handleImageChange}
-                className="hidden"
-              />
+          <div className="mt-4 flex gap-3">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") sendMessage();
+              }}
+              placeholder={t("robot.ask")}
+              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+            />
 
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-white hover:bg-black/30"
-              >
-                Add photo
-              </button>
-
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") sendMessage();
-                }}
-                placeholder={t("robot.ask")}
-                className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
-              />
-
-              <button
-                type="button"
-                onClick={sendMessage}
-                disabled={isThinking || !input.trim()}
-                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Send
-              </button>
-            </div>
-
-            {imagePreview ? (
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-semibold text-white">
-                      Attached photo
-                    </div>
-                    <div className="mt-1 text-xs text-white/60">
-                      {imageFile?.name}
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={clearImage}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10"
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-                  <img
-                    src={imagePreview}
-                    alt="Selected upload preview"
-                    className="max-h-72 w-full object-contain"
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {imageNotice ? (
-              <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-50/95">
-                {imageNotice}
-              </div>
-            ) : null}
+            <button
+              type="button"
+              onClick={sendMessage}
+              disabled={isThinking || !input.trim()}
+              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Send
+            </button>
           </div>
+
 
           <div className="mt-5 space-y-4">
             {!selectedMain ? (

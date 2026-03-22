@@ -1,3 +1,4 @@
+===== ROBOT PAGE =====
 "use client";
 
 import Link from "next/link";
@@ -263,7 +264,6 @@ export default function RobotWorldPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const listRef = useRef<HTMLDivElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [messages, setMessages] = useState<Msg[]>(INITIAL_MESSAGES);
   const [selectedMain, setSelectedMain] = useState<MainChoice | null>(null);
@@ -272,9 +272,6 @@ export default function RobotWorldPage() {
   const [isThinking, setIsThinking] = useState(false);
   const [input, setInput] = useState("");
   const [mode] = useState<"text">("text");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [imageNotice, setImageNotice] = useState("");
 
   const options = useMemo(
     () => (selectedMain ? GROUP_OPTIONS[selectedMain] : []),
@@ -293,57 +290,6 @@ export default function RobotWorldPage() {
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages, isThinking]);
-
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
-
-  function clearImage() {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImageFile(null);
-    setImagePreview("");
-    setImageNotice("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  }
-
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    const maxSize = 5 * 1024 * 1024;
-
-    if (!allowed.includes(file.type)) {
-      clearImage();
-      setImageNotice("Please upload a JPG, PNG, or WEBP image.");
-      return;
-    }
-
-    if (file.size > maxSize) {
-      clearImage();
-      setImageNotice("Please keep the image under 5 MB.");
-      return;
-    }
-
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    setImageFile(file);
-    setImagePreview(previewUrl);
-    setImageNotice(
-      "Photo attached. Preview is ready. Visual AI analysis will be enabled when backend image support is connected."
-    );
-  }
 
   function pushRobotMessages(next: Msg[]) {
     setIsThinking(true);
@@ -423,23 +369,14 @@ export default function RobotWorldPage() {
     setSelectedTarget(null);
     setIsThinking(false);
     setInput("");
-    clearImage();
     setMessages([...INITIAL_MESSAGES]);
   }
 
+
+
   async function sendMessage() {
     const text = input.trim();
-
-    if (isThinking) return;
-
-    if (!text) {
-      if (imageFile) {
-        setImageNotice(
-          "The photo is attached, but image analysis is not live yet. Add a text question for now."
-        );
-      }
-      return;
-    }
+    if (!text || isThinking) return;
 
     const nextHistory = [...messages, { role: "user" as const, text }];
     setMessages(nextHistory);
@@ -448,7 +385,10 @@ export default function RobotWorldPage() {
 
     try {
       const reply = await fetchRobotReply(text, nextHistory, language);
+
       setMessages((prev) => [...prev, { role: "robot", text: reply }]);
+
+
     } catch (error) {
       const msg =
         error instanceof Error
@@ -617,90 +557,33 @@ export default function RobotWorldPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="mt-4">
             <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
               Text
             </span>
-            <span className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100">
-              Photo preview beta
-            </span>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3">
-            <div className="flex flex-wrap gap-3">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={handleImageChange}
-                className="hidden"
-              />
+          <div className="mt-4 flex gap-3">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") sendMessage();
+              }}
+              placeholder={t("robot.ask")}
+              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+            />
 
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-white hover:bg-black/30"
-              >
-                Add photo
-              </button>
-
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") sendMessage();
-                }}
-                placeholder={t("robot.ask")}
-                className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
-              />
-
-              <button
-                type="button"
-                onClick={sendMessage}
-                disabled={isThinking || !input.trim()}
-                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Send
-              </button>
-            </div>
-
-            {imagePreview ? (
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-semibold text-white">
-                      Attached photo
-                    </div>
-                    <div className="mt-1 text-xs text-white/60">
-                      {imageFile?.name}
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={clearImage}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10"
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-                  <img
-                    src={imagePreview}
-                    alt="Selected upload preview"
-                    className="max-h-72 w-full object-contain"
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {imageNotice ? (
-              <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-50/95">
-                {imageNotice}
-              </div>
-            ) : null}
+            <button
+              type="button"
+              onClick={sendMessage}
+              disabled={isThinking || !input.trim()}
+              className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Send
+            </button>
           </div>
+
 
           <div className="mt-5 space-y-4">
             {!selectedMain ? (
@@ -782,3 +665,310 @@ export default function RobotWorldPage() {
     </section>
   );
 }
+
+===== PUBLIC CHAT ROUTE =====
+import { NextRequest, NextResponse } from "next/server";
+import { checkAiAccess, recordAiUsage } from "@/api/_utils/aiAccess";
+
+const DEFAULT_PATHS = [
+  "/api/public/chat",
+  "/public/chat",
+  "/api/chat",
+  "/chat",
+];
+
+export async function POST(req: NextRequest) {
+  try {
+    const access = await checkAiAccess(req);
+
+    if (!access.ok) {
+      return NextResponse.json(
+        { error: access.message },
+        { status: access.status }
+      );
+    }
+
+    const body = await req.json();
+
+    const baseUrl =
+      process.env.BACKEND_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.RAILWAY_API_BASE_URL ||
+      "";
+
+    if (!baseUrl) {
+      return NextResponse.json(
+        { error: "Missing backend URL." },
+        { status: 500 }
+      );
+    }
+
+    const cleanBase = baseUrl.replace(/\/+$/, "");
+    const apiKey =
+      process.env.SH_API_KEY ||
+      process.env.NEXT_PUBLIC_SH_API_KEY ||
+      "";
+    const customPath = process.env.BACKEND_CHAT_PATH || "";
+    const candidatePaths = customPath
+      ? [customPath.startsWith("/") ? customPath : `/${customPath}`, ...DEFAULT_PATHS]
+      : DEFAULT_PATHS;
+
+    let lastStatus = 500;
+    let lastText = "Endpoint not found";
+
+    for (const path of candidatePaths) {
+      try {
+        const res = await fetch(`${cleanBase}${path}`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            ...(apiKey ? { "x-sh-api-key": apiKey } : {}),
+          },
+          body: JSON.stringify(body),
+          cache: "no-store",
+        });
+
+        const text = await res.text();
+        lastStatus = res.status;
+        lastText = text;
+
+        if (res.ok) {
+          await recordAiUsage(access);
+
+          return new NextResponse(text, {
+            status: res.status,
+            headers: {
+              "content-type": res.headers.get("content-type") || "application/json",
+            },
+          });
+        }
+      } catch (err) {
+        lastStatus = 500;
+        lastText = err instanceof Error ? err.message : "Backend request failed";
+      }
+    }
+
+    return NextResponse.json(
+      {
+        error: "Backend chat endpoint not found or failed.",
+        details: lastText,
+      },
+      { status: lastStatus || 500 }
+    );
+  } catch (error) {
+    console.error("Proxy /api/public/chat error:", error);
+    return NextResponse.json(
+      { error: "Failed to reach backend chat service." },
+      { status: 500 }
+    );
+  }
+}
+
+===== ROBOT CHAT ROUTE =====
+import { NextRequest, NextResponse } from "next/server";
+import { recordAiUsage } from "@/api/_utils/aiAccess";
+
+export const runtime = "nodejs";
+
+function mustEnv(name: string) {
+  const v = process.env[name];
+  if (!v) throw new Error(`Missing ${name}`);
+  return v;
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const base = mustEnv("NEXT_PUBLIC_API_URL");
+    const key = mustEnv("SH_API_KEY");
+    const body = await req.json();
+
+    const res = await fetch(`${base.replace(/\/$/, "")}/api/robot-chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-sh-key": key,
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok) {
+      try {
+        await recordAiUsage({
+          ok: true,
+          userId: "frontier-public",
+          plan: "frontier",
+          remaining: null,
+        } as any);
+      } catch {
+        // ignore usage-recording issues so Frontier never breaks
+      }
+    }
+
+    return NextResponse.json(data, { status: res.status });
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err?.message || "robot-chat proxy failed" },
+      { status: 500 }
+    );
+  }
+}
+
+===== STORAGE / ASSISTANT HELPERS =====
+export const STORAGE_KEY = "shynvo_sh_assistant_chat_v1";
+export const THEME_KEY = "shynvo_sh_assistant_theme_v1";
+
+export type ThemeMode = "dark" | "light";
+
+export type ChatRole = "user" | "assistant";
+
+export interface ChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string;
+  ts: number;
+}
+
+export function loadTheme(): ThemeMode {
+  if (typeof window === "undefined") return "dark";
+  const t = (localStorage.getItem(THEME_KEY) || "dark") as ThemeMode;
+  return t === "light" ? "light" : "dark";
+}
+
+export function saveTheme(theme: ThemeMode) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+export function loadChat(): ChatMessage[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed as ChatMessage[];
+  } catch {
+    return [];
+  }
+}
+
+export function saveChat(messages: ChatMessage[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+}function escapeHtml(str: string) {
+  return String(str || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function normalizeLang(lang: string) {
+  const l = (lang || "").toLowerCase().trim();
+  if (!l) return "plaintext";
+  if (l === "js") return "javascript";
+  if (l === "ts") return "typescript";
+  if (l === "html") return "markup";
+  if (l === "sh" || l === "shell") return "bash";
+  if (l === "py") return "python";
+  if (l === "c++") return "cpp";
+  return l;
+}
+
+function formatTextChunk(chunk: string) {
+  let safe = escapeHtml(chunk);
+
+  // inline code
+  safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+
+  // soften markdown headings so they don't show ugly ##
+  safe = safe.replace(/^###\s+(.+)$/gm, '<div class="sh-h3">$1</div>');
+  safe = safe.replace(/^##\s+(.+)$/gm, '<div class="sh-h2">$1</div>');
+  safe = safe.replace(/^#\s+(.+)$/gm, '<div class="sh-h1">$1</div>');
+
+  // bold markdown
+  safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+
+  // simple bullet styling
+  safe = safe.replace(/^[-*]\s+(.+)$/gm, '<div class="sh-li">• $1</div>');
+
+  // line breaks
+  safe = safe.replace(/\n/g, "<br>");
+
+  return safe;
+}
+
+/**
+ * Converts assistant text into HTML with:
+ * - fenced code blocks ```lang ...```
+ * - inline `code`
+ * - softened markdown headings
+ * - neat line breaks / bullets
+ */
+export function renderAssistantHtml(text: string) {
+  const raw = String(text || "");
+  const parts = raw.split(/```/);
+  let html = "";
+
+  for (let i = 0; i < parts.length; i++) {
+    const chunk = parts[i];
+
+    if (i % 2 === 0) {
+      html += formatTextChunk(chunk);
+    } else {
+      const firstNewline = chunk.indexOf("\n");
+      let lang = "";
+      let code = chunk;
+
+      if (firstNewline !== -1) {
+        lang = chunk.slice(0, firstNewline).trim();
+        code = chunk.slice(firstNewline + 1);
+      }
+
+      const prismLang = normalizeLang(lang);
+      const label = prismLang === "plaintext" ? "code" : prismLang;
+
+      html += `
+        <div class="sh-codewrap" data-lang="${escapeHtml(label)}">
+          <div class="sh-codebar">
+            <div class="sh-lang">${escapeHtml(label)}</div>
+            <button class="sh-copy" type="button">Copy</button>
+          </div>
+          <pre class="sh-pre"><code>${escapeHtml(code)}</code></pre>
+        </div>
+      `;
+    }
+  }
+
+  return html.trim();
+}
+
+===== SEARCH FOR IMAGE / UPLOAD / STORAGE USAGE =====
+app/account/page.tsx:55:        .from("profiles")
+app/account/page.tsx.lang1.bak:53:        .from("profiles")
+app/api/language/route.ts:34:      .from("profiles")
+app/api/_utils/aiAccess.ts:61:    .from("profiles")
+app/api/_utils/aiAccess.ts:67:    await admin.from("profiles").upsert(
+app/api/_utils/aiAccess.ts:79:      .from("profiles")
+app/api/_utils/aiAccess.ts:118:      .from("profiles")
+app/api/_utils/aiAccess.ts:170:    .from("profiles")
+app/api/_utils/aiAccess.ts.limitmsg.bak:61:    .from("profiles")
+app/api/_utils/aiAccess.ts.limitmsg.bak:67:    await admin.from("profiles").upsert(
+app/api/_utils/aiAccess.ts.limitmsg.bak:79:      .from("profiles")
+app/api/_utils/aiAccess.ts.limitmsg.bak:105:      .from("profiles")
+app/components/SiteNav.tsx:91:        .from("profiles")
+app/components/SiteNav.tsx.auth.bak:53:        .from("profiles")
+app/components/SiteNav.tsx.logout.bak:53:        .from("profiles")
+app/components/SiteNav.tsx.mobilemenu.bak:72:        .from("profiles")
+app/components/SiteNav.tsx.navusagefix.bak:72:        .from("profiles")
+app/components/SiteNav.tsx.usage.bak:66:        .from("profiles")
+app/enterprise/settings.bak.detail/profile/page.tsx:3:export default function ProfileSettings() {
+app/frontier/coding/page.tsx:86:      "I want to automate renaming files and sorting them into folders.",
+app/lib/i18n/LanguageContext.tsx.enonly.bak:50:        .from("profiles")
+app/sign-up/page.tsx:60:        await supabase.from("profiles").upsert(
+app/sign-up/page.tsx.bak:60:        await supabase.from("profiles").upsert(
+app/sign-up/page.tsx.mobilefix.bak:59:        await supabase.from("profiles").upsert(
