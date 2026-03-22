@@ -185,8 +185,7 @@ function TypingDots() {
 async function fetchRobotReply(
   input: string,
   history: Msg[],
-  preferredLanguage: string,
-  imageDataUrl?: string
+  preferredLanguage: string
 ): Promise<string> {
   const systemPrompt = `
 You are Shynvo Robot, the multilingual guide and assistant for the Shynvo platform.
@@ -214,7 +213,6 @@ Your behavior:
     preferredLanguage,
     message: input,
     systemPrompt,
-    imageDataUrl,
     messages: history.map((m) => ({
       role: m.role === "user" ? "user" : "assistant",
       content: m.text,
@@ -276,7 +274,6 @@ export default function RobotWorldPage() {
   const [mode] = useState<"text">("text");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState("");
-  const [imageDataUrl, setImageDataUrl] = useState("");
   const [imageNotice, setImageNotice] = useState("");
 
   const options = useMemo(
@@ -311,7 +308,6 @@ export default function RobotWorldPage() {
     }
     setImageFile(null);
     setImagePreview("");
-    setImageDataUrl("");
     setImageNotice("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -344,18 +340,9 @@ export default function RobotWorldPage() {
     const previewUrl = URL.createObjectURL(file);
     setImageFile(file);
     setImagePreview(previewUrl);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : "";
-      setImageDataUrl(result);
-      setImageNotice("Photo attached successfully. You can preview it below.");
-    };
-    reader.onerror = () => {
-      clearImage();
-      setImageNotice("The image could not be processed. Please try another one.");
-    };
-    reader.readAsDataURL(file);
+    setImageNotice(
+      "Photo attached successfully. You can preview it below. Image analysis will be available soon."
+    );
   }
 
   function pushRobotMessages(next: Msg[]) {
@@ -460,11 +447,8 @@ export default function RobotWorldPage() {
     setIsThinking(true);
 
     try {
-      const reply = await fetchRobotReply(text, nextHistory, language, imageDataUrl);
+      const reply = await fetchRobotReply(text, nextHistory, language);
       setMessages((prev) => [...prev, { role: "robot", text: reply }]);
-      if (imageFile) {
-        clearImage();
-      }
     } catch (error) {
       const msg =
         error instanceof Error
