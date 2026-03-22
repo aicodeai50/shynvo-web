@@ -174,7 +174,7 @@ export default function HomePage() {
 
                 <div className="rounded-2xl border border-white/10 bg-white p-3">
                   <QRCodeSVG
-                    value="https://www.shynvo.app"
+                    value="https://shynvo-web.vercel.app"
                     size={112}
                     bgColor="#ffffff"
                     fgColor="#0B0F14"
@@ -184,7 +184,7 @@ export default function HomePage() {
               </div>
 
               <div className="mt-4 text-xs text-white/45">
-                Opens www.shynvo.app
+                Opens shynvo-web.vercel.app
               </div>
             </div>
           </div>

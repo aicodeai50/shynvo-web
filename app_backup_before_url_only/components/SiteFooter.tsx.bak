@@ -1,0 +1,47 @@
+import Link from "next/link";
+
+type FooterLink = {
+  label: string;
+  href: string;
+};
+
+const LINKS: FooterLink[] = [
+  { label: "Docs", href: "/docs" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Contact", href: "/contact" },
+  { label: "Terms", href: "/terms" },
+  { label: "Privacy", href: "/privacy" },
+];
+
+export default function SiteFooter() {
+  return (
+    <footer className="mt-14 border-t border-white/10">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div>
+            <div className="text-lg font-semibold">Shynvo</div>
+            <p className="mt-2 max-w-sm text-sm text-white/70">
+              Multi-environment AI platform for learning, building, and deploying.
+            </p>
+          </div>
+
+          <nav className="grid grid-cols-2 gap-x-10 gap-y-3 sm:grid-cols-3" aria-label="Footer">
+            {LINKS.map((x) => (
+              <Link
+                key={x.label}
+                href={x.href}
+                className="text-sm text-white/70 hover:text-white"
+              >
+                {x.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="mt-10 text-xs text-white/50">
+          © {new Date().getFullYear()} Shynvo. All rights reserved.
+        </div>
+</div>
+    </footer>
+  );
+}
