@@ -178,8 +178,8 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/22" />
       </div>
 
-      <section className="mx-auto max-w-7xl px-4 pb-24 pt-5 sm:px-6 lg:px-8 lg:pb-28 lg:pt-6">
-        <div className="grid items-start gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+      <section className="mx-auto max-w-7xl px-4 pb-16 pt-4 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24 lg:pt-6">
+        <div className="grid items-start gap-4 xl:grid-cols-[1.08fr_0.92fr]">
           <div className="rounded-[2rem] border border-white/5 bg-transparent p-4 sm:p-5 lg:p-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
@@ -234,7 +234,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             <Link
               href="/robot"
               className="group block overflow-hidden rounded-[2rem] border border-white/5 bg-black/15 shadow-none backdrop-blur-[2px]"
@@ -307,7 +307,7 @@ export default function HomePage() {
             Shynvo helps people move from confusion to structured progress by giving them clear environments, guided AI help, and focused digital workflows.
           </p>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {VALUE_POINTS.map((item) => {
               const Icon = item.Icon;
               return (
@@ -326,7 +326,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mt-10 grid gap-4 lg:grid-cols-3">
+        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 backdrop-blur-[2px]">
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
               What you can do
@@ -390,7 +390,7 @@ export default function HomePage() {
             Shynvo is designed so new users can start clearly instead of trying to figure out everything alone.
           </p>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {HOW_IT_WORKS.map((item) => (
               <div
                 key={item.title}
@@ -417,7 +417,7 @@ export default function HomePage() {
             Shynvo is more than a homepage. It is a system of guided environments, AI support, and structured progress tools.
           </p>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {INSIDE_SHYNVO.map((item) => {
               const Icon = item.Icon;
               return (
@@ -458,7 +458,7 @@ export default function HomePage() {
                   key={item.key}
                   href={item.href}
                   className={cx(
-                    "group rounded-[1.75rem] border border-white/5 bg-black/15 p-5 transition backdrop-blur-[2px]",
+                    "group rounded-[1.75rem] border border-white/5 bg-black/15 p-4 sm:p-5 transition backdrop-blur-[2px]",
                     "hover:border-white/8 hover:bg-white/[0.03]"
                   )}
                 >
