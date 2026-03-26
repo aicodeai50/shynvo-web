@@ -3,35 +3,36 @@
 import { useEffect, useState } from "react";
 
 export default function PreviewTypingLoop({ lines }: { lines: string[] }) {
-  const [index, setIndex] = useState(0);
-  const [text, setText] = useState("");
-  const [char, setChar] = useState(0);
+  const [lineIndex, setLineIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [display, setDisplay] = useState("");
 
   useEffect(() => {
     if (!lines.length) return;
 
-    const current = lines[index];
+    const current = lines[lineIndex];
 
-    if (char < current.length) {
+    if (charIndex < current.length) {
       const t = setTimeout(() => {
-        setText((prev) => prev + current[char]);
-        setChar(char + 1);
-      }, 25);
-      return () => clearTimeout(t);
-    } else {
-      const t = setTimeout(() => {
-        setText("");
-        setChar(0);
-        setIndex((i) => (i + 1) % lines.length);
-      }, 1200);
+        setDisplay(current.slice(0, charIndex + 1));
+        setCharIndex((c) => c + 1);
+      }, 28);
       return () => clearTimeout(t);
     }
-  }, [char, index, lines]);
+
+    const t = setTimeout(() => {
+      setDisplay("");
+      setCharIndex(0);
+      setLineIndex((i) => (i + 1) % lines.length);
+    }, 1400);
+
+    return () => clearTimeout(t);
+  }, [charIndex, lineIndex, lines]);
 
   return (
-    <div className="font-mono text-xs text-lime-300/90 leading-relaxed whitespace-pre-wrap">
-      {text}
-      <span className="animate-pulse">|</span>
+    <div className="font-mono text-xs leading-6 text-lime-300/90 whitespace-pre-wrap">
+      {display}
+      <span className="animate-pulse text-lime-200">▌</span>
     </div>
   );
 }
