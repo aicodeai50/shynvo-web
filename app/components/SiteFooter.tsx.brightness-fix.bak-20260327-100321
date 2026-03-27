@@ -16,12 +16,12 @@ const LINKS: FooterLink[] = [
 
 export default function SiteFooter() {
   return (
-    <footer className="relative z-20 mt-14 border-t border-white/10">
+    <footer className="mt-14 border-t border-white/10">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="text-lg font-semibold">Shynvo</div>
-            <p className="mt-2 max-w-sm text-sm text-white/88">
+            <p className="mt-2 max-w-sm text-sm text-white/70">
               Structured AI platform for learning, building, and skill development.
             </p>
           </div>
@@ -31,7 +31,7 @@ export default function SiteFooter() {
               <Link
                 key={x.label}
                 href={x.href}
-                className="text-sm text-white/88 hover:text-white"
+                className="text-sm text-white/70 hover:text-white"
               >
                 {x.label}
               </Link>
