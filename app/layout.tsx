@@ -4,6 +4,7 @@ import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
 import ShynvoGuideChat from "@/components/ShynvoGuideChat";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import AIBackground from "./components/AIBackground";
 
 export const metadata: Metadata = {
   title: "Shynvo",
