@@ -21,7 +21,7 @@ export default function RootLayout({
       <body>
         <LanguageProvider>
           <SiteNav />
-          <main><AIBackground />
+          <main className="relative z-10"><AIBackground />
 {children}</main>
           <SiteFooter />
           <ShynvoGuideChat />
