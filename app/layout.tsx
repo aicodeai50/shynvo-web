@@ -20,7 +20,8 @@ export default function RootLayout({
       <body>
         <LanguageProvider>
           <SiteNav />
-          <main>{children}</main>
+          <main><AIBackground />
+{children}</main>
           <SiteFooter />
           <ShynvoGuideChat />
         </LanguageProvider>
