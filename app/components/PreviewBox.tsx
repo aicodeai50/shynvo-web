@@ -12,6 +12,7 @@ const items = [
       "Next step: choose where to begin",
     ],
     tag: "Guide",
+    href: "/robot",
   },
   {
     title: "University Hub",
@@ -23,6 +24,7 @@ const items = [
       "Next lesson: Algorithms fundamentals",
     ],
     tag: "Learning",
+    href: "/university",
   },
   {
     title: "Frontier Lab",
@@ -34,6 +36,7 @@ const items = [
       "Preparing engineering workflow...",
     ],
     tag: "Build",
+    href: "/frontier",
   },
 ];
 
@@ -68,9 +71,10 @@ export default function PreviewBox() {
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {items.map((item) => (
-            <div
+            <Link
               key={item.title}
-              className="rounded-[1.4rem] border border-white/10 bg-black/20 p-4"
+              href={item.href}
+              className="group rounded-[1.4rem] border border-white/10 bg-black/20 p-4 transition hover:bg-white/[0.04] hover:border-white/20"
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-semibold text-white">{item.title}</div>
@@ -84,7 +88,11 @@ export default function PreviewBox() {
               <div className="mt-4">
                 <PreviewTypingLoop variant={item.variant} lines={item.lines} />
               </div>
-            </div>
+
+              <div className="mt-4 text-xs font-semibold text-white/75 group-hover:text-white">
+                Open this preview path →
+              </div>
+            </Link>
           ))}
         </div>
       </div>
