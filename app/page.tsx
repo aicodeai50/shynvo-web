@@ -398,36 +398,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mt-10 sm:mt-12">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/65">
-            Inside Shynvo
-          </div>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            What users actually get inside the platform
-          </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72 sm:text-base">
-            Shynvo is more than a homepage. It is a system of guided environments, AI support, and structured progress tools.
-          </p>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {INSIDE_SHYNVO.map((item) => {
-              const Icon = item.Icon;
-              return (
-                <div
-                  key={item.title}
-                  className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 backdrop-blur-[2px]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                    <Icon className="h-5 w-5 text-white/80" strokeWidth={1.8} />
-                  </div>
-                  <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-white/72">{item.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
         <ProofWithoutScreenshots />
 
         <section className="mt-10 sm:mt-12">
