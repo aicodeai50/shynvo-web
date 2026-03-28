@@ -17,6 +17,7 @@ import {
   Bot,
   Layers3,
 } from "lucide-react";
+import ContinueSection from "./components/ContinueSection";
 import StartPathSection from "./components/StartPathSection";
 
 
