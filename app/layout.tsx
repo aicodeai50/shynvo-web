@@ -5,6 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import ShynvoGuideChat from "@/components/ShynvoGuideChat";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import AIBackground from "./components/AIBackground";
+import PathTracker from "./components/PathTracker";
 
 export const metadata: Metadata = {
   title: "Shynvo",
@@ -18,8 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body onClick={() => localStorage.setItem("shynvo_last_path", window.location.pathname)} className="relative min-h-screen overflow-x-hidden bg-[#04070d] text-white">
+      <body className="relative min-h-screen overflow-x-hidden bg-[#04070d] text-white">
         <LanguageProvider>
+          <PathTracker />
           <div className="relative z-10">
           <SiteNav />
           <main className="relative z-10"><AIBackground />
