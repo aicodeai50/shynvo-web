@@ -17,6 +17,7 @@ import {
   Bot,
   Layers3,
 } from "lucide-react";
+import PreviewBox from "./components/PreviewBox";
 import ExploreWorldsCard from "./components/ExploreWorldsCard";
 import ProofWithoutScreenshots from "./components/ProofWithoutScreenshots";
 import ContinueSection from "./components/ContinueSection";
@@ -562,6 +563,8 @@ export default function HomePage() {
         </section>
 
         <ExploreWorldsCard />
+
+        <PreviewBox />
 
         <section id="environments" className="mt-10 sm:mt-12">
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/65">
