@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import PreviewBox from "./components/PreviewBox";
 
 export default function SignUpPage() {
   const { t } = useLanguage();

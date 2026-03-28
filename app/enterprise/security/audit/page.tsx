@@ -1,3 +1,5 @@
+"use client";
+
 import EnterpriseDetailPage from "@/components/enterprise/EnterpriseDetailPage";
 
 export default function Page() {
