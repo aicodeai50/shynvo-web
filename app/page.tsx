@@ -209,22 +209,24 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4 pb-16 pt-4 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24 lg:pt-6">
         <div className="grid items-start gap-4 xl:grid-cols-[1.08fr_0.92fr]">
           <div className="rounded-[2rem] border border-white/5 bg-transparent p-4 sm:p-5 lg:p-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
-              Structured AI Platform
+            <div className="space-y-5">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/85">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+                Structured AI Platform
+              </div>
+
+              <h1 className="max-w-6xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-7xl lg:leading-[1.02]">
+                Shynvo
+              </h1>
+
+              <div className="max-w-6xl text-2xl font-medium leading-tight text-white/92 sm:text-3xl lg:text-5xl lg:leading-[1.08]">
+                Learn, build, train, and explore inside guided AI environments
+              </div>
+
+              <p className="max-w-5xl text-base leading-8 text-white/78 sm:text-lg lg:text-xl">
+                Shynvo is a structured AI platform for learners, builders, and teams who want guided environments instead of scattered tools, random prompts, and unclear workflows.
+              </p>
             </div>
-
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Shynvo
-            </h1>
-
-            <p className="mt-3 max-w-4xl text-xl font-medium leading-tight text-white/92 sm:text-2xl lg:text-[2.5rem]">
-              Learn, build, train, and explore inside guided AI environments
-            </p>
-
-            <p className="mt-5 max-w-3xl text-base leading-7 text-white/78 sm:text-lg">
-              Shynvo is a structured AI platform for learners, builders, and teams who want guided environments instead of scattered tools, random prompts, and unclear workflows.
-            </p>
 
             <div className="mt-6 rounded-[1.5rem] border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm leading-6 text-white/85">
               <div className="text-sm font-semibold text-white">Start clearly</div>
