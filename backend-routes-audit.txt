@@ -1,6 +1,0 @@
-]633;E;{   echo "===== backend route refs ====="\x3b   grep -R 'robot-chat\\|public/chat\\|/chat\\|app.post(\\|router.post(\\|fastify.post(\\|@Post(' sh-backend --exclude-dir=node_modules\x3b   echo\x3b   echo "===== backend files ====="\x3b   find sh-backend -type f | grep -E '\\.(js|ts)$'\x3b } > backend-routes-audit.txt;f08cd224-996f-4fb4-a88a-d641019025a6]633;C===== backend route refs =====
-sh-backend/app/api/admin/routes.py:@router.post("/unlock/{api_key}")
-sh-backend/app/api/company/routes.py:@router.post("/skill-matrix")
-sh-backend/app/api/company/routes.py:@router.post("/upskill-plan")
-
-===== backend files =====

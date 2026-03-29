@@ -225,7 +225,7 @@ export default function HomePage() {
               Shynvo is a structured AI platform for learners, builders, and teams who want guided environments instead of scattered tools, random prompts, and unclear workflows.
             </p>
 
-            <div className="mt-6 rounded-[1.5rem] border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm leading-6 text-white/85">
+            <div className="mt-8 rounded-[1.5rem] border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm leading-6 text-white/85">
               <div className="text-sm font-semibold text-white">Start clearly</div>
               <ul className="mt-2 space-y-1 text-white/78">
                 <li>Create an account to use Shynvo.</li>
@@ -235,7 +235,7 @@ export default function HomePage() {
               </ul>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/sign-up"
                 className="inline-flex items-center rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90"
@@ -265,19 +265,19 @@ export default function HomePage() {
           </div>
         </div>
 
-        <section className="mt-10 sm:mt-12">
+        <section className="mt-16 sm:mt-20 lg:mt-24">
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/65">
 
           What Shynvo is
           </div>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
             One platform for learning, building, and AI-guided work
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72 sm:text-base">
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/72 sm:text-base lg:text-lg">
             Shynvo helps people move from confusion to structured progress by giving them clear environments, guided AI help, and focused digital workflows.
           </p>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {VALUE_POINTS.map((item) => {
               const Icon = item.Icon;
               return (
@@ -352,18 +352,18 @@ export default function HomePage() {
 
         <ProofWithoutScreenshots />
 
-        <section className="mt-10 sm:mt-12">
+        <section className="mt-16 sm:mt-20 lg:mt-24">
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/65">
             See inside Shynvo
           </div>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
             What the platform looks like
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72 sm:text-base">
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/72 sm:text-base lg:text-lg">
             Explore how Shynvo looks and feels before you enter. These previews show real directions inside the platform and where each experience begins.
           </p>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {PLATFORM_PREVIEWS.map((item) => (
               <Link
                 key={item.title}
@@ -449,7 +449,7 @@ export default function HomePage() {
 
         <ExploreWorldsCard />
 
-        <section className="mt-10 sm:mt-12">
+        <section className="mt-20 sm:mt-24 lg:mt-28">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 backdrop-blur-[2px]">
               <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5">
@@ -507,19 +507,19 @@ export default function HomePage() {
               <div className="mt-4 text-xs text-white/45">Secure link: shynvo.app</div>
             </div>
 
-        <section className="mt-10 sm:mt-12">
+        <section className="mt-16 sm:mt-20 lg:mt-24">
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-[2px] sm:p-8">
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/55">
               Start now
             </div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
               Enter Shynvo with a clear starting path
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/72 sm:text-base">
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-white/72 sm:text-base lg:text-lg">
               Create your account, begin your 7-day free trial, and explore all core environments with full access before upgrading.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/sign-up"
                 className="inline-flex items-center rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90"
