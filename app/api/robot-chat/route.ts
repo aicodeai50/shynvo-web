@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { recordAiUsage } from "@/api/_utils/aiAccess";
+import { checkAiAccess, recordAiUsage } from "@/api/_utils/aiAccess";
 
 export const runtime = "nodejs";
 
@@ -11,6 +11,15 @@ function mustEnv(name: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    const access = await checkAiAccess(req);
+
+    if (!access.ok) {
+      return NextResponse.json(
+        { error: access.message },
+        { status: access.status }
+      );
+    }
+
     const base = mustEnv("NEXT_PUBLIC_API_URL");
     const key = mustEnv("SH_API_KEY");
     const body = await req.json();
@@ -29,14 +38,9 @@ export async function POST(req: NextRequest) {
 
     if (res.ok) {
       try {
-        await recordAiUsage({
-          ok: true,
-          userId: "frontier-public",
-          plan: "frontier",
-          remaining: null,
-        } as any);
+        await recordAiUsage(access as any);
       } catch {
-        // ignore usage-recording issues so Frontier never breaks
+        // ignore usage-recording issues
       }
     }
 

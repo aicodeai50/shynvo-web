@@ -12,26 +12,13 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
 
-    let access = await checkAiAccess(req);
+    const access = await checkAiAccess(req);
 
     if (!access.ok) {
-      // Allow public-style AI requests that send a plain message payload,
-      // such as Frontier and other guided workspace previews.
-      if (typeof body?.message === "string" && body.message.trim()) {
-        access = {
-          ok: true,
-          mode: "auth",
-          userId: "public-preview",
-          plan: "free",
-          trialActive: false,
-          remaining: null,
-        } as any;
-      } else {
-        return NextResponse.json(
-          { error: access.message },
-          { status: access.status }
-        );
-      }
+      return NextResponse.json(
+        { error: access.message },
+        { status: access.status }
+      );
     }
 
     const baseUrl =
@@ -84,19 +71,11 @@ export async function POST(req: NextRequest) {
         lastStatus = res.status;
         lastText = text;
 
-        console.error("Backend response:", {
-          url: `${cleanBase}${path}`,
-          status: res.status,
-          body: text,
-        });
-
         if (res.ok) {
           try {
-            if (access?.ok && access.userId !== "public-preview") {
-              await recordAiUsage(access as any);
-            }
+            await recordAiUsage(access as any);
           } catch {
-            // keep response working even if usage recording fails
+            // ignore usage recording issues
           }
 
           return new NextResponse(text, {
@@ -109,11 +88,6 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         lastStatus = 500;
         lastText = err instanceof Error ? err.message : "Backend request failed";
-
-        console.error("Backend fetch error:", {
-          url: `${cleanBase}${path}`,
-          error: lastText,
-        });
       }
     }
 
@@ -125,8 +99,6 @@ export async function POST(req: NextRequest) {
       { status: lastStatus || 500 }
     );
   } catch (error) {
-    console.error("Proxy /api/public/chat error:", error);
-
     return NextResponse.json(
       { error: "Failed to reach backend chat service." },
       { status: 500 }
