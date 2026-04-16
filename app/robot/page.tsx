@@ -8,1018 +8,478 @@ import { useRouter } from "next/navigation";
 import { renderAssistantHtml } from "@/lib/sh-assistant/render";
 
 type MainChoice = "learn" | "build" | "train" | "explore";
-type RouteTarget =
-  | "university"
-  | "academy"
-  | "frontier"
-  | "arcade"
-  | "experiments"
-  | "enterprise"
-  | "os";
+type RouteTarget = "university" | "academy" | "frontier" | "arcade" | "experiments" | "enterprise" | "os";
+type Msg = { role: "robot" | "user"; text: string };
+type ChatThread = { id: string; title: string; messages: Msg[]; updatedAt: number };
 
-type Msg = {
-  role: "robot" | "user";
-  text: string;
-};
+const THREADS_KEY = "shynvo_robot_threads_v1";
+const ACTIVE_KEY = "shynvo_robot_active_thread_v1";
 
-type ChatThread = {
-  id: string;
-  title: string;
-  messages: Msg[];
-  updatedAt: number;
-};
-
-const THREADS_STORAGE_KEY = "shynvo_robot_threads_v1";
-const ACTIVE_THREAD_STORAGE_KEY = "shynvo_robot_active_thread_v1";
-
-function makeId() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+function makeId() { return `${Date.now()}-${Math.random().toString(36).slice(2,9)}`; }
+function buildTitle(messages: Msg[]) {
+  const u = messages.find(m => m.role==="user")?.text?.trim();
+  if (!u) return "New chat";
+  return u.length > 42 ? u.slice(0,42)+"…" : u;
 }
 
-function buildThreadTitle(messages: Msg[]) {
-  const firstUser = messages.find((m) => m.role === "user")?.text?.trim();
-  if (!firstUser) return "New chat";
-  return firstUser.length > 42 ? `${firstUser.slice(0, 42)}...` : firstUser;
-}
-
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
-}
-
-const MAIN_CHOICES: Array<{
-  key: MainChoice;
-  title: string;
-  desc: string;
-}> = [
-  {
-    key: "learn",
-    title: "Learn",
-    desc: "Study inside University Hub or Shynvo Academy.",
-  },
-  {
-    key: "build",
-    title: "Build",
-    desc: "Create with code, systems, and structured workflows.",
-  },
-  {
-    key: "train",
-    title: "Train",
-    desc: "Practice through challenges, drills, and progression.",
-  },
-  {
-    key: "explore",
-    title: "Explore",
-    desc: "Discover simulations, ideas, operations, and experiments.",
-  },
+const CHOICES = [
+  { key:"learn"   as MainChoice, title:"Learn",   desc:"University Hub or Shynvo Academy.",       glyph:"◈" },
+  { key:"build"   as MainChoice, title:"Build",   desc:"Code, systems, and structured workflows.", glyph:"⬡" },
+  { key:"train"   as MainChoice, title:"Train",   desc:"Challenges, drills, and progression.",     glyph:"⬢" },
+  { key:"explore" as MainChoice, title:"Explore", desc:"Simulations, ideas, and experiments.",     glyph:"◎" },
 ];
 
-const GROUP_OPTIONS: Record<
-  MainChoice,
-  Array<{
-    key: RouteTarget;
-    title: string;
-    desc: string;
-    explanation: string;
-    href: string;
-  }>
-> = {
-  learn: [
-    {
-      key: "university",
-      title: "University Hub",
-      desc: "Structured higher learning by faculty and course.",
-      explanation:
-        "University Hub is your academic environment for structured higher learning. It is best for serious study, faculty-based knowledge, and guided understanding.",
-      href: "/university",
-    },
-    {
-      key: "academy",
-      title: "Shynvo Academy",
-      desc: "Junior and senior school learning paths.",
-      explanation:
-        "Shynvo Academy is designed for junior and senior school learners. It focuses on subjects, guided explanations, and patient learning support.",
-      href: "/academy",
-    },
+const ENVS: Record<MainChoice, Array<{key:RouteTarget;title:string;desc:string;explanation:string;href:string;glyph:string}>> = {
+  learn:[
+    {key:"university",title:"University Hub",glyph:"◈",desc:"Structured higher learning by faculty.",explanation:"University Hub is your academic environment for structured higher learning. Best for serious study, faculty-based knowledge, and guided understanding.",href:"/university"},
+    {key:"academy",title:"Shynvo Academy",glyph:"◇",desc:"Junior and senior school learning paths.",explanation:"Shynvo Academy is designed for junior and senior school learners. Focuses on subjects, guided explanations, and patient learning support.",href:"/academy"},
   ],
-  build: [
-    {
-      key: "frontier",
-      title: "Frontier Lab",
-      desc: "Build with code, logic, AI modes, and technical systems.",
-      explanation:
-        "Frontier Lab is your engineering environment. It is the best place to build with code, solve technical problems, and explore structured system thinking.",
-      href: "/frontier",
-    },
-    {
-      key: "enterprise",
-      title: "Enterprise Suite",
-      desc: "Build structured company workflows and coordination systems.",
-      explanation:
-        "Enterprise Suite is for organizational building. It helps teams structure collaboration, missions, analytics, and coordinated work.",
-      href: "/enterprise",
-    },
-    {
-      key: "os",
-      title: "Shynvo OS",
-      desc: "Operate personal systems, missions, and execution flows.",
-      explanation:
-        "Shynvo OS is your execution cockpit. It is best for focus, operations, workflows, and personal mission structure.",
-      href: "/os",
-    },
+  build:[
+    {key:"frontier",title:"Frontier Lab",glyph:"⬡",desc:"Code, logic, AI modes, technical systems.",explanation:"Frontier Lab is your engineering environment. Build with code, solve technical problems, and explore structured system thinking.",href:"/frontier"},
+    {key:"enterprise",title:"Enterprise Suite",glyph:"▣",desc:"Company workflows and coordination.",explanation:"Enterprise Suite is for organizational building. Helps teams structure collaboration, missions, analytics, and coordinated work.",href:"/enterprise"},
+    {key:"os",title:"Shynvo OS",glyph:"⬢",desc:"Personal systems, missions, execution.",explanation:"Shynvo OS is your execution cockpit. Best for focus, operations, workflows, and personal mission structure.",href:"/os"},
   ],
-  train: [
-    {
-      key: "arcade",
-      title: "Arcade Sim",
-      desc: "Train through drills, game loops, and challenge progression.",
-      explanation:
-        "Arcade Sim turns skill training into challenge mode. It is best for drills, repeated practice, progression, and competitive learning energy.",
-      href: "/arcade",
-    },
-    {
-      key: "frontier",
-      title: "Frontier Lab",
-      desc: "Train technical intelligence through coding and reasoning.",
-      explanation:
-        "Frontier Lab also works as a technical training ground. It is stronger when your training goal is coding, algorithms, AI behavior, or logic puzzles.",
-      href: "/frontier",
-    },
+  train:[
+    {key:"arcade",title:"Arcade Sim",glyph:"◉",desc:"Drills, game loops, challenge progression.",explanation:"Arcade Sim turns skill training into challenge mode. Best for drills, repeated practice, and competitive learning energy.",href:"/arcade"},
+    {key:"frontier",title:"Frontier Lab",glyph:"⬡",desc:"Technical training, coding, reasoning.",explanation:"Frontier Lab works as a technical training ground. Stronger when your goal is coding, algorithms, or logic puzzles.",href:"/frontier"},
   ],
-  explore: [
-    {
-      key: "experiments",
-      title: "Experiments",
-      desc: "Explore simulations, concepts, and new AI worlds.",
-      explanation:
-        "Experiments is where new ideas and simulations live. It is best for concept exploration, trying worlds, and interacting with new system experiences.",
-      href: "/experiments",
-    },
-    {
-      key: "enterprise",
-      title: "Enterprise Suite",
-      desc: "Explore business coordination and team systems.",
-      explanation:
-        "Enterprise Suite is also useful for exploring how structured work, meetings, and business environments operate inside Shynvo.",
-      href: "/enterprise",
-    },
-    {
-      key: "os",
-      title: "Shynvo OS",
-      desc: "Explore operational systems and execution architecture.",
-      explanation:
-        "Shynvo OS lets you explore how personal execution systems and organized workflows can be structured across missions and operations.",
-      href: "/os",
-    },
+  explore:[
+    {key:"experiments",title:"Experiments",glyph:"◎",desc:"Simulations, concepts, new AI worlds.",explanation:"Experiments is where new ideas and simulations live. Best for concept exploration and new system experiences.",href:"/experiments"},
+    {key:"enterprise",title:"Enterprise Suite",glyph:"▣",desc:"Business coordination and team systems.",explanation:"Enterprise Suite is useful for exploring how structured work and business environments operate inside Shynvo.",href:"/enterprise"},
+    {key:"os",title:"Shynvo OS",glyph:"⬢",desc:"Operational systems, execution flows.",explanation:"Shynvo OS lets you explore personal execution systems and organized workflows across missions.",href:"/os"},
   ],
 };
 
-const STATUS_LINES = [
-  "Guiding across Shynvo environments",
-  "Ready to help you begin",
-  "Online for learning, building, training, and exploration",
-  "Preparing your next path",
+const STATUS = ["Guiding across Shynvo environments","Ready to help you begin","Online · learning, building, training","Preparing your next path"];
+const INIT: Msg[] = [
+  {role:"robot",text:"Welcome to Shynvo Robot. I can guide you through learning, building, training, and exploration across the Shynvo environments."},
+  {role:"robot",text:"What would you like to do first?"},
 ];
 
-const INITIAL_MESSAGES: Msg[] = [
-  {
-    role: "robot",
-    text:
-      "Welcome to Shynvo Robot. I can guide you through learning, building, training, and exploration across the Shynvo environments.",
-  },
-  {
-    role: "robot",
-    text: "What would you like to do first?",
-  },
-];
-
-function TypingDots() {
+function Dots() {
   return (
-    <div className="inline-flex items-center gap-1">
-      <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-300 [animation-delay:-0.2s]" />
-      <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-300 [animation-delay:-0.1s]" />
-      <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-300" />
+    <span style={{display:"inline-flex",alignItems:"center",gap:3}}>
+      {[0,1,2].map(i=>(
+        <span key={i} style={{width:5,height:5,borderRadius:"50%",background:"#00e5ff",opacity:0.7,display:"inline-block",animation:`shb 1.1s ease-in-out ${i*0.15}s infinite`}}/>
+      ))}
+    </span>
+  );
+}
+
+async function getRobotReply(input:string,history:Msg[],lang:string,img?:string):Promise<string> {
+  const systemPrompt = `You are Shynvo Robot, the multilingual guide for the Shynvo platform. Answer naturally in the user's language. Prefer: ${lang}. Be professional, clear, warm, concise. Environments: University Hub, Shynvo Academy, Shynvo OS, Experiments, Enterprise Suite, Frontier Lab, Arcade Sim. Do not mention backend or API.`;
+  const supabase = getSupabaseClient();
+  const session = supabase ? await supabase.auth.getSession() : {data:{session:null}};
+  const token = (session as any).data?.session?.access_token || "";
+  const res = await fetch("/api/public/chat",{
+    method:"POST",
+    headers:{"content-type":"application/json",...(token?{authorization:`Bearer ${token}`}:{})},
+    body:JSON.stringify({preferredLanguage:lang,message:input,systemPrompt,imageDataUrl:img,messages:history.map(m=>({role:m.role==="user"?"user":"assistant",content:m.text}))}),
+  });
+  const raw = await res.text();
+  let data:any=null; try{data=JSON.parse(raw);}catch{data=null;}
+  if(!res.ok) throw new Error(data?.error||raw||"No reply.");
+  return data?.answer||data?.reply||data?.message||raw||"No reply.";
+}
+
+const C = "#00e5ff";
+const G = "#00ff88";
+const mono = {fontFamily:"var(--font-space-mono,monospace)"} as React.CSSProperties;
+const sans = {fontFamily:"var(--font-syne,sans-serif)"} as React.CSSProperties;
+const dim = "rgba(255,255,255,0.5)";
+const faint = "rgba(255,255,255,0.22)";
+const bdim = "rgba(255,255,255,0.06)";
+const bg2 = "#060c14";
+const bg3 = "#0a1220";
+
+function Panel({children,style}:{children:React.ReactNode;style?:React.CSSProperties}) {
+  return (
+    <div style={{background:bg2,border:"1px solid rgba(0,229,255,0.14)",borderRadius:4,position:"relative",overflow:"hidden",...style}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:1,background:"linear-gradient(90deg,transparent,rgba(0,229,255,0.5),transparent)",pointerEvents:"none"}}/>
+      {[[{top:4,left:4},{borderTop:"1px solid rgba(0,229,255,0.5)",borderLeft:"1px solid rgba(0,229,255,0.5)"}],[{top:4,right:4},{borderTop:"1px solid rgba(0,229,255,0.5)",borderRight:"1px solid rgba(0,229,255,0.5)"}],[{bottom:4,left:4},{borderBottom:"1px solid rgba(0,229,255,0.5)",borderLeft:"1px solid rgba(0,229,255,0.5)"}],[{bottom:4,right:4},{borderBottom:"1px solid rgba(0,229,255,0.5)",borderRight:"1px solid rgba(0,229,255,0.5)"}]].map(([p,b],i)=>(
+        <div key={i} aria-hidden style={{position:"absolute",width:10,height:10,opacity:0.55,...p as any,...b as any}}/>
+      ))}
+      {children}
     </div>
   );
 }
 
-async function fetchRobotReply(
-  input: string,
-  history: Msg[],
-  preferredLanguage: string,
-  imageDataUrl?: string
-): Promise<string> {
-  const systemPrompt = `
-You are Shynvo Robot, the multilingual guide and assistant for the Shynvo platform.
-
-Your behavior:
-- Answer naturally like a real AI assistant.
-- Answer in the same language the user writes in.
-- Strongly prefer this language when possible: ${preferredLanguage}.
-- Be professional, clear, warm, and concise.
-- You can explain the Shynvo environments and also answer normal user questions.
-- The main Shynvo environments are:
-  - University Hub: higher education, faculties, courses, academic guidance
-  - Shynvo Academy: junior and senior school learning
-  - Shynvo OS: focus, workflow, missions, execution systems
-  - Experiments: concept worlds, simulations, exploration
-  - Enterprise Suite: teams, coordination, analytics, company workflows
-  - Frontier Lab: coding, algorithms, AI bot behavior, logic, engineering
-  - Arcade Sim: drills, interview quests, rankings, gamified skill training
-- If the user asks where to start, guide them to the right environment.
-- If the user asks a general question, answer it normally.
-- Do not mention backend, API, model, routing, infrastructure, or system internals.
-`.trim();
-
-  const payload = {
-    preferredLanguage,
-    message: input,
-    systemPrompt,
-    imageDataUrl,
-    messages: history.map((m) => ({
-      role: m.role === "user" ? "user" : "assistant",
-      content: m.text,
-    })),
-  };
-
-  const supabase = getSupabaseClient();
-  const session = supabase ? await supabase.auth.getSession() : { data: { session: null } };
-  const token = session.data.session?.access_token || "";
-
-  const res = await fetch("/api/public/chat", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const raw = await res.text();
-
-  let data: any = null;
-  try {
-    data = JSON.parse(raw);
-  } catch {
-    data = null;
-  }
-
-  if (!res.ok) {
-    const message =
-      data?.error ||
-      data?.details ||
-      raw ||
-      "The robot could not answer right now.";
-    throw new Error(message);
-  }
-
-  return (
-    data?.answer ||
-    data?.reply ||
-    data?.message ||
-    raw ||
-    "The robot could not answer right now."
-  );
-}
-
-export default function RobotWorldPage() {
+export default function RobotPage() {
   const router = useRouter();
-  const { t, language } = useLanguage();
-  const listRef = useRef<HTMLDivElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const isSwitchingThreadRef = useRef(false);
+  const {t,language} = useLanguage();
+  const listRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const switching = useRef(false);
 
-  const [threads, setThreads] = useState<ChatThread[]>([]);
-  const [activeThreadId, setActiveThreadId] = useState("");
-  const [messages, setMessages] = useState<Msg[]>(INITIAL_MESSAGES);
-  const [selectedMain, setSelectedMain] = useState<MainChoice | null>(null);
-  const [selectedTarget, setSelectedTarget] = useState<RouteTarget | null>(null);
-  const [statusIndex, setStatusIndex] = useState(0);
-  const [isThinking, setIsThinking] = useState(false);
-  const [input, setInput] = useState("");
-  const [mode] = useState<"text">("text");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [imageDataUrl, setImageDataUrl] = useState("");
-  const [imageNotice, setImageNotice] = useState("");
+  const [threads,setThreads] = useState<ChatThread[]>([]);
+  const [activeId,setActiveId] = useState("");
+  const [messages,setMessages] = useState<Msg[]>(INIT);
+  const [selMain,setSelMain] = useState<MainChoice|null>(null);
+  const [selTarget,setSelTarget] = useState<RouteTarget|null>(null);
+  const [statusIdx,setStatusIdx] = useState(0);
+  const [thinking,setThinking] = useState(false);
+  const [input,setInput] = useState("");
+  const [imgFile,setImgFile] = useState<File|null>(null);
+  const [imgPreview,setImgPreview] = useState("");
+  const [imgData,setImgData] = useState("");
+  const [imgNote,setImgNote] = useState("");
+  const [sideOpen,setSideOpen] = useState(false);
+  const [tick,setTick] = useState(0);
 
-  const options = useMemo(
-    () => (selectedMain ? GROUP_OPTIONS[selectedMain] : []),
-    [selectedMain]
-  );
+  const opts = useMemo(()=>selMain?ENVS[selMain]:[],[selMain]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    try {
-      const savedThreads = JSON.parse(localStorage.getItem(THREADS_STORAGE_KEY) || "[]");
-      const savedActive = localStorage.getItem(ACTIVE_THREAD_STORAGE_KEY) || "";
-
-      if (Array.isArray(savedThreads) && savedThreads.length > 0) {
-        setThreads(savedThreads);
-        const active =
-          savedThreads.find((t) => t.id === savedActive)?.id || savedThreads[0].id;
-        setActiveThreadId(active);
-        const activeThread = savedThreads.find((t) => t.id === active);
-        if (activeThread?.messages?.length) {
-          setMessages(activeThread.messages);
-        }
+  useEffect(()=>{const id=setInterval(()=>setTick(p=>p+1),60);return()=>clearInterval(id);},[]);
+  useEffect(()=>{
+    try{
+      const saved=JSON.parse(localStorage.getItem(THREADS_KEY)||"[]");
+      const act=localStorage.getItem(ACTIVE_KEY)||"";
+      if(Array.isArray(saved)&&saved.length>0){
+        setThreads(saved);
+        const a=saved.find((t:ChatThread)=>t.id===act)?.id||saved[0].id;
+        setActiveId(a);
+        const th=saved.find((t:ChatThread)=>t.id===a);
+        if(th?.messages?.length) setMessages(th.messages);
       } else {
-        const starterThread = {
-          id: makeId(),
-          title: "New chat",
-          messages: INITIAL_MESSAGES,
-          updatedAt: Date.now(),
-        };
-        setThreads([starterThread]);
-        setActiveThreadId(starterThread.id);
+        const s={id:makeId(),title:"New chat",messages:INIT,updatedAt:Date.now()};
+        setThreads([s]);setActiveId(s.id);
       }
-    } catch {
-      const starterThread = {
-        id: makeId(),
-        title: "New chat",
-        messages: INITIAL_MESSAGES,
-        updatedAt: Date.now(),
-      };
-      setThreads([starterThread]);
-      setActiveThreadId(starterThread.id);
+    }catch{
+      const s={id:makeId(),title:"New chat",messages:INIT,updatedAt:Date.now()};
+      setThreads([s]);setActiveId(s.id);
     }
-  }, []);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setStatusIndex((prev) => (prev + 1) % STATUS_LINES.length);
-    }, 2600);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [messages, isThinking]);
-
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
-
-  useEffect(() => {
-    if (!activeThreadId) return;
-    if (isSwitchingThreadRef.current) {
-      isSwitchingThreadRef.current = false;
-      return;
-    }
-
-    setThreads((prev) => {
-      const exists = prev.some((thread) => thread.id === activeThreadId);
-
-      const nextThreads = exists
-        ? prev.map((thread) =>
-            thread.id === activeThreadId
-              ? {
-                  ...thread,
-                  messages,
-                  title: buildThreadTitle(messages),
-                  updatedAt: Date.now(),
-                }
-              : thread
-          )
-        : [
-            {
-              id: activeThreadId,
-              title: buildThreadTitle(messages),
-              messages,
-              updatedAt: Date.now(),
-            },
-            ...prev,
-          ];
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem(THREADS_STORAGE_KEY, JSON.stringify(nextThreads));
-        localStorage.setItem(ACTIVE_THREAD_STORAGE_KEY, activeThreadId);
-      }
-
-      return nextThreads;
+  },[]);
+  useEffect(()=>{const id=setInterval(()=>setStatusIdx(p=>(p+1)%STATUS.length),2600);return()=>clearInterval(id);},[]);
+  useEffect(()=>{const el=listRef.current;if(!el)return;el.scrollTo({top:el.scrollHeight,behavior:"smooth"});},[messages,thinking]);
+  useEffect(()=>()=>{if(imgPreview)URL.revokeObjectURL(imgPreview);},[imgPreview]);
+  useEffect(()=>{
+    if(!activeId)return;
+    if(switching.current){switching.current=false;return;}
+    setThreads(prev=>{
+      const exists=prev.some(t=>t.id===activeId);
+      const next=exists
+        ?prev.map(t=>t.id===activeId?{...t,messages,title:buildTitle(messages),updatedAt:Date.now()}:t)
+        :[{id:activeId,title:buildTitle(messages),messages,updatedAt:Date.now()},...prev];
+      localStorage.setItem(THREADS_KEY,JSON.stringify(next));
+      localStorage.setItem(ACTIVE_KEY,activeId);
+      return next;
     });
-  }, [messages, activeThreadId]);
+  },[messages,activeId]);
 
-  function createNewChat() {
-    isSwitchingThreadRef.current = true;
-    const newThread = {
-      id: makeId(),
-      title: "New chat",
-      messages: INITIAL_MESSAGES,
-      updatedAt: Date.now(),
-    };
-    const next = [newThread, ...threads];
-    setThreads(next);
-    setActiveThreadId(newThread.id);
-    setMessages(INITIAL_MESSAGES);
-    setSelectedMain(null);
-    setSelectedTarget(null);
-    setInput("");
-    clearImage();
-    if (typeof window !== "undefined") {
-      localStorage.setItem(THREADS_STORAGE_KEY, JSON.stringify(next));
-      localStorage.setItem(ACTIVE_THREAD_STORAGE_KEY, newThread.id);
-    }
+  function newChat(){
+    switching.current=true;
+    const s={id:makeId(),title:"New chat",messages:INIT,updatedAt:Date.now()};
+    const next=[s,...threads];
+    setThreads(next);setActiveId(s.id);setMessages(INIT);
+    setSelMain(null);setSelTarget(null);setInput("");clearImg();
+    localStorage.setItem(THREADS_KEY,JSON.stringify(next));
+    localStorage.setItem(ACTIVE_KEY,s.id);
   }
 
-  function openThread(threadId: string) {
-    const thread = threads.find((t) => t.id === threadId);
-    if (!thread) return;
-    isSwitchingThreadRef.current = true;
-    setActiveThreadId(threadId);
-    setMessages(thread.messages?.length ? thread.messages : INITIAL_MESSAGES);
-    setSelectedMain(null);
-    setSelectedTarget(null);
-    setInput("");
-    clearImage();
-    if (typeof window !== "undefined") {
-      localStorage.setItem(ACTIVE_THREAD_STORAGE_KEY, threadId);
-    }
+  function openThread(id:string){
+    const t=threads.find(t=>t.id===id);if(!t)return;
+    switching.current=true;
+    setActiveId(id);setMessages(t.messages?.length?t.messages:INIT);
+    setSelMain(null);setSelTarget(null);setInput("");clearImg();
+    localStorage.setItem(ACTIVE_KEY,id);setSideOpen(false);
   }
 
-  function deleteThread(threadId: string) {
-    const remaining = threads.filter((t) => t.id !== threadId);
-
-    if (remaining.length === 0) {
-      const starterThread = {
-        id: makeId(),
-        title: "New chat",
-        messages: INITIAL_MESSAGES,
-        updatedAt: Date.now(),
-      };
-      setThreads([starterThread]);
-      setActiveThreadId(starterThread.id);
-      setMessages(INITIAL_MESSAGES);
-      if (typeof window !== "undefined") {
-        localStorage.setItem(THREADS_STORAGE_KEY, JSON.stringify([starterThread]));
-        localStorage.setItem(ACTIVE_THREAD_STORAGE_KEY, starterThread.id);
-      }
-      return;
+  function delThread(id:string){
+    const rem=threads.filter(t=>t.id!==id);
+    if(rem.length===0){
+      const s={id:makeId(),title:"New chat",messages:INIT,updatedAt:Date.now()};
+      setThreads([s]);setActiveId(s.id);setMessages(INIT);
+      localStorage.setItem(THREADS_KEY,JSON.stringify([s]));localStorage.setItem(ACTIVE_KEY,s.id);return;
     }
-
-    setThreads(remaining);
-
-    if (activeThreadId === threadId) {
-      isSwitchingThreadRef.current = true;
-      setActiveThreadId(remaining[0].id);
-      setMessages(remaining[0].messages?.length ? remaining[0].messages : INITIAL_MESSAGES);
-      if (typeof window !== "undefined") {
-        localStorage.setItem(ACTIVE_THREAD_STORAGE_KEY, remaining[0].id);
-      }
+    setThreads(rem);
+    if(activeId===id){
+      switching.current=true;
+      setActiveId(rem[0].id);setMessages(rem[0].messages?.length?rem[0].messages:INIT);
+      localStorage.setItem(ACTIVE_KEY,rem[0].id);
     }
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem(THREADS_STORAGE_KEY, JSON.stringify(remaining));
-    }
+    localStorage.setItem(THREADS_KEY,JSON.stringify(rem));
   }
 
-  function clearImage() {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImageFile(null);
-    setImagePreview("");
-    setImageDataUrl("");
-    setImageNotice("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  function clearImg(){
+    if(imgPreview)URL.revokeObjectURL(imgPreview);
+    setImgFile(null);setImgPreview("");setImgData("");setImgNote("");
+    if(fileRef.current)fileRef.current.value="";
   }
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    const maxSize = 5 * 1024 * 1024;
-
-    if (!allowed.includes(file.type)) {
-      clearImage();
-      setImageNotice("Please upload a JPG, PNG, or WEBP image.");
-      return;
-    }
-
-    if (file.size > maxSize) {
-      clearImage();
-      setImageNotice("Please keep the image under 5 MB.");
-      return;
-    }
-
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    setImageFile(file);
-    setImagePreview(previewUrl);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === "string" ? reader.result : "";
-      setImageDataUrl(result);
-      setImageNotice("Photo attached successfully. You can preview it below.");
-    };
-    reader.onerror = () => {
-      clearImage();
-      setImageNotice("The image could not be processed. Please try another one.");
-    };
-    reader.readAsDataURL(file);
+  function onImg(e:React.ChangeEvent<HTMLInputElement>){
+    const f=e.target.files?.[0];if(!f)return;
+    if(!["image/jpeg","image/png","image/webp"].includes(f.type)){clearImg();setImgNote("JPG, PNG or WEBP only.");return;}
+    if(f.size>5*1024*1024){clearImg();setImgNote("Max 5 MB.");return;}
+    if(imgPreview)URL.revokeObjectURL(imgPreview);
+    setImgFile(f);setImgPreview(URL.createObjectURL(f));
+    const r=new FileReader();
+    r.onload=()=>{setImgData(typeof r.result==="string"?r.result:"");setImgNote("Photo attached.");};
+    r.onerror=()=>{clearImg();setImgNote("Could not read image.");};
+    r.readAsDataURL(f);
   }
 
-  function pushRobotMessages(next: Msg[]) {
-    setIsThinking(true);
-    setTimeout(() => {
-      setMessages((prev) => [...prev, ...next]);
-      setIsThinking(false);
-    }, 380);
+  function push(next:Msg[]){
+    setThinking(true);
+    setTimeout(()=>{setMessages(p=>[...p,...next]);setThinking(false);},380);
   }
 
-  function chooseMain(choice: MainChoice) {
-    const item = MAIN_CHOICES.find((x) => x.key === choice);
-    if (!item) return;
-
-    setSelectedMain(choice);
-    setSelectedTarget(null);
-
-    pushRobotMessages([
-      { role: "user", text: item.title },
-      {
-        role: "robot",
-        text:
-          choice === "learn"
-            ? "Good choice. I can guide you into a learning environment."
-            : choice === "build"
-              ? "Good choice. I can guide you into a build-focused environment."
-              : choice === "train"
-                ? "Good choice. I can guide you into a training environment."
-                : "Good choice. I can guide you into an exploration environment.",
-      },
-      {
-        role: "robot",
-        text: "Choose one environment below and I will explain it before you enter.",
-      },
-    ]);
+  function chooseMain(c:MainChoice){
+    const item=CHOICES.find(x=>x.key===c);if(!item)return;
+    setSelMain(c);setSelTarget(null);
+    push([{role:"user",text:item.title},{role:"robot",text:`Understood. Guiding you to a ${c} environment.`},{role:"robot",text:"Select an environment below. I will explain it before you enter."}]);
   }
 
-  function explainTarget(target: RouteTarget) {
-    const item = options.find((x) => x.key === target);
-    if (!item) return;
-
-    setSelectedTarget(target);
-
-    pushRobotMessages([
-      { role: "user", text: item.title },
-      { role: "robot", text: item.explanation },
-      {
-        role: "robot",
-        text: "If this feels right, you can enter now or compare with another option.",
-      },
-    ]);
+  function chooseTarget(t:RouteTarget){
+    const item=opts.find(x=>x.key===t);if(!item)return;
+    setSelTarget(t);
+    push([{role:"user",text:item.title},{role:"robot",text:item.explanation},{role:"robot",text:"Enter now or compare another option."}]);
   }
 
-  function enterTarget() {
-    if (!selectedTarget) return;
-    const item = options.find((x) => x.key === selectedTarget);
-    if (!item) return;
-
-    pushRobotMessages([{ role: "robot", text: `Opening ${item.title}.` }]);
-
-    setTimeout(() => {
-      router.push(item.href);
-    }, 650);
+  function enter(){
+    if(!selTarget)return;
+    const item=opts.find(x=>x.key===selTarget);if(!item)return;
+    push([{role:"robot",text:`Opening ${item.title}. Stand by.`}]);
+    setTimeout(()=>router.push(item.href),650);
   }
 
-  function compareAgain() {
-    setSelectedTarget(null);
-    pushRobotMessages([
-      {
-        role: "robot",
-        text: "No problem. Choose another environment and I will explain it before you enter.",
-      },
-    ]);
+  function restart(){setSelMain(null);setSelTarget(null);setThinking(false);setInput("");clearImg();setMessages([...INIT]);}
+
+  async function send(){
+    const text=input.trim();if(thinking)return;
+    if(!text){if(imgFile)setImgNote("Add a description with your photo.");return;}
+    const hist=[...messages,{role:"user" as const,text}];
+    setMessages(hist);setInput("");setThinking(true);
+    try{
+      const reply=await getRobotReply(text,hist,language,imgData);
+      setMessages(p=>[...p,{role:"robot",text:reply}]);
+      if(imgFile)clearImg();
+    }catch(e){
+      setMessages(p=>[...p,{role:"robot",text:`Could not respond. ${e instanceof Error?e.message:"Try again."}`}]);
+    }finally{setThinking(false);}
   }
 
-  function restartGuide() {
-    setSelectedMain(null);
-    setSelectedTarget(null);
-    setIsThinking(false);
-    setInput("");
-    clearImage();
-    setMessages([...INITIAL_MESSAGES]);
-  }
+  const scanY=(tick*2)%100;
 
-  async function sendMessage() {
-    const text = input.trim();
+  return(
+    <>
+      <style>{`
+        @keyframes shb{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-4px)}}
+        @keyframes shp{0%,100%{opacity:1;box-shadow:0 0 8px #00ff88,0 0 16px rgba(0,255,136,.4)}50%{opacity:.6;box-shadow:0 0 4px #00ff88}}
+        @keyframes shbl{0%,100%{opacity:.6}50%{opacity:.2}}
+        .shs::-webkit-scrollbar{width:4px}.shs::-webkit-scrollbar-track{background:transparent}.shs::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);border-radius:2px}
+        .shc{background:#0a1220;border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:14px 16px;cursor:pointer;text-align:left;width:100%;transition:border-color .15s,background .15s}
+        .shc:hover{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,.05)}
+        .sht{border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:10px 12px;transition:border-color .15s,background .15s}
+        .sht:hover{border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.03)}
+        .sht.act{border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.06)}
+        .shi{background:#0a1220;border:1px solid rgba(255,255,255,.06);border-radius:4px;color:rgba(255,255,255,.92);font-family:var(--font-space-mono,monospace);font-size:13px;padding:12px 14px;outline:none;width:100%;transition:border-color .15s}
+        .shi:focus{border-color:rgba(0,229,255,.4)}.shi::placeholder{color:rgba(255,255,255,.22)}
+        .ah a{color:#00e5ff;text-decoration:underline}.ah code{font-family:var(--font-space-mono,monospace);background:rgba(0,229,255,.08);padding:1px 5px;border-radius:2px;font-size:12px}
+        .ah ul{padding-left:1.2em;margin:6px 0}.ah li{margin:3px 0}.ah strong{color:#00e5ff;font-weight:600}
+        .shov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99;opacity:0;pointer-events:none;transition:opacity .2s}
+        .shov.on{opacity:1;pointer-events:all}
+        .shsb{position:fixed;top:0;left:0;bottom:0;width:272px;background:#040810;border-right:1px solid rgba(0,229,255,.14);z-index:100;transform:translateX(-100%);transition:transform .22s ease;padding:24px 16px;overflow-y:auto}
+        .shsb.on{transform:translateX(0)}
+        @media(min-width:1280px){.shsb{position:static;transform:none!important;width:auto;border-right:none;padding:0;background:transparent}}
+        .shgrid{display:grid;gap:16px;grid-template-columns:1fr}
+        @media(min-width:1280px){.shgrid{grid-template-columns:240px minmax(300px,.8fr) 1fr}}
+        .shdsk{display:none}@media(min-width:1280px){.shdsk{display:block}}
+        .shmob{display:block}@media(min-width:1280px){.shmob{display:none}}
+      `}</style>
 
-    if (isThinking) return;
+      <div style={{background:"#040810",minHeight:"100dvh",color:"rgba(255,255,255,.92)",...sans}}>
+        <div aria-hidden style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,background:"radial-gradient(ellipse 70% 45% at 15% 8%,rgba(0,229,255,.07) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 85% 5%,rgba(0,255,136,.05) 0%,transparent 55%),radial-gradient(ellipse 80% 50% at 50% 110%,rgba(168,85,247,.06) 0%,transparent 55%)"}}/>
+        <div aria-hidden style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,opacity:.025,backgroundImage:"linear-gradient(rgba(0,229,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,1) 1px,transparent 1px)",backgroundSize:"48px 48px"}}/>
 
-    if (!text) {
-      if (imageFile) {
-        setImageNotice(
-          "Your photo is attached, but I cannot analyze images yet. Please add a short description so I can help."
-        );
-      }
-      return;
-    }
+        <div className={`shov ${sideOpen?"on":""}`} onClick={()=>setSideOpen(false)} aria-hidden/>
 
-    const nextHistory = [...messages, { role: "user" as const, text }];
-    setMessages(nextHistory);
-    setInput("");
-    setIsThinking(true);
-
-    try {
-      const reply = await fetchRobotReply(text, nextHistory, language, imageDataUrl);
-      setMessages((prev) => [...prev, { role: "robot", text: reply }]);
-      if (imageFile) {
-        clearImage();
-      }
-    } catch (error) {
-      const msg =
-        error instanceof Error
-          ? error.message
-          : "The robot could not answer right now.";
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "robot",
-          text: `I couldn’t respond properly right now. Please try again. ${msg}`,
-        },
-      ]);
-    } finally {
-      setIsThinking(false);
-    }
-  }
-
-  return (
-    <section className="relative mx-auto w-full max-w-[1600px] px-4 py-10 sm:px-6 sm:py-14">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[2rem]"
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(900px_520px_at_15%_10%,rgba(56,189,248,0.10),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1000px_560px_at_82%_18%,rgba(16,185,129,0.10),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(900px_520px_at_50%_100%,rgba(168,85,247,0.08),transparent_55%)]" />
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <Link
-          href="/"
-          className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/75 hover:bg-white/10 hover:text-white"
-        >
-          ← Back
-        </Link>
-        <Link
-          href="/"
-          className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/75 hover:bg-white/10 hover:text-white"
-        >
-          Home
-        </Link>
-        <span className="inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-sm text-cyan-100">
-          Shynvo Robot
-        </span>
-      </div>
-
-      <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/70">
-            Platform Guide
+        <div className={`shsb ${sideOpen?"on":""}`}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+            <span style={{...mono,fontSize:10,color:C,letterSpacing:"0.12em",textTransform:"uppercase"as const}}>Sessions</span>
+            <button onClick={()=>setSideOpen(false)} style={{...mono,fontSize:11,color:dim,background:"transparent",border:"1px solid rgba(255,255,255,.06)",borderRadius:3,padding:"6px 10px",cursor:"pointer"}}>✕</button>
           </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            Shynvo Robot
-          </h1>
-          <p className="mt-3 max-w-4xl text-sm leading-6 text-white/70 sm:text-base">
-            Your guide across the Shynvo platform.
-          </p>
-        </div>
-
-        <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-100">
-          I can speak multiple languages
-        </div>
-      </div>
-
-      <div className="mt-8 grid gap-5 xl:grid-cols-[260px_minmax(340px,0.85fr)_minmax(420px,1fr)] 2xl:grid-cols-[280px_minmax(360px,0.82fr)_minmax(460px,0.98fr)]">
-        <aside className="order-2 rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm xl:order-1">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-sm font-semibold text-white">Chats</div>
-              <div className="text-xs text-white/60">Robot history on this device</div>
-            </div>
-            <button
-              type="button"
-              onClick={createNewChat}
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/85 hover:bg-white/10"
-            >
-              New chat
-            </button>
-          </div>
-
-          <div className="mt-4 space-y-2">
-            {threads
-              .slice()
-              .sort((a, b) => b.updatedAt - a.updatedAt)
-              .map((thread) => (
-                <div
-                  key={thread.id}
-                  className={cx(
-                    "rounded-2xl border p-3 transition",
-                    activeThreadId === thread.id
-                      ? "border-cyan-400/30 bg-cyan-400/10"
-                      : "border-white/10 bg-black/20"
-                  )}
-                >
-                  <button
-                    type="button"
-                    onClick={() => openThread(thread.id)}
-                    className="w-full text-left"
-                  >
-                    <div className="text-sm font-medium text-white">
-                      {thread.title || "New chat"}
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => deleteThread(thread.id)}
-                    className="mt-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/75 hover:bg-white/10"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-          </div>
-        </aside>
-
-        <div className="order-3 rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm xl:order-2 xl:p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-              Robot Presence
-            </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-100">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
-              Online
-            </div>
-          </div>
-
-          <div className="mt-4 overflow-hidden rounded-3xl border border-white/10 bg-black/20">
-            <div className="relative aspect-[4/3] max-h-[420px] w-full bg-black xl:max-h-[380px] 2xl:max-h-[360px]">
-              <div className="pointer-events-none absolute inset-0 z-10 animate-pulse bg-[radial-gradient(circle_at_50%_50%,rgba(56,189,248,0.18),transparent_42%)]" />
-              <video
-                className="h-full w-full object-cover"
-                src="/robot.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-            </div>
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4">
-            <div className="text-sm font-semibold text-cyan-100">How I help</div>
-            <div className="mt-2 text-sm leading-6 text-cyan-50/90">
-              I can guide you through the environments and help you decide where to begin.
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-sm font-semibold text-white">What you can do</div>
-            <div className="mt-2 text-sm leading-6 text-white/65">
-              Ask questions, explore the environments, or start your first activity.
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">
-              Live status
-            </div>
-            <div className="mt-2 text-sm text-white/80">{STATUS_LINES[statusIndex]}</div>
-          </div>
-        </div>
-
-        <div className="order-1 flex min-h-[75dvh] flex-col rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm xl:order-3 xl:min-h-0">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-sm font-semibold text-white">Robot channel</div>
-              <div className="text-xs text-white/60">
-                Guided onboarding • environment navigation • smart assistance
+          <div style={{display:"flex",flexDirection:"column"as const,gap:6}}>
+            {threads.slice().sort((a,b)=>b.updatedAt-a.updatedAt).map(th=>(
+              <div key={th.id} className={`sht ${activeId===th.id?"act":""}`}>
+                <button type="button" onClick={()=>openThread(th.id)} style={{width:"100%",textAlign:"left"as const,background:"none",border:"none",cursor:"pointer",padding:0}}>
+                  <div style={{...mono,fontSize:12,color:"rgba(255,255,255,.85)",whiteSpace:"nowrap"as const,overflow:"hidden",textOverflow:"ellipsis"}}>{th.title||"New chat"}</div>
+                  <div style={{...mono,fontSize:10,color:faint,marginTop:3}}>{new Date(th.updatedAt).toLocaleDateString()}</div>
+                </button>
+                <button type="button" onClick={()=>delThread(th.id)} style={{marginTop:8,...mono,fontSize:10,color:faint,background:"none",border:"none",cursor:"pointer",padding:0,textTransform:"uppercase"as const,letterSpacing:"0.08em"}}>Delete</button>
               </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={restartGuide}
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10"
-            >
-              Restart
-            </button>
+            ))}
           </div>
+        </div>
 
-          <div
-            ref={listRef}
-            className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl border border-white/10 bg-black/20 p-4 h-[42dvh] sm:h-[420px]"
-          >
-            <div className="space-y-3">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={cx(
-                    "max-w-[88%] rounded-2xl border px-4 py-3 text-sm leading-6 transition duration-300 xl:max-w-[82%]",
-                    msg.role === "user"
-                      ? "ml-auto border-white/10 bg-white/10 text-white"
-                      : "border-white/10 bg-white/5 text-white/85"
-                  )}
-                >
-                  {msg.role === "user" ? (
-                    <div className="whitespace-pre-wrap">{msg.text}</div>
-                  ) : (
-                    <div
-                      className="assistant-html"
-                      dangerouslySetInnerHTML={{
-                        __html: renderAssistantHtml(msg.text),
-                      }}
-                    />
-                  )}
-                </div>
-              ))}
+        <div style={{position:"relative",zIndex:10,maxWidth:1600,margin:"0 auto",padding:"32px 24px"}}>
 
-              {isThinking ? (
-                <div className="max-w-[88%] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-white/85 xl:max-w-[82%]">
-                  <TypingDots />
-                </div>
-              ) : null}
+          <nav style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"as const}}>
+            <Link href="/" style={{...mono,fontSize:11,color:dim,background:"transparent",border:"1px solid rgba(255,255,255,.06)",borderRadius:3,padding:"8px 14px",textDecoration:"none",letterSpacing:"0.08em",textTransform:"uppercase"as const}}>← Home</Link>
+            <div style={{...mono,fontSize:10,color:C,opacity:1,border:"1px solid rgba(0,229,255,.2)",padding:"7px 12px",borderRadius:3,letterSpacing:"0.12em",textTransform:"uppercase"as const}}>SH-ROBOT · GUIDE SYSTEM</div>
+            <div style={{marginLeft:"auto",...mono,fontSize:10,color:C,opacity:.45,letterSpacing:"0.1em"}}>{new Date().toISOString().slice(11,19)} UTC</div>
+            <button className="shmob" onClick={()=>setSideOpen(true)} style={{...mono,fontSize:11,color:dim,background:"none",border:"1px solid rgba(255,255,255,.06)",borderRadius:3,padding:"8px 14px",cursor:"pointer",letterSpacing:"0.08em"}}>≡ CHATS</button>
+          </nav>
+
+          <header style={{marginTop:32,display:"flex",flexWrap:"wrap"as const,alignItems:"flex-end",justifyContent:"space-between",gap:16}}>
+            <div>
+              <div style={{...mono,fontSize:10,color:C,opacity:.65,letterSpacing:"0.12em",textTransform:"uppercase"as const}}>Platform Guide · Intelligent Navigation</div>
+              <h1 style={{...sans,fontWeight:800,fontSize:"clamp(2rem,5vw,3.5rem)",letterSpacing:"-0.02em",lineHeight:1.05,color:"#fff",margin:"8px 0 0"}}>
+                Shynvo <span style={{color:C}}>Robot</span>
+              </h1>
+              <p style={{...mono,marginTop:8,fontSize:13,color:dim,maxWidth:420}}>Intelligent guide · multi-environment · multilingual</p>
             </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-              Text
-            </span>
-            <span className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100">
-              Image upload (preview)
-            </span>
-          </div>
-
-          <div className="sticky bottom-0 z-10 mt-4 flex flex-col gap-3 border-t border-white/10 bg-[#0B0F14]/95 pt-4 backdrop-blur-xl">
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-white hover:bg-black/30"
-              >
-                Add photo
-              </button>
-
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") sendMessage();
-                }}
-                placeholder={t("robot.ask")}
-                className="w-full min-w-0 flex-1 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
-              />
-
-              <button
-                type="button"
-                onClick={sendMessage}
-                disabled={isThinking || !input.trim()}
-                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Send
-              </button>
+            <div style={{display:"flex",alignItems:"center",gap:8,...mono,fontSize:11,color:G,border:"1px solid rgba(0,255,136,.2)",padding:"8px 14px",borderRadius:3,letterSpacing:"0.1em"}}>
+              <span style={{width:6,height:6,borderRadius:"50%",background:G,boxShadow:`0 0 8px ${G}`,animation:"shp 2s ease-in-out infinite",display:"inline-block"}}/>
+              GUIDE READY
             </div>
+          </header>
 
-            {imagePreview ? (
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-semibold text-white">
-                      Attached photo
-                    </div>
-                    <div className="mt-1 text-xs text-white/60">
-                      {imageFile?.name}
-                    </div>
+          <div className="shgrid" style={{marginTop:32}}>
+
+            <Panel className="shdsk" style={{padding:16}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                <div style={{...mono,fontSize:10,color:C,opacity:.65,letterSpacing:"0.12em",textTransform:"uppercase"as const}}>Sessions</div>
+                <button onClick={newChat} style={{...mono,fontSize:10,color:C,background:"transparent",border:"1px solid rgba(0,229,255,.25)",borderRadius:3,padding:"5px 10px",cursor:"pointer",letterSpacing:"0.08em"}}>+ NEW</button>
+              </div>
+              <div style={{...mono,fontSize:10,color:faint,marginBottom:14}}>Stored on device</div>
+              <div className="shs" style={{display:"flex",flexDirection:"column"as const,gap:6,maxHeight:"calc(70vh - 100px)",overflowY:"auto"as const}}>
+                {threads.slice().sort((a,b)=>b.updatedAt-a.updatedAt).map(th=>(
+                  <div key={th.id} className={`sht ${activeId===th.id?"act":""}`}>
+                    <button type="button" onClick={()=>openThread(th.id)} style={{width:"100%",textAlign:"left"as const,background:"none",border:"none",cursor:"pointer",padding:0}}>
+                      <div style={{...mono,fontSize:12,color:"rgba(255,255,255,.85)",whiteSpace:"nowrap"as const,overflow:"hidden",textOverflow:"ellipsis"}}>{th.title||"New chat"}</div>
+                      <div style={{...mono,fontSize:10,color:faint,marginTop:3}}>{new Date(th.updatedAt).toLocaleDateString()}</div>
+                    </button>
+                    <button type="button" onClick={()=>delThread(th.id)} style={{marginTop:8,...mono,fontSize:10,color:faint,background:"none",border:"none",cursor:"pointer",padding:0,textTransform:"uppercase"as const,letterSpacing:"0.08em"}}>Delete</button>
                   </div>
+                ))}
+              </div>
+            </Panel>
 
-                  <button
-                    type="button"
-                    onClick={clearImage}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10"
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-                  <img
-                    src={imagePreview}
-                    alt="Selected upload preview"
-                    className="max-h-72 w-full object-contain"
-                  />
+            <Panel style={{padding:20,display:"flex",flexDirection:"column"as const,gap:14}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{...mono,fontSize:10,color:C,opacity:.65,letterSpacing:"0.12em",textTransform:"uppercase"as const}}>Robot Presence</div>
+                <div style={{display:"flex",alignItems:"center",gap:6,...mono,fontSize:10,color:G,border:"1px solid rgba(0,255,136,.2)",padding:"5px 10px",borderRadius:3,letterSpacing:"0.1em"}}>
+                  <span style={{width:5,height:5,borderRadius:"50%",background:G,boxShadow:`0 0 6px ${G}`,animation:"shp 2s ease-in-out infinite",display:"inline-block"}}/>ONLINE
                 </div>
               </div>
-            ) : null}
-
-            {imageNotice ? (
-              <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-50/95">
-                {imageNotice}
+              <div style={{position:"relative",background:"#000",borderRadius:4,overflow:"hidden"}}>
+                <div aria-hidden style={{position:"absolute",top:`${scanY}%`,left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent)",pointerEvents:"none",zIndex:5}}/>
+                <video src="/robot.mp4" autoPlay muted loop playsInline preload="auto" style={{width:"100%",maxHeight:320,objectFit:"cover",display:"block"}}/>
+                <div aria-hidden style={{position:"absolute",inset:0,background:"radial-gradient(circle at 50% 50%,rgba(0,229,255,.1) 0%,transparent 65%)",pointerEvents:"none"}}/>
+                {[{top:8,left:8,borderTop:"1px solid rgba(0,229,255,.7)",borderLeft:"1px solid rgba(0,229,255,.7)"},{top:8,right:8,borderTop:"1px solid rgba(0,229,255,.7)",borderRight:"1px solid rgba(0,229,255,.7)"},{bottom:8,left:8,borderBottom:"1px solid rgba(0,229,255,.7)",borderLeft:"1px solid rgba(0,229,255,.7)"},{bottom:8,right:8,borderBottom:"1px solid rgba(0,229,255,.7)",borderRight:"1px solid rgba(0,229,255,.7)"}].map((s,i)=>(
+                  <div key={i} aria-hidden style={{position:"absolute",width:14,height:14,...s as any}}/>
+                ))}
+                <div style={{position:"absolute",bottom:8,left:10,...mono,fontSize:9,color:C,opacity:.55,letterSpacing:"0.12em"}}>SH-ROBOT · UNIT-01 · ACTIVE</div>
               </div>
-            ) : null}
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                {[{l:"Mode",v:"Guide"},{l:"Lang",v:(language||"en").toUpperCase()},{l:"Signal",v:"Strong"},{l:"State",v:"Online"}].map(x=>(
+                  <div key={x.l} style={{background:bg3,border:`1px solid ${bdim}`,borderRadius:3,padding:"8px 12px"}}>
+                    <div style={{...mono,fontSize:9,color:faint,letterSpacing:"0.12em",textTransform:"uppercase"as const,marginBottom:3}}>{x.l}</div>
+                    <div style={{...mono,fontSize:12,color:C}}>{x.v}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{background:"rgba(0,229,255,.04)",border:"1px solid rgba(0,229,255,.15)",borderRadius:3,padding:"12px 14px"}}>
+                <div style={{...mono,fontSize:9,color:C,letterSpacing:"0.12em",textTransform:"uppercase"as const,marginBottom:6}}>Capabilities</div>
+                <div style={{...mono,fontSize:12,color:dim,lineHeight:1.7}}>Environment guidance · Platform navigation · Multi-language · Image analysis</div>
+              </div>
+              <div style={{...mono,fontSize:11,color:dim,borderTop:`1px solid ${bdim}`,paddingTop:10}}>
+                <span style={{color:C,animation:"shbl 2s ease-in-out infinite"}}>▶</span> {STATUS[statusIdx]}
+              </div>
+            </Panel>
+
+            <Panel style={{display:"flex",flexDirection:"column"as const,minHeight:"75dvh"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px",borderBottom:`1px solid ${bdim}`}}>
+                <div>
+                  <div style={{...mono,fontSize:10,color:C,opacity:.65,letterSpacing:"0.12em",textTransform:"uppercase"as const}}>Robot Channel</div>
+                  <div style={{...mono,fontSize:10,color:faint,marginTop:3}}>Navigation · Guidance · Assistance</div>
+                </div>
+                <button onClick={restart} style={{...mono,fontSize:11,color:dim,background:"transparent",border:`1px solid ${bdim}`,borderRadius:3,padding:"9px 14px",cursor:"pointer",letterSpacing:"0.08em",textTransform:"uppercase"as const}}>↺ RESET</button>
+              </div>
+
+              <div ref={listRef} className="shs" style={{flex:1,overflowY:"auto"as const,padding:"14px 18px",display:"flex",flexDirection:"column"as const,gap:10,minHeight:0,height:"42dvh"}}>
+                {messages.map((msg,i)=>(
+                  <div key={i} style={msg.role==="user"?{background:"rgba(0,229,255,.07)",border:"1px solid rgba(0,229,255,.2)",borderRadius:"6px 2px 2px 6px",padding:"11px 14px",fontSize:13,lineHeight:1.65,color:"rgba(255,255,255,.92)",maxWidth:"88%",marginLeft:"auto",...mono}:{background:bg3,border:`1px solid ${bdim}`,borderLeft:"2px solid rgba(0,229,255,.3)",borderRadius:"2px 6px 6px 2px",padding:"11px 14px",fontSize:13.5,lineHeight:1.65,color:"rgba(255,255,255,.85)",maxWidth:"88%"}}>
+                    {msg.role==="robot"&&<div style={{...mono,fontSize:9,color:C,opacity:.6,marginBottom:5,letterSpacing:"0.1em"}}>SH-ROBOT</div>}
+                    {msg.role==="user"
+                      ?<div style={{whiteSpace:"pre-wrap"}}>{msg.text}</div>
+                      :<div className="ah" dangerouslySetInnerHTML={{__html:renderAssistantHtml(msg.text)}}/>
+                    }
+                  </div>
+                ))}
+                {thinking&&(
+                  <div style={{background:bg3,border:`1px solid ${bdim}`,borderLeft:"2px solid rgba(0,229,255,.3)",borderRadius:"2px 6px 6px 2px",padding:"11px 14px",maxWidth:"88%"}}>
+                    <div style={{...mono,fontSize:9,color:C,opacity:.6,marginBottom:5}}>SH-ROBOT · PROCESSING</div>
+                    <Dots/>
+                  </div>
+                )}
+              </div>
+
+              <div style={{borderTop:`1px solid ${bdim}`,padding:"12px 18px",display:"flex",flexDirection:"column"as const,gap:8}}>
+                {imgPreview&&(
+                  <div style={{background:bg3,border:`1px solid ${bdim}`,borderRadius:3,padding:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                      <span style={{...mono,fontSize:10,color:dim}}>ATTACHED · {imgFile?.name}</span>
+                      <button onClick={clearImg} style={{...mono,fontSize:10,color:dim,background:"transparent",border:`1px solid ${bdim}`,borderRadius:3,padding:"4px 8px",cursor:"pointer"}}>REMOVE</button>
+                    </div>
+                    <img src={imgPreview} alt="preview" style={{maxHeight:140,width:"100%",objectFit:"contain",borderRadius:2}}/>
+                  </div>
+                )}
+                {imgNote&&<div style={{...mono,fontSize:11,color:C,background:"rgba(0,229,255,.05)",border:"1px solid rgba(0,229,255,.15)",borderRadius:3,padding:"7px 12px"}}>{imgNote}</div>}
+                <div style={{display:"flex",gap:8}}>
+                  <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={onImg} style={{display:"none"}}/>
+                  <button onClick={()=>fileRef.current?.click()} style={{...mono,fontSize:16,color:dim,background:"transparent",border:`1px solid ${bdim}`,borderRadius:3,padding:"0 12px",minWidth:42,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>⊕</button>
+                  <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}} placeholder={t("robot.ask")||"Ask the Robot…"} className="shi" style={{flex:1}}/>
+                  <button onClick={send} disabled={thinking||!input.trim()} style={{background:C,color:"#040810",...mono,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase"as const,padding:"0 18px",borderRadius:3,border:"none",cursor:"pointer",whiteSpace:"nowrap"as const,opacity:(thinking||!input.trim())?.3:1}}>SEND</button>
+                </div>
+              </div>
+
+              <div style={{padding:"0 18px 18px"}}>
+                {!selMain&&(
+                  <>
+                    <div style={{...mono,fontSize:9,color:faint,letterSpacing:"0.12em",textTransform:"uppercase"as const,marginBottom:10}}>— Select Direction —</div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                      {CHOICES.map(c=>(
+                        <button key={c.key} type="button" className="shc" onClick={()=>chooseMain(c.key)}>
+                          <div style={{fontSize:20,color:C,marginBottom:6,opacity:.7}}>{c.glyph}</div>
+                          <div style={{...sans,fontSize:14,fontWeight:600,color:"#fff",marginBottom:4}}>{c.title}</div>
+                          <div style={{...mono,fontSize:11,color:dim,lineHeight:1.5}}>{c.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {selMain&&!selTarget&&(
+                  <>
+                    <div style={{...mono,fontSize:9,color:faint,letterSpacing:"0.12em",textTransform:"uppercase"as const,marginBottom:10}}>— Select Environment —</div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                      {opts.map(item=>(
+                        <button key={item.key} type="button" className="shc" onClick={()=>chooseTarget(item.key)}>
+                          <div style={{fontSize:20,color:C,marginBottom:6,opacity:.7}}>{item.glyph}</div>
+                          <div style={{...sans,fontSize:14,fontWeight:600,color:"#fff",marginBottom:4}}>{item.title}</div>
+                          <div style={{...mono,fontSize:11,color:dim,lineHeight:1.5}}>{item.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                    <button onClick={restart} style={{marginTop:10,width:"100%",...mono,fontSize:11,color:dim,background:"transparent",border:`1px solid ${bdim}`,borderRadius:3,padding:"9px 14px",cursor:"pointer",letterSpacing:"0.08em",textTransform:"uppercase"as const}}>← Change Direction</button>
+                  </>
+                )}
+                {selMain&&selTarget&&(
+                  <div style={{display:"flex",flexWrap:"wrap"as const,gap:8}}>
+                    <button onClick={enter} style={{background:C,color:"#040810",...mono,fontSize:12,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase"as const,padding:"11px 20px",borderRadius:3,border:"none",cursor:"pointer"}}>ENTER ENVIRONMENT →</button>
+                    <button onClick={()=>{setSelTarget(null);push([{role:"robot",text:"Choose another environment to compare."}]);}} style={{...mono,fontSize:11,color:dim,background:"transparent",border:`1px solid ${bdim}`,borderRadius:3,padding:"9px 14px",cursor:"pointer",letterSpacing:"0.08em",textTransform:"uppercase"as const}}>COMPARE</button>
+                    <button onClick={restart} style={{...mono,fontSize:11,color:C,background:"transparent",border:"1px solid rgba(0,229,255,.25)",borderRadius:3,padding:"9px 14px",cursor:"pointer",letterSpacing:"0.08em",textTransform:"uppercase"as const}}>RESTART</button>
+                  </div>
+                )}
+              </div>
+            </Panel>
           </div>
 
-          <div className="mt-5 space-y-4">
-            {!selectedMain ? (
-              <div>
-                <div className="text-sm font-semibold text-white">Choose a direction</div>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {MAIN_CHOICES.map((choice) => (
-                    <button
-                      key={choice.key}
-                      type="button"
-                      onClick={() => chooseMain(choice.key)}
-                      className="rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
-                    >
-                      <div className="text-base font-semibold text-white">{choice.title}</div>
-                      <div className="mt-1 text-sm leading-6 text-white/65">{choice.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {selectedMain && !selectedTarget ? (
-              <div>
-                <div className="text-sm font-semibold text-white">Choose an environment</div>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {options.map((item) => (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onClick={() => explainTarget(item.key)}
-                      className="rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:bg-white/7 hover:shadow-[0_0_0_1px_rgba(56,189,248,0.15)]"
-                    >
-                      <div className="text-base font-semibold text-white">{item.title}</div>
-                      <div className="mt-1 text-sm leading-6 text-white/65">{item.desc}</div>
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={restartGuide}
-                  className="mt-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
-                >
-                  Choose a different direction
-                </button>
-              </div>
-            ) : null}
-
-            {selectedMain && selectedTarget ? (
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={enterTarget}
-                  className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0B0F14] hover:bg-white/90"
-                >
-                  Enter environment
-                </button>
-
-                <button
-                  type="button"
-                  onClick={compareAgain}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10"
-                >
-                  Compare another option
-                </button>
-
-                <button
-                  type="button"
-                  onClick={restartGuide}
-                  className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-100 hover:bg-cyan-400/15"
-                >
-                  Start over
-                </button>
-              </div>
-            ) : null}
-          </div>
+          <footer style={{marginTop:20,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap"as const,gap:8}}>
+            <div style={{...mono,fontSize:10,color:C,opacity:.4,letterSpacing:"0.1em"}}>SHYNVO · ROBOT SYSTEM · V2.0</div>
+            <div style={{...mono,fontSize:10,color:faint,letterSpacing:"0.08em"}}>{STATUS[statusIdx]}</div>
+          </footer>
         </div>
       </div>
-    </section>
+    </>
   );
 }
