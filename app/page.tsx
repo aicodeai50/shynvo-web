@@ -62,7 +62,7 @@ export default function HomePage() {
 
       {/* ══ HERO ══ */}
       <section className="sh-page" style={{maxWidth:960,margin:"0 auto",padding:"40px 20px 56px",position:"relative",zIndex:1}}>
-        <div style={{display:"grid",gridTemplateColumns:"1fr",gap:32,alignItems:"flex-start"}} className="lg:grid-cols-[1fr_320px]">
+        <div style={{display:"block",position:"relative"}}>
 
           {/* LEFT */}
           <div>
