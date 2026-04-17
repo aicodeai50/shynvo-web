@@ -99,7 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="msapplication-TileImage" content="/icons/icon-512.png" />
         <meta name="msapplication-TileColor" content="#020508" />
       </head>
-      <body className="relative min-h-[100dvh] overflow-x-hidden bg-[#020508] text-white">
+      <body className="relative min-h-[100dvh] overflow-x-hidden text-white">
         <LanguageProvider>
           <CapacitorKeyboardFix />
           <PathTracker />
@@ -110,7 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="relative z-10 flex-1">
               {children}
             </main>
-            <div className="relative z-20">
+            <div className="relative z-20" style={{background:"transparent"}}>
               <SiteFooter />
             </div>
             <ShynvoGuideChat />
