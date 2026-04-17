@@ -160,7 +160,7 @@ export default function HomePage() {
                     <span style={{fontFamily:"var(--font-space-mono,monospace)",fontSize:8,color:GREEN,letterSpacing:"0.08em",textTransform:"uppercase"}}>Standby</span>
                   </div>
                 </div>
-                <WelcomeRobot/>
+                
               </div>
             </div>
           </div>
