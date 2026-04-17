@@ -3,7 +3,6 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useRef, useState } from "react";
 import PreviewTypingLoop from "./components/PreviewTypingLoop";
-import WelcomeRobot from "./components/WelcomeRobot";
 
 const VALUES = [
   { tag:"01", title:"AI-Guided Intelligence Layer", desc:"Shynvo understands your intent and adapts to you. It recommends the right direction, adjusts guidance as you progress, and gives you clarity instead of chaos.", href:"/ai-guided-intelligence", glyph:"◈", color:"#00e5ff" },
@@ -62,7 +61,7 @@ export default function HomePage() {
 
       {/* ══ HERO ══ */}
       <section className="sh-page" style={{maxWidth:960,margin:"0 auto",padding:"40px 20px 56px",position:"relative",zIndex:1}}>
-        <div style={{display:"grid",gridTemplateColumns:"1fr",gap:32,alignItems:"flex-start"}} className="lg:grid-cols-[1fr_300px]">
+        <div style={{display:"block"}}>
 
           {/* LEFT */}
           <div>
